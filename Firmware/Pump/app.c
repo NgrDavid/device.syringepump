@@ -5,6 +5,8 @@
 #include "app.h"
 #include "app_funcs.h"
 #include "app_ios_and_regs.h"
+#define F_CPU 32000000
+#include <util/delay.h>
 
 /************************************************************************/
 /* Declare application registers                                        */
@@ -66,7 +68,18 @@ void core_callback_1st_config_hw_after_boot(void)
 	init_ios();
 	
 	/* Initialize hardware */
+	set_DIR;
+	clr_MS1;
+	clr_MS2;
+	clr_MS3;
+	clr_SLEEP;
 	
+	// RESET -> clear, wait 10ms, set
+	clr_RESET;
+	_delay_ms(10);
+	set_RESET;
+	
+	clr_EN_DRIVER;
 }
 
 void core_callback_reset_registers(void)
