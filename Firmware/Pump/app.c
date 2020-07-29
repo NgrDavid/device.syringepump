@@ -96,7 +96,18 @@ void core_callback_1st_config_hw_after_boot(void)
 void core_callback_reset_registers(void)
 {
 	/* Initialize registers */
+	app_regs.REG_ENABLE_MOTOR_DRIVER = B_MOTOR_ENABLE;
+	app_regs.REG_SET_DOS |= (B_SET_DO0 | B_SET_DO1);	// FIXME: this might be wrong
+	app_regs.REG_CLEAR_DOS |= (B_CLR_DO0 | B_CLR_DO1);	// FIXME: this might be wrong
+	app_regs.REG_DO0_CONFIG = GM_OUT0_SOFTWARE;
+	app_regs.REG_DO1_CONFIG = GM_OUT1_SOFTWARE;
+	app_regs.REG_DI0_CONFIG = GM_DI0_SYNC;
+	app_regs.REG_MOTOR_MICROSTEP = GM_STEP_FULL;
 	
+	app_regs.REG_PROTOCOL_NUMBER_STEPS = 1;
+	app_regs.REG_PROTOCOL_FLOWRATE = 0.5;
+	
+	app_regs.REG_EVT_ENABLE = (B_EVT_STEP_STATE | B_EVT_DIR_STATE | B_EVT_SW_FORWARD_STATE | B_EVT_SW_REVERSE_STATE | B_EVT_INPUT_STATE);
 }
 
 void core_callback_registers_were_reinitialized(void)
