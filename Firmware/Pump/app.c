@@ -50,7 +50,18 @@ void hwbp_app_initialize(void)
 /************************************************************************/
 void core_callback_catastrophic_error_detected(void)
 {
+	clr_STEP;
+	clr_DIR;
+	clr_MS1;
+	clr_MS2;
+	clr_MS3;
+	clr_EN_DRIVER;
+	clr_SLEEP;
+	clr_RESET;
 	
+	clr_OUT00;
+	clr_OUT01;
+	clr_BUF_EN;
 }
 
 /************************************************************************/
