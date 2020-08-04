@@ -264,16 +264,47 @@ bool app_write_REG_DI0_CONFIG(void *a)
 /************************************************************************/
 /* REG_MOTOR_MICROSTEP                                                  */
 /************************************************************************/
-void app_read_REG_MOTOR_MICROSTEP(void)
-{
-	//app_regs.REG_MOTOR_MICROSTEP = 0;
-
-}
-
+void app_read_REG_MOTOR_MICROSTEP(void){}
 bool app_write_REG_MOTOR_MICROSTEP(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
+	
+	if (reg & ~MSK_MICROSTEP)
+		return false;
+	
+	switch (reg)
+	{
+		case GM_STEP_FULL:
+			clr_MS1;
+			clr_MS2;
+			clr_MS3;
+			break;
+		
+		case GM_STEP_HALF:
+			set_MS1;
+			clr_MS2;
+			clr_MS3;
+			break;
+		
+		case GM_STEP_QUARTER:
+			clr_MS1;
+			set_MS2;
+			clr_MS3;
+			break;
+		
+		case GM_STEP_EIGHTH:
+			set_MS1;
+			set_MS2;
+			clr_MS3;
+			break;
 
+		case GM_STEP_SIXTEENTH:
+			set_MS1;
+			set_MS2;
+			set_MS3;
+			break;
+	}
+	
 	app_regs.REG_MOTOR_MICROSTEP = reg;
 	return true;
 }
