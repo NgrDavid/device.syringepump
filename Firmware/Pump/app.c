@@ -113,7 +113,26 @@ void core_callback_reset_registers(void)
 void core_callback_registers_were_reinitialized(void)
 {
 	/* Update registers if needed */
+	app_regs.REG_ENABLE_MOTOR_DRIVER = 0;
 	
+	app_regs.REG_STEP_STATE = 0;
+	app_regs.REG_DIR_STATE = 0;
+	app_regs.REG_SW_FORWARD_STATE = 0;
+	app_regs.REG_SW_REVERSE_STATE = 0;
+	app_regs.REG_INPUT_STATE = 0;
+	
+	app_regs.REG_SET_DOS = 0;
+	app_regs.REG_CLEAR_DOS = 0;
+	
+	// TODO: PROTOCOL VALUES should be changed?
+	
+	/* Update config */
+	app_write_REG_DO0_CONFIG(&app_regs.REG_DO0_CONFIG);
+	app_write_REG_DO1_CONFIG(&app_regs.REG_DO1_CONFIG);
+	app_write_REG_DI0_CONFIG(&app_regs.REG_DI0_CONFIG);
+
+	app_write_REG_MOTOR_MICROSTEP(&app_regs.REG_MOTOR_MICROSTEP);
+	clr_EN_DRIVER;
 }
 
 /************************************************************************/
