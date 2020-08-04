@@ -54,17 +54,25 @@ bool (*app_func_wr_pointer[])(void*) = {
 /************************************************************************/
 /* REG_ENABLE_MOTOR_DRIVER                                              */
 /************************************************************************/
-void app_read_REG_ENABLE_MOTOR_DRIVER(void)
-{
-	//app_regs.REG_ENABLE_MOTOR_DRIVER = 0;
+uint16_t reset_motor_traveling;
 
-}
-
+void app_read_REG_ENABLE_MOTOR_DRIVER(void){}
 bool app_write_REG_ENABLE_MOTOR_DRIVER(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
+	
+	if(reg & ~B_MOTOR_ENABLE)
+		return false;
+		
+	/* if the motor is not enabled, check if we want to enable it */
+	if(app_regs.REG_ENABLE_MOTOR_DRIVER == ~B_MOTOR_ENABLE)
+	{
+		if(reg == B_MOTOR_ENABLE)
+		{
+			app_regs.REG_ENABLE_MOTOR_DRIVER = B_MOTOR_ENABLE;
+		}
+	}
 
-	app_regs.REG_ENABLE_MOTOR_DRIVER = reg;
 	return true;
 }
 
