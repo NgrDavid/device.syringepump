@@ -5,6 +5,8 @@
 #include "app.h"
 #include "app_funcs.h"
 #include "app_ios_and_regs.h"
+#define F_CPU 32000000
+#include <util/delay.h>
 
 /************************************************************************/
 /* Declare application registers                                        */
@@ -48,7 +50,18 @@ void hwbp_app_initialize(void)
 /************************************************************************/
 void core_callback_catastrophic_error_detected(void)
 {
+	clr_STEP;
+	clr_DIR;
+	clr_MS1;
+	clr_MS2;
+	clr_MS3;
+	clr_EN_DRIVER;
+	clr_SLEEP;
+	clr_RESET;
 	
+	clr_OUT00;
+	clr_OUT01;
+	clr_BUF_EN;
 }
 
 /************************************************************************/
@@ -66,19 +79,60 @@ void core_callback_1st_config_hw_after_boot(void)
 	init_ios();
 	
 	/* Initialize hardware */
+	set_DIR;
+	clr_MS1;
+	clr_MS2;
+	clr_MS3;
+	clr_SLEEP;
 	
+	// RESET -> clear, wait 10ms, set
+	clr_RESET;
+	_delay_ms(10);
+	set_RESET;
+	
+	clr_EN_DRIVER;
 }
 
 void core_callback_reset_registers(void)
 {
 	/* Initialize registers */
+	app_regs.REG_ENABLE_MOTOR_DRIVER = B_MOTOR_ENABLE;
+	app_regs.REG_SET_DOS |= (B_SET_DO0 | B_SET_DO1);
+	app_regs.REG_CLEAR_DOS |= (B_CLR_DO0 | B_CLR_DO1);
+	app_regs.REG_DO0_CONFIG = GM_OUT0_SOFTWARE;
+	app_regs.REG_DO1_CONFIG = GM_OUT1_SOFTWARE;
+	app_regs.REG_DI0_CONFIG = GM_DI0_SYNC;
+	app_regs.REG_MOTOR_MICROSTEP = GM_STEP_FULL;
 	
+	app_regs.REG_PROTOCOL_NUMBER_STEPS = 100;
+	app_regs.REG_PROTOCOL_FLOWRATE = 0.5;
+	
+	app_regs.REG_EVT_ENABLE = (B_EVT_STEP_STATE | B_EVT_DIR_STATE | B_EVT_SW_FORWARD_STATE | B_EVT_SW_REVERSE_STATE | B_EVT_INPUT_STATE);
 }
 
 void core_callback_registers_were_reinitialized(void)
 {
 	/* Update registers if needed */
+	app_regs.REG_ENABLE_MOTOR_DRIVER = 0;
 	
+	app_regs.REG_STEP_STATE = 0;
+	app_regs.REG_DIR_STATE = 0;
+	app_regs.REG_SW_FORWARD_STATE = 0;
+	app_regs.REG_SW_REVERSE_STATE = 0;
+	app_regs.REG_INPUT_STATE = 0;
+	
+	app_regs.REG_SET_DOS = 0;
+	app_regs.REG_CLEAR_DOS = 0;
+	
+	// TODO: PROTOCOL VALUES should be changed?
+	
+	/* Update config */
+	app_write_REG_DO0_CONFIG(&app_regs.REG_DO0_CONFIG);
+	app_write_REG_DO1_CONFIG(&app_regs.REG_DO1_CONFIG);
+	app_write_REG_DI0_CONFIG(&app_regs.REG_DI0_CONFIG);
+
+	app_write_REG_MOTOR_MICROSTEP(&app_regs.REG_MOTOR_MICROSTEP);
+	clr_EN_DRIVER;
 }
 
 /************************************************************************/
