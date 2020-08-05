@@ -101,6 +101,7 @@ bool app_write_REG_STEP_STATE(void *a)
 /************************************************************************/
 /* REG_DIR_STATE                                                        */
 /************************************************************************/
+uint8_t prev_dir = 0;
 void app_read_REG_DIR_STATE(void)
 {
 	//app_regs.REG_DIR_STATE = 0;
@@ -110,6 +111,9 @@ void app_read_REG_DIR_STATE(void)
 bool app_write_REG_DIR_STATE(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
+	
+	if(reg != prev_dir)
+		prev_dir = reg;
 
 	app_regs.REG_DIR_STATE = reg;
 	return true;
