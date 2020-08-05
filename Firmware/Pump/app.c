@@ -200,7 +200,13 @@ void core_callback_t_before_exec(void)
 	}
 }
 void core_callback_t_after_exec(void) {}
-void core_callback_t_new_second(void) {}
+void core_callback_t_new_second(void)
+{
+	if(app_regs.REG_DO1_CONFIG & GM_DO0_DATA_SEC)
+	{
+		tgl_OUT01;
+	}	
+}
 void core_callback_t_500us(void) {}
 void core_callback_t_1ms(void) {
 	load_motor();
