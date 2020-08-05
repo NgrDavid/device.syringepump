@@ -123,6 +123,7 @@ bool app_write_REG_DIR_STATE(void *a)
 /************************************************************************/
 /* REG_SW_FORWARD_STATE                                                 */
 /************************************************************************/
+bool disable_steps = false;
 void app_read_REG_SW_FORWARD_STATE(void)
 {
 	//app_regs.REG_SW_FORWARD_STATE = 0;

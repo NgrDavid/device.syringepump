@@ -8,6 +8,7 @@
 /* Declare application registers                                        */
 /************************************************************************/
 extern AppRegs app_regs;
+extern bool disable_steps;
 
 /************************************************************************/
 /* Interrupts from Timers                                               */
@@ -39,6 +40,11 @@ ISR(PORTB_INT0_vect, ISR_NAKED)
 /************************************************************************/
 ISR(PORTC_INT0_vect, ISR_NAKED)
 {
+	if(!read_SW_F && !read_SW_R)
+		disable_steps = true;
+	else
+		disable_steps = false;
+	
 	reti();
 }
 
