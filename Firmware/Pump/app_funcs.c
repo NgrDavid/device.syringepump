@@ -89,6 +89,9 @@ void app_read_REG_STEP_STATE(void)
 bool app_write_REG_STEP_STATE(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
+	
+	if(reg)
+		set_STEP;
 
 	app_regs.REG_STEP_STATE = reg;
 	return true;
