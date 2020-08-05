@@ -5,6 +5,8 @@
 #include "app.h"
 #include "app_funcs.h"
 #include "app_ios_and_regs.h"
+
+#include "load_motor.h"
 #define F_CPU 32000000
 #include <util/delay.h>
 
@@ -165,7 +167,9 @@ void core_callback_t_before_exec(void) {}
 void core_callback_t_after_exec(void) {}
 void core_callback_t_new_second(void) {}
 void core_callback_t_500us(void) {}
-void core_callback_t_1ms(void) {}
+void core_callback_t_1ms(void) {
+	load_motor();
+}
 
 /************************************************************************/
 /* Callbacks: uart control                                              */
