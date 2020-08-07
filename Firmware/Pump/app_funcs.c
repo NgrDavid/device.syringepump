@@ -282,9 +282,6 @@ bool app_write_REG_MOTOR_MICROSTEP(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
-	if (reg & ~MSK_MICROSTEP)
-		return false;
-	
 	switch (reg)
 	{
 		case GM_STEP_FULL:
@@ -316,6 +313,9 @@ bool app_write_REG_MOTOR_MICROSTEP(void *a)
 			set_MS2;
 			set_MS3;
 			break;
+
+		default:
+			return false;
 	}
 	
 	app_regs.REG_MOTOR_MICROSTEP = reg;
