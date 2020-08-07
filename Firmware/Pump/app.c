@@ -204,7 +204,7 @@ void core_callback_t_before_exec(void)
 void core_callback_t_after_exec(void) {}
 void core_callback_t_new_second(void)
 {
-	if(app_regs.REG_DO1_CONFIG & GM_DO0_DATA_SEC)
+	if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_DO0_DATA_SEC)
 	{
 		tgl_OUT01;
 	}	

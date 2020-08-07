@@ -181,11 +181,13 @@ bool app_write_REG_SET_DOS(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
-	if((app_regs.REG_DO0_CONFIG & GM_OUT0_SOFTWARE) && (reg & B_SET_DO0))
-		set_OUT00;
+	if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SOFTWARE)
+		if(reg & B_SET_DO0)
+			set_OUT00;
 	
-	if((app_regs.REG_DO1_CONFIG & GM_OUT1_SOFTWARE) && (reg & B_SET_DO1))
-		set_OUT01;
+	if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_SOFTWARE)
+		if(reg & B_SET_DO1)
+			set_OUT01;
 
 	app_regs.REG_SET_DOS = reg;
 	return true;
@@ -205,11 +207,13 @@ bool app_write_REG_CLEAR_DOS(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
-	if((app_regs.REG_DO0_CONFIG & GM_OUT0_SOFTWARE) && ((reg & B_CLR_DO0) == 0))
-		clr_OUT00;
+	if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SOFTWARE)
+		if((reg & B_CLR_DO0) == 0)
+			clr_OUT00;
 	
-	if((app_regs.REG_DO1_CONFIG & GM_OUT1_SOFTWARE) && ((reg & B_CLR_DO1) == 0))
-		clr_OUT01;
+	if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_SOFTWARE)
+		if((reg & B_CLR_DO1) == 0)
+			clr_OUT01;
 
 	app_regs.REG_CLEAR_DOS = reg;
 	return true;
