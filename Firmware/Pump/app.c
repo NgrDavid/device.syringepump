@@ -178,13 +178,13 @@ void core_callback_t_before_exec(void)
 			core_func_send_event(ADD_REG_INPUT_STATE, true);
 			
 		/* on DI0_SYNC mode, on IN0 transition, generate INPUT_STATE event */
-		if(app_regs.REG_DI0_CONFIG & GM_DI0_SYNC)
+		if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_SYNC)
 		{
 			core_func_send_event(ADD_REG_INPUT_STATE, true);
 		}
 		
 		/* on DI0_RISE_FALL_UPDATE_STEP, on low -> high transition, generate a STEP */
-		if(app_regs.REG_DI0_CONFIG & GM_DI0_RISE_FALL_UPDATE_STEP)
+		if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_RISE_FALL_UPDATE_STEP)
 		{
 			set_EN_DRIVER;
 			
@@ -195,7 +195,7 @@ void core_callback_t_before_exec(void)
 		}
 		
 		/* on DI0_RISE_START_PROTOCOL we should start the protocol defined in the PROTOCOL registers */
-		if(app_regs.REG_DI0_CONFIG & GM_DI0_RISE_START_PROTOCOL)
+		if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_RISE_START_PROTOCOL)
 		{
 			// TODO: generate as many steps as defined in the protocol and then stop
 		}

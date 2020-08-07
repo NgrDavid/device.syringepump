@@ -33,9 +33,11 @@ extern bool disable_steps;
 ISR(PORTB_INT0_vect, ISR_NAKED)
 {
 	uint8_t aux = read_IN00;
-	if (app_regs.REG_DI0_CONFIG & GM_DI0_SYNC)
+
+	if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_SYNC )
 	{
-		app_write_REG_INPUT_STATE(&aux);
+		app_regs.REG_INPUT_STATE = aux;
+		app_write_REG_INPUT_STATE(&app_regs.REG_INPUT_STATE);
 		core_func_send_event(ADD_REG_INPUT_STATE, true);
 	}
 	
@@ -59,7 +61,6 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 		else
 			clr_OUT00;
 	}
-		
 	
 	reti();
 }
