@@ -8,8 +8,8 @@
 void init_ios(void)
 {	/* Configure input pins */
 	io_pin2in(&PORTB, 0, PULL_IO_TRISTATE, SENSE_IO_EDGES_BOTH);         // IN00
-	io_pin2in(&PORTC, 4, PULL_IO_TRISTATE, SENSE_IO_EDGES_BOTH);         // SW_F
-	io_pin2in(&PORTC, 5, PULL_IO_TRISTATE, SENSE_IO_EDGES_BOTH);         // SW_R
+	io_pin2in(&PORTC, 4, PULL_IO_UP, SENSE_IO_EDGES_BOTH);				 // SW_F
+	io_pin2in(&PORTC, 5, PULL_IO_UP, SENSE_IO_EDGES_BOTH);				 // SW_R
 	io_pin2in(&PORTD, 0, PULL_IO_TRISTATE, SENSE_IO_EDGES_BOTH);         // EN_DRIVER_UC
 	io_pin2in(&PORTD, 5, PULL_IO_UP, SENSE_IO_EDGES_BOTH);               // BUT_PUSH
 	io_pin2in(&PORTD, 6, PULL_IO_UP, SENSE_IO_EDGES_BOTH);               // BUT_PULL
