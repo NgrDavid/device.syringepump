@@ -21,6 +21,7 @@
 /* Prototypes                                                           */
 /************************************************************************/
 void app_read_REG_ENABLE_MOTOR_DRIVER(void);
+void app_read_REG_ENABLE_MOTOR_UC(void);
 void app_read_REG_STEP_STATE(void);
 void app_read_REG_DIR_STATE(void);
 void app_read_REG_SW_FORWARD_STATE(void);
@@ -40,6 +41,7 @@ void app_read_REG_PROTOCOL_VAR2(void);
 void app_read_REG_EVT_ENABLE(void);
 
 bool app_write_REG_ENABLE_MOTOR_DRIVER(void *a);
+bool app_write_REG_ENABLE_MOTOR_UC(void *a);
 bool app_write_REG_STEP_STATE(void *a);
 bool app_write_REG_DIR_STATE(void *a);
 bool app_write_REG_SW_FORWARD_STATE(void *a);

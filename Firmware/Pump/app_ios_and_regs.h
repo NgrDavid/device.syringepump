@@ -110,6 +110,7 @@ void init_ios(void);
 typedef struct
 {
 	uint8_t REG_ENABLE_MOTOR_DRIVER;
+	uint8_t REG_ENABLE_MOTOR_UC;
 	uint8_t REG_STEP_STATE;
 	uint8_t REG_DIR_STATE;
 	uint8_t REG_SW_FORWARD_STATE;
@@ -134,23 +135,24 @@ typedef struct
 /************************************************************************/
 /* Registers */
 #define ADD_REG_ENABLE_MOTOR_DRIVER         32 // U8     Enable the motor driver
-#define ADD_REG_STEP_STATE                  33 // U8     Control the step of the motor controller
-#define ADD_REG_DIR_STATE                   34 // U8     Control the direction of the motor controller
-#define ADD_REG_SW_FORWARD_STATE            35 // U8     State of the forward switch limit
-#define ADD_REG_SW_REVERSE_STATE            36 // U8     State of the reverse switch limit
-#define ADD_REG_INPUT_STATE                 37 // U8     Value of input 0 pin
-#define ADD_REG_SET_DOS                     38 // U8     Set digital outputs
-#define ADD_REG_CLEAR_DOS                   39 // U8     Clear digital outputs
-#define ADD_REG_DO0_CONFIG                  40 // U8     Configures which signal is connected to the digital output 0
-#define ADD_REG_DO1_CONFIG                  41 // U8     Configures which signal is connected to the digital output 1
-#define ADD_REG_DI0_CONFIG                  42 // U8     Configuration of the digital input 0 (DI0)
-#define ADD_REG_MOTOR_MICROSTEP             43 // U8     Defines the motor microstep
-#define ADD_REG_PROTOCOL_NUMBER_STEPS       44 // U16    Number of steps [1;65535]
-#define ADD_REG_PROTOCOL_FLOWRATE           45 // FLOAT  Flowrate value [0.5;2000.0]?
-#define ADD_REG_PROTOCOL_VAR0               46 // U8     Dummy
-#define ADD_REG_PROTOCOL_VAR1               47 // U16    Dummy
-#define ADD_REG_PROTOCOL_VAR2               48 // FLOAT  Dummy
-#define ADD_REG_EVT_ENABLE                  49 // U8     Enable the Events
+#define ADD_REG_ENABLE_MOTOR_UC             33 // U8     Enable the motor micro controller
+#define ADD_REG_STEP_STATE                  34 // U8     Control the step of the motor controller
+#define ADD_REG_DIR_STATE                   35 // U8     Control the direction of the motor controller
+#define ADD_REG_SW_FORWARD_STATE            36 // U8     State of the forward switch limit
+#define ADD_REG_SW_REVERSE_STATE            37 // U8     State of the reverse switch limit
+#define ADD_REG_INPUT_STATE                 38 // U8     Value of input 0 pin
+#define ADD_REG_SET_DOS                     39 // U8     Set digital outputs
+#define ADD_REG_CLEAR_DOS                   40 // U8     Clear digital outputs
+#define ADD_REG_DO0_CONFIG                  41 // U8     Configures which signal is connected to the digital output 0
+#define ADD_REG_DO1_CONFIG                  42 // U8     Configures which signal is connected to the digital output 1
+#define ADD_REG_DI0_CONFIG                  43 // U8     Configuration of the digital input 0 (DI0)
+#define ADD_REG_MOTOR_MICROSTEP             44 // U8     Defines the motor microstep
+#define ADD_REG_PROTOCOL_NUMBER_STEPS       45 // U16    Number of steps [1;65535]
+#define ADD_REG_PROTOCOL_FLOWRATE           46 // FLOAT  Flowrate value [0.5;2000.0]?
+#define ADD_REG_PROTOCOL_VAR0               47 // U8     Dummy
+#define ADD_REG_PROTOCOL_VAR1               48 // U16    Dummy
+#define ADD_REG_PROTOCOL_VAR2               49 // FLOAT  Dummy
+#define ADD_REG_EVT_ENABLE                  50 // U8     Enable the Events
 
 /************************************************************************/
 /* PWM Generator registers' memory limits                               */
@@ -160,13 +162,14 @@ typedef struct
 /************************************************************************/
 /* Memory limits */
 #define APP_REGS_ADD_MIN                    0x20
-#define APP_REGS_ADD_MAX                    0x31
-#define APP_NBYTES_OF_REG_BANK              26
+#define APP_REGS_ADD_MAX                    0x32
+#define APP_NBYTES_OF_REG_BANK              27
 
 /************************************************************************/
 /* Registers' bits                                                      */
 /************************************************************************/
 #define B_MOTOR_ENABLE                     (1<<0)       // Enable motor when equal to 1
+#define B_MOTOR_UC_ENABLE                  (1<<0)       // Enable motor when equal to 1
 #define B_STEP_PIN                         (1<<0)       // Status of the STEP motor controller pin
 #define B_DIR_PIN                          (1<<1)       // Status of the DIR motor controller pin
 #define B_SW_F_PIN                         (1<<0)       // Status of the forward switch limit

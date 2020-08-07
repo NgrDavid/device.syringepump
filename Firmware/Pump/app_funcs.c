@@ -10,6 +10,7 @@ extern AppRegs app_regs;
 
 void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_ENABLE_MOTOR_DRIVER,
+	&app_read_REG_ENABLE_MOTOR_UC,
 	&app_read_REG_STEP_STATE,
 	&app_read_REG_DIR_STATE,
 	&app_read_REG_SW_FORWARD_STATE,
@@ -31,6 +32,7 @@ void (*app_func_rd_pointer[])(void) = {
 
 bool (*app_func_wr_pointer[])(void*) = {
 	&app_write_REG_ENABLE_MOTOR_DRIVER,
+	&app_write_REG_ENABLE_MOTOR_UC,
 	&app_write_REG_STEP_STATE,
 	&app_write_REG_DIR_STATE,
 	&app_write_REG_SW_FORWARD_STATE,
@@ -65,6 +67,20 @@ bool app_write_REG_ENABLE_MOTOR_DRIVER(void *a)
 		clr_EN_DRIVER;
 	
 	app_regs.REG_ENABLE_MOTOR_DRIVER = reg;
+
+	return true;
+}
+
+
+/************************************************************************/
+/* REG_ENABLE_MOTOR_UC		                                            */
+/************************************************************************/
+void app_read_REG_ENABLE_MOTOR_UC(void){}
+bool app_write_REG_ENABLE_MOTOR_UC(void *a)
+{
+	uint8_t reg = *((uint8_t*)a);
+	
+	app_regs.REG_ENABLE_MOTOR_UC = reg;
 
 	return true;
 }
