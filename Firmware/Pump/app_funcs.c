@@ -84,7 +84,13 @@ bool app_write_REG_STEP_STATE(void *a)
 	uint8_t reg = *((uint8_t*)a);
 	
 	if(reg)
+	{
 		set_STEP;
+		if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT0_STEP_STATE)
+		{
+			set_OUT01;
+		}
+	}
 
 	app_regs.REG_STEP_STATE = reg;
 	return true;
