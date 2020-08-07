@@ -86,7 +86,7 @@ bool app_write_REG_STEP_STATE(void *a)
 	if(reg)
 	{
 		set_STEP;
-		if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT0_STEP_STATE)
+		if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
 		{
 			set_OUT01;
 		}

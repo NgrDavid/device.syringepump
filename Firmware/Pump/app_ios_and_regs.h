@@ -181,8 +181,8 @@ typedef struct
 #define GM_OUT0_SWLIMIT                    (1<<0)       // Either limits reached (register SW_FORWARD_STATE OR SW_REVERSE_STATE)
 #define MSK_OUT1_CONF                      (3<<0)       // Select OUT1 function
 #define GM_OUT1_SOFTWARE                   (0<<0)       // Digital output controlled by software (SET_DO1 and CLEAR_DO1)
-#define GM_DO0_DATA_SEC                    (1<<0)       // Toggles each second when is acquiring
-#define GM_OUT0_STEP_STATE                 (2<<0)       // Equal to register STEP_STATE
+#define GM_OUT1_DATA_SEC                   (1<<0)       // Toggles each second when is acquiring
+#define GM_OUT1_STEP_STATE                 (2<<0)       // Equal to register STEP_STATE
 #define MSK_DI0_CONF                       (3<<0)       // Select IN0 function
 #define GM_DI0_SYNC                        (0<<0)       // Use as a pure digital input
 #define GM_DI0_RISE_FALL_UPDATE_STEP       (1<<0)       // Update STEP with a rising edge
