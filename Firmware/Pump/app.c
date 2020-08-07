@@ -80,7 +80,9 @@ void core_callback_1st_config_hw_after_boot(void)
 	/* Don't delete this function!!! */
 	init_ios();
 	
+	// TODO: find out if this should be done here or if it is enough to set them on core_callback_registers_were_reinitialized
 	/* Initialize hardware */
+	clr_BUF_EN;
 	set_DIR;
 	clr_MS1;
 	clr_MS2;
@@ -88,9 +90,9 @@ void core_callback_1st_config_hw_after_boot(void)
 	clr_SLEEP;
 	
 	// RESET -> clear, wait 10ms, set
-	clr_RESET;
-	_delay_ms(10);
 	set_RESET;
+	_delay_ms(10);
+	clr_RESET;
 	
 	clr_EN_DRIVER;
 }
