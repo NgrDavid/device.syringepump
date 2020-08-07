@@ -176,7 +176,7 @@ typedef struct
 #define B_SET_DO1                          (1<<1)       // Write one to this bit will put digital out 1 into High state
 #define B_CLR_DO0                          (1<<0)       // Write one to this bit will put digital out 0 into Low state
 #define B_CLR_DO1                          (1<<1)       // Write one to this bit will put digital out 1 into Low state
-#define MSK_OUT0_CONF                      (2<<0)       // Select OUT0 function
+#define MSK_OUT0_CONF                      (3<<0)       // Select OUT0 function
 #define GM_OUT0_SOFTWARE                   (0<<0)       // Digital output controlled by software
 #define GM_OUT0_SWLIMIT                    (1<<0)       // Either limits reached (register SW_FORWARD_STATE OR SW_REVERSE_STATE)
 #define MSK_OUT1_CONF                      (3<<0)       // Select OUT1 function
@@ -187,7 +187,7 @@ typedef struct
 #define GM_DI0_SYNC                        (0<<0)       // Use as a pure digital input
 #define GM_DI0_RISE_FALL_UPDATE_STEP       (1<<0)       // Update STEP with a rising edge
 #define GM_DI0_RISE_START_PROTOCOL         (2<<0)       // Will trigger the predefined protocol on a rising edge
-#define MSK_MICROSTEP                      (5<<0)       // 
+#define MSK_MICROSTEP                      (7<<0)       // 
 #define GM_STEP_FULL                       (0<<0)       // Full step (2 phase)
 #define GM_STEP_HALF                       (1<<0)       // Half step
 #define GM_STEP_QUARTER                    (2<<0)       // Quarter step
