@@ -89,6 +89,7 @@ bool app_write_REG_ENABLE_MOTOR_UC(void *a)
 /************************************************************************/
 /* REG_STEP_STATE                                                       */
 /************************************************************************/
+uint8_t step_period_counter = 0;
 void app_read_REG_STEP_STATE(void)
 {
 	//app_regs.REG_STEP_STATE = 0;
@@ -101,6 +102,8 @@ bool app_write_REG_STEP_STATE(void *a)
 	
 	if(reg)
 	{
+		// force starting counting from the start
+		step_period_counter = 0;
 		set_STEP;
 		if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
 		{
