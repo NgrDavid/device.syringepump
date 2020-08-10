@@ -80,6 +80,8 @@ bool app_write_REG_ENABLE_MOTOR_UC(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
+	app_write_REG_ENABLE_MOTOR_DRIVER(&reg);
+	
 	app_regs.REG_ENABLE_MOTOR_UC = reg;
 
 	return true;
