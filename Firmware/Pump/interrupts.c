@@ -83,8 +83,16 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 /************************************************************************/ 
 /* EN_DRIVER_UC & BUT_PUSH & BUT_PULL & BUT_RESET                       */
 /************************************************************************/
+static uint8_t auxBit = 0;
+
 ISR(PORTD_INT0_vect, ISR_NAKED)
 {
+	if(read_EN_DRIVER_UC)
+	{
+		auxBit = 1;
+		app_write_REG_ENABLE_MOTOR_UC(&auxBit);
+	}
+	
 	reti();
 }
 
