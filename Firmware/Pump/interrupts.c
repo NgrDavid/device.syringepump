@@ -30,6 +30,8 @@ extern bool disable_steps;
 /************************************************************************/ 
 /* IN00                                                                 */
 /************************************************************************/
+uint8_t previous_in0;
+
 ISR(PORTB_INT0_vect, ISR_NAKED)
 {
 	uint8_t aux = read_IN00;
@@ -39,6 +41,19 @@ ISR(PORTB_INT0_vect, ISR_NAKED)
 		app_regs.REG_INPUT_STATE = aux;
 		app_write_REG_INPUT_STATE(&app_regs.REG_INPUT_STATE);
 		core_func_send_event(ADD_REG_INPUT_STATE, true);
+	}
+	
+	if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_RISE_FALL_UPDATE_STEP )
+	{
+		// transition from low to high
+		if(previous_in0 == 0 && aux == 1)
+		{
+			// generate a STEP
+			app_regs.REG_STEP_STATE = aux;
+			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+		}
+		
+		previous_in0 = aux;
 	}
 	
 	reti();
