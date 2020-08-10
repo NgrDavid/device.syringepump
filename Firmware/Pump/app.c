@@ -171,41 +171,8 @@ void core_callback_device_to_speed(void) {}
 /************************************************************************/
 /* Callbacks: 1 ms timer                                                */
 /************************************************************************/
-uint8_t previous_IN00_value = 0;
 void core_callback_t_before_exec(void) 
 {
-	uint8_t tmp = read_IN00;
-	if( previous_IN00_value != tmp )
-	{
-		app_regs.REG_INPUT_STATE = tmp;
-		if(app_regs.REG_EVT_ENABLE & B_EVT_INPUT_STATE)
-			core_func_send_event(ADD_REG_INPUT_STATE, true);
-			
-		/* on DI0_SYNC mode, on IN0 transition, generate INPUT_STATE event */
-		if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_SYNC)
-		{
-			core_func_send_event(ADD_REG_INPUT_STATE, true);
-		}
-		
-		/* on DI0_RISE_FALL_UPDATE_STEP, on low -> high transition, generate a STEP */
-		if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_RISE_FALL_UPDATE_STEP)
-		{
-			set_EN_DRIVER;
-			
-			// TODO: generate function to generate a STEP (with event)
-			set_STEP;
-			
-			// TODO: wait to disable STEP
-		}
-		
-		/* on DI0_RISE_START_PROTOCOL we should start the protocol defined in the PROTOCOL registers */
-		if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_RISE_START_PROTOCOL)
-		{
-			// TODO: generate as many steps as defined in the protocol and then stop
-		}
-		
-		previous_IN00_value = tmp;
-	}
 }
 void core_callback_t_after_exec(void) {}
 void core_callback_t_new_second(void)
