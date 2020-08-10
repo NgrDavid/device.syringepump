@@ -69,7 +69,11 @@ void core_callback_catastrophic_error_detected(void)
 /************************************************************************/
 /* User functions                                                       */
 /************************************************************************/
-/* Add your functions here or load external functions if needed */
+
+
+uint8_t but_push_counter_ms = 0;
+uint8_t but_pull_counter_ms = 0;
+uint8_t but_reset_counter_ms = 0;
 
 /************************************************************************/
 /* Initialization Callbacks                                             */
@@ -212,8 +216,58 @@ void core_callback_t_new_second(void)
 	}	
 }
 void core_callback_t_500us(void) {}
-void core_callback_t_1ms(void) {
+void core_callback_t_1ms(void) 
+{
 	load_motor();
+	
+	/* handle buttons */
+	/* De-bounce PUSH button */
+	if (but_push_counter_ms)
+	{
+		if (!(read_BUT_PUSH))
+		{
+			if (!--but_push_counter_ms)
+			{
+				// TODO: do action here (start protocol, etc)
+			}
+		}
+		else
+		{
+			but_push_counter_ms = 0;
+		}
+	} 
+	
+	/* De-bounce PULL button */
+	if (but_pull_counter_ms)
+	{
+		if (!(read_BUT_PUSH))
+		{
+			if (!--but_pull_counter_ms)
+			{
+				// TODO: do action here (start protocol, etc)
+			}
+		}
+		else
+		{
+			but_pull_counter_ms = 0;
+		}
+	}
+	
+	/* De-bounce RESET button */
+	if (but_reset_counter_ms)
+	{
+		if (!(read_BUT_PUSH))
+		{
+			if (!--but_reset_counter_ms)
+			{
+				// TODO: do action here (start protocol, etc)
+			}
+		}
+		else
+		{
+			but_reset_counter_ms = 0;
+		}
+	}
 }
 
 /************************************************************************/
