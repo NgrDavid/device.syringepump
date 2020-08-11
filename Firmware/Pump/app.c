@@ -207,7 +207,7 @@ void core_callback_t_1ms(void)
 	/* De-bounce PULL button */
 	if (but_pull_counter_ms)
 	{
-		if (!(read_BUT_PUSH))
+		if (!(read_BUT_PULL))
 		{
 			if (!--but_pull_counter_ms)
 			{
@@ -223,7 +223,7 @@ void core_callback_t_1ms(void)
 	/* De-bounce RESET button */
 	if (but_reset_counter_ms)
 	{
-		if (!(read_BUT_PUSH))
+		if (!(read_BUT_RESET))
 		{
 			if (!--but_reset_counter_ms)
 			{
