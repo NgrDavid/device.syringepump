@@ -75,6 +75,10 @@ uint8_t but_push_counter_ms = 0;
 uint8_t but_pull_counter_ms = 0;
 uint8_t but_reset_counter_ms = 0;
 
+uint8_t curr_dir = 0;
+bool disable_steps = false;
+uint8_t step_period_counter = 0;
+
 /************************************************************************/
 /* Initialization Callbacks                                             */
 /************************************************************************/
@@ -171,8 +175,38 @@ void core_callback_device_to_speed(void) {}
 /************************************************************************/
 /* Callbacks: 1 ms timer                                                */
 /************************************************************************/
+
+#define STEP_PERIOD_MILLISECONDS 8
+
 void core_callback_t_before_exec(void) 
 {
+	// this is called every 500ms, we should handle the steps here
+	if (++step_period_counter == STEP_PERIOD_MILLISECONDS)
+	{
+		clr_STEP;
+		if((app_regs.REG_DO1_CONFIG & MSK_DI0_CONF) == GM_OUT1_STEP_STATE)
+		{
+			clr_OUT01;
+		}
+		step_period_counter = 0;
+		return;
+	}
+	
+	/* when reaching either switch limit, this flag will be true */
+	if(disable_steps)
+		return;
+	
+	if (app_regs.REG_ENABLE_MOTOR_DRIVER == B_MOTOR_ENABLE)
+	{
+		// keep the current direction
+		if(curr_dir)
+			set_DIR;
+		else
+			clr_DIR;
+		
+		app_regs.REG_DIR_STATE = curr_dir;
+		app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+	}
 }
 void core_callback_t_after_exec(void) {}
 void core_callback_t_new_second(void)
@@ -183,10 +217,9 @@ void core_callback_t_new_second(void)
 	}	
 }
 void core_callback_t_500us(void) {}
-void core_callback_t_1ms(void) 
-{
-	load_motor();
 	
+void core_callback_t_1ms(void) 
+{	
 	/* handle buttons */
 	/* De-bounce PUSH button */
 	if (but_push_counter_ms)
