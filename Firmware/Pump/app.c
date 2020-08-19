@@ -6,7 +6,6 @@
 #include "app_funcs.h"
 #include "app_ios_and_regs.h"
 
-#include "load_motor.h"
 #define F_CPU 32000000
 #include <util/delay.h>
 
