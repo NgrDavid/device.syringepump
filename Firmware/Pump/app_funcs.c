@@ -7,6 +7,8 @@
 /************************************************************************/
 extern AppRegs app_regs;
 extern uint8_t curr_dir;
+extern bool disable_steps;
+extern uint8_t step_period_counter;
 
 void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_ENABLE_MOTOR_DRIVER,
@@ -133,7 +135,6 @@ bool app_write_REG_START_PROTOCOL(void *a)
 /************************************************************************/
 /* REG_STEP_STATE                                                       */
 /************************************************************************/
-uint8_t step_period_counter = 0;
 void app_read_REG_STEP_STATE(void)
 {
 	//app_regs.REG_STEP_STATE = 0;
@@ -196,7 +197,6 @@ bool app_write_REG_DIR_STATE(void *a)
 /************************************************************************/
 /* REG_SW_FORWARD_STATE                                                 */
 /************************************************************************/
-bool disable_steps = false;
 void app_read_REG_SW_FORWARD_STATE(void)
 {
 	//app_regs.REG_SW_FORWARD_STATE = 0;

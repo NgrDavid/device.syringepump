@@ -94,23 +94,34 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 /* EN_DRIVER_UC & BUT_PUSH & BUT_PULL & BUT_RESET                       */
 /************************************************************************/
 extern uint8_t but_push_counter_ms;
+extern uint8_t but_long_push_counter_ms;
 extern uint8_t but_pull_counter_ms;
+extern uint8_t but_long_pull_counter_ms;
 extern uint8_t but_reset_counter_ms;
-static uint8_t auxBit = 0;
 
 ISR(PORTD_INT0_vect, ISR_NAKED)
 {
-	if(read_BUT_PUSH)
+	if(!(read_BUT_PUSH))
+	{
 		but_push_counter_ms = 25;
-	if(read_BUT_PULL)
+		but_long_push_counter_ms = 20;		// 20 x 25ms = 500ms
+	}
+	
+	if(!(read_BUT_PULL))
+	{
 		but_pull_counter_ms = 25;
-	if(read_BUT_RESET)
+		but_long_pull_counter_ms = 20;		// 20 x 25ms = 500ms
+	}
+	
+	if(!(read_BUT_RESET))
+	{
 		but_reset_counter_ms = 25;
-		
+	}
+	
 	if(read_EN_DRIVER_UC)
 	{
-		auxBit = 1;
-		app_write_REG_ENABLE_MOTOR_UC(&auxBit);
+		app_regs.REG_ENABLE_MOTOR_UC = 1;
+		app_write_REG_ENABLE_MOTOR_UC(&app_regs.REG_ENABLE_MOTOR_UC);
 	}
 	
 	reti();

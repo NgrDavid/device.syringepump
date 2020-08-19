@@ -72,7 +72,17 @@ void core_callback_catastrophic_error_detected(void)
 
 
 uint8_t but_push_counter_ms = 0;
+uint8_t but_long_push_counter_ms = 0;
+
+// NOTE: this needs to be volatile so that the compiler knows it shouldn't optimize this variable.
+bool but_push_single_press = false;
+
 uint8_t but_pull_counter_ms = 0;
+uint8_t but_long_pull_counter_ms = 0;
+
+// NOTE: this needs to be volatile so that the compiler knows it shouldn't optimize this variable.
+bool but_pull_single_press = false;
+
 uint8_t but_reset_counter_ms = 0;
 
 uint8_t curr_dir = 0;
@@ -228,14 +238,41 @@ void core_callback_t_1ms(void)
 		{
 			if (!--but_push_counter_ms)
 			{
-				// TODO: do action here (start protocol, etc)
+				// long press detection
+				if(but_long_push_counter_ms)
+				{
+					// single press
+					but_push_counter_ms = 25;
+					--but_long_push_counter_ms;
+					
+					if(!but_push_single_press)
+					{
+						app_regs.REG_DIR_STATE = 0;
+						app_regs.REG_STEP_STATE = 1;
+						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+						but_push_single_press = true;
+					}
+				}
+				else
+				{
+					// long press
+					// we enter here only once every 25ms, it is more than time for another step but might need adjustments
+					app_regs.REG_DIR_STATE = 0;
+					app_regs.REG_STEP_STATE = 1;
+					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+					but_push_counter_ms = 25;
+				}
 			}
 		}
 		else
 		{
 			but_push_counter_ms = 0;
+			but_long_push_counter_ms = 0;
+			but_push_single_press = false;
 		}
-	} 
+	}
 	
 	/* De-bounce PULL button */
 	if (but_pull_counter_ms)
@@ -244,12 +281,39 @@ void core_callback_t_1ms(void)
 		{
 			if (!--but_pull_counter_ms)
 			{
-				// TODO: do action here (start protocol, etc)
+				// long press detection
+				if(but_long_pull_counter_ms)
+				{
+					// single press
+					but_pull_counter_ms = 25;
+					--but_long_pull_counter_ms;
+					
+					if(!but_pull_single_press)
+					{
+						app_regs.REG_DIR_STATE = 1;
+						app_regs.REG_STEP_STATE = 1;
+						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+						but_pull_single_press = true;
+					}
+				}
+				else
+				{
+					// long press
+					// we enter here every 25ms, it is more than time for another step but might need adjustments
+					app_regs.REG_DIR_STATE = 1;
+					app_regs.REG_STEP_STATE = 1;
+					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+					but_pull_counter_ms = 25;
+				}
 			}
 		}
 		else
 		{
 			but_pull_counter_ms = 0;
+			but_long_pull_counter_ms = 0;
+			but_pull_single_press = false;
 		}
 	}
 	
@@ -260,7 +324,11 @@ void core_callback_t_1ms(void)
 		{
 			if (!--but_reset_counter_ms)
 			{
-				// TODO: do action here (start protocol, etc)
+				// steps in the opposite direction until we get the SW_F or SW_R interrupt
+				
+				// pseudo-code:
+					// activate flag here that will be caught on the interrupt for SW_F or SW_R
+					// in the interrupt
 			}
 		}
 		else
