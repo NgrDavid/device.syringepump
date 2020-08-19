@@ -152,6 +152,11 @@ bool app_write_REG_STEP_STATE(void *a)
 		{
 			set_OUT01;
 		}
+		
+		if (app_regs.REG_EVT_ENABLE & B_EVT_STEP_STATE)
+		{
+			core_func_send_event(ADD_REG_STEP_STATE, true);
+		}
 	}
 
 	app_regs.REG_STEP_STATE = reg;
