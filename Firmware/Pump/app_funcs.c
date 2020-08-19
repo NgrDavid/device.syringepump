@@ -6,6 +6,7 @@
 /* Create pointers to functions                                         */
 /************************************************************************/
 extern AppRegs app_regs;
+extern uint8_t curr_dir;
 
 void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_ENABLE_MOTOR_DRIVER,
@@ -167,7 +168,6 @@ bool app_write_REG_STEP_STATE(void *a)
 /************************************************************************/
 /* REG_DIR_STATE                                                        */
 /************************************************************************/
-uint8_t curr_dir = 0;
 void app_read_REG_DIR_STATE(void)
 {
 	//app_regs.REG_DIR_STATE = 0;
@@ -179,7 +179,14 @@ bool app_write_REG_DIR_STATE(void *a)
 	uint8_t reg = *((uint8_t*)a);
 	
 	if(reg != curr_dir)
+	{
 		curr_dir = reg;
+		if(app_regs.REG_ENABLE_MOTOR_DRIVER == B_MOTOR_ENABLE)
+		{
+			if(app_regs.REG_EVT_ENABLE & B_EVT_DIR_STATE)
+				core_func_send_event(ADD_REG_DIR_STATE, true);
+		}
+	}
 
 	app_regs.REG_DIR_STATE = reg;
 	return true;
