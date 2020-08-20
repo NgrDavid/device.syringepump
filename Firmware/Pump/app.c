@@ -310,7 +310,7 @@ void core_callback_t_1ms(void)
 					// reset push counter to allow to detect long press
 					but_push_counter_ms = 25;
 					
-					if(!but_push_single_press)
+					if(!but_push_single_press && !running_protocol)
 					{
 						app_regs.REG_DIR_STATE = 0;
 						app_regs.REG_STEP_STATE = 1;
@@ -349,7 +349,7 @@ void core_callback_t_1ms(void)
 					// reset pull counter to allow to detect long press
 					but_pull_counter_ms = 25;
 					
-					if(!but_pull_single_press)
+					if(!but_pull_single_press && !running_protocol)
 					{
 						app_regs.REG_DIR_STATE = 1;
 						app_regs.REG_STEP_STATE = 1;
