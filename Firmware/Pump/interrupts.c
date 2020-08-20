@@ -11,6 +11,7 @@ extern AppRegs app_regs;
 extern bool disable_steps;
 extern bool but_reset_pressed;
 extern bool but_reset_dir_change;
+extern bool running_protocol;
 
 /************************************************************************/
 /* Interrupts from Timers                                               */
@@ -56,6 +57,15 @@ ISR(PORTB_INT0_vect, ISR_NAKED)
 		}
 		
 		previous_in0 = aux;
+	}
+	
+	if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_RISE_START_PROTOCOL)
+	{
+		// transition from low to high
+		if(previous_in0 == 0 && aux == 1)
+			running_protocol = true;
+		else
+			running_protocol = false;
 	}
 	
 	reti();
