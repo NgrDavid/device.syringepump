@@ -88,6 +88,27 @@ uint8_t curr_dir = 0;
 bool disable_steps = false;
 uint8_t step_period_counter = 0;
 
+bool running_protocol = false;
+uint16_t prot_remaining_steps = 0;
+uint16_t prot_step_period = 0;
+
+void reset_protocol_variables()
+{
+	prot_remaining_steps = app_regs.REG_PROTOCOL_NUMBER_STEPS;
+	prot_step_period = app_regs.REG_PROTOCOL_PERIOD;
+}
+
+void clear_step()
+{
+	clr_STEP;
+	if((app_regs.REG_DO1_CONFIG & MSK_DI0_CONF) == GM_OUT1_STEP_STATE)
+	{
+		clr_OUT01;
+	}
+	step_period_counter = 0;
+}
+
+
 /************************************************************************/
 /* Initialization Callbacks                                             */
 /************************************************************************/
@@ -189,61 +210,76 @@ void core_callback_device_to_speed(void) {}
 
 void core_callback_t_before_exec(void) 
 {
-	// this is called every 500ms, we should handle the steps here
-	if (++step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
+	if(running_protocol)
 	{
-		clr_STEP;
-		if((app_regs.REG_DO1_CONFIG & MSK_DI0_CONF) == GM_OUT1_STEP_STATE)
+		if(!disable_steps)
 		{
-			clr_OUT01;
-		}
-		step_period_counter = 0;
-		
-		if(but_reset_pressed)
-		{
-			// change direction once and continue steps
-			if(!but_reset_dir_change)
+			// this is called every 500 us, so we need to check twice the protocol's step period
+			if(++step_period_counter == (prot_step_period * 2))
 			{
-				app_regs.REG_DIR_STATE = app_regs.REG_DIR_STATE == 0? 1 : 0;
-				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-				but_reset_dir_change = true;
+				clear_step();
+							
+				// make step if there are still steps remaining in the current running protocol
+				if(--prot_remaining_steps)
+				{
+					app_regs.REG_DIR_STATE = curr_dir;
+					app_regs.REG_STEP_STATE = 1;
+					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+				}
+				else
+				{
+					// we reached the end, lets stop everything and reset variables
+					running_protocol = false;
+					reset_protocol_variables();
+				}
+			}
+		}
+	}
+	else
+	{
+		// normal counting, outside of protocol
+		// this is called every 500us, we should handle the steps here
+		if (++step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
+		{
+			clear_step();
+			
+			if(but_reset_pressed)
+			{
+				// change direction once and continue steps
+				if(!but_reset_dir_change)
+				{
+					app_regs.REG_DIR_STATE = app_regs.REG_DIR_STATE == 0? 1 : 0;
+					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+					but_reset_dir_change = true;
+				}
+				
+				app_regs.REG_STEP_STATE = 1;
+				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+				
+				// if reset was pressed, we don't really want to do anything else
+				return;
 			}
 			
-			app_regs.REG_STEP_STATE = 1;
-			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-		}
-		
-		// long press STEP handling (generates new STEP immediately if in long press)
-		if (but_push_long_press)
+			// long press STEP handling (generates new STEP immediately if in long press)
+			if (but_push_long_press)
 			app_regs.REG_DIR_STATE = 0;
-		
-		if(but_pull_long_press)
+			
+			if(but_pull_long_press)
 			app_regs.REG_DIR_STATE = 1;
-		
-		if(but_pull_long_press || but_push_long_press)
-		{
-			app_regs.REG_STEP_STATE = 1;
-			app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-		}
-		
-		return;
-	}
-	
-	/* when reaching either switch limit, this flag will be true */
-	if(disable_steps)
-		return;
-	
-	if (app_regs.REG_ENABLE_MOTOR_DRIVER == B_MOTOR_ENABLE)
-	{
-		// keep the current direction
-		if(curr_dir)
-			set_DIR;
-		else
-			clr_DIR;
-		
-		app_regs.REG_DIR_STATE = curr_dir;
-		app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+			
+			if(but_pull_long_press || but_push_long_press)
+			{
+				if(!disable_steps)
+				{
+					app_regs.REG_STEP_STATE = 1;
+					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+				}
+			}
+			
+			return;
+		}	
 	}
 }
 void core_callback_t_after_exec(void) {}
