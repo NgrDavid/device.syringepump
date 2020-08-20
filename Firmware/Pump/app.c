@@ -223,8 +223,8 @@ void core_callback_t_before_exec(void)
 		if(but_pull_long_press || but_push_long_press)
 		{
 			app_regs.REG_STEP_STATE = 1;
-			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 			app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 		}
 		
 		return;
@@ -278,8 +278,8 @@ void core_callback_t_1ms(void)
 					{
 						app_regs.REG_DIR_STATE = 0;
 						app_regs.REG_STEP_STATE = 1;
-						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 						but_push_single_press = true;
 					}
 				}
@@ -317,8 +317,8 @@ void core_callback_t_1ms(void)
 					{
 						app_regs.REG_DIR_STATE = 1;
 						app_regs.REG_STEP_STATE = 1;
-						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 						but_pull_single_press = true;
 					}
 				}
