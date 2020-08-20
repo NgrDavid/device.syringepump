@@ -381,6 +381,7 @@ void core_callback_t_1ms(void)
 			if (!--but_reset_counter_ms)
 			{
 				but_reset_pressed = true;
+				running_protocol = false;
 			}
 		}
 		else
