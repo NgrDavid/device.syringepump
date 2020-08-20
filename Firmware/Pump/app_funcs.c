@@ -197,6 +197,11 @@ bool app_write_REG_DIR_STATE(void *a)
 				core_func_send_event(ADD_REG_DIR_STATE, true);
 		}
 	}
+	
+	if(curr_dir)
+		set_DIR;
+	else
+		clr_DIR;
 
 	app_regs.REG_DIR_STATE = reg;
 	return true;
