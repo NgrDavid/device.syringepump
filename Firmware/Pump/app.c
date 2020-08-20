@@ -72,15 +72,13 @@ void core_callback_catastrophic_error_detected(void)
 
 uint8_t but_push_counter_ms = 0;
 uint8_t but_long_push_counter_ms = 0;
-
-// NOTE: this needs to be volatile so that the compiler knows it shouldn't optimize this variable.
 bool but_push_single_press = false;
+bool but_push_long_press = false;
 
 uint8_t but_pull_counter_ms = 0;
 uint8_t but_long_pull_counter_ms = 0;
-
-// NOTE: this needs to be volatile so that the compiler knows it shouldn't optimize this variable.
 bool but_pull_single_press = false;
+bool but_pull_long_press = false;
 
 uint8_t but_reset_counter_ms = 0;
 
@@ -198,6 +196,21 @@ void core_callback_t_before_exec(void)
 			clr_OUT01;
 		}
 		step_period_counter = 0;
+		
+		// long press STEP handling (generates new STEP immediately if in long press)
+		if (but_push_long_press)
+			app_regs.REG_DIR_STATE = 0;
+		
+		if(but_pull_long_press)
+			app_regs.REG_DIR_STATE = 1;
+		
+		if(but_pull_long_press || but_push_long_press)
+		{
+			app_regs.REG_STEP_STATE = 1;
+			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+			app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+		}
+		
 		return;
 	}
 	
@@ -240,9 +253,10 @@ void core_callback_t_1ms(void)
 				// long press detection
 				if(but_long_push_counter_ms)
 				{
-					// single press
-					but_push_counter_ms = 25;
 					--but_long_push_counter_ms;
+					
+					// reset push counter to allow to detect long press
+					but_push_counter_ms = 25;
 					
 					if(!but_push_single_press)
 					{
@@ -255,13 +269,7 @@ void core_callback_t_1ms(void)
 				}
 				else
 				{
-					// long press
-					// we enter here only once every 25ms, it is more than time for another step but might need adjustments
-					app_regs.REG_DIR_STATE = 0;
-					app_regs.REG_STEP_STATE = 1;
-					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-					but_push_counter_ms = 25;
+					but_push_long_press = true;
 				}
 			}
 		}
@@ -270,6 +278,7 @@ void core_callback_t_1ms(void)
 			but_push_counter_ms = 0;
 			but_long_push_counter_ms = 0;
 			but_push_single_press = false;
+			but_push_long_press = false;
 		}
 	}
 	
@@ -283,9 +292,10 @@ void core_callback_t_1ms(void)
 				// long press detection
 				if(but_long_pull_counter_ms)
 				{
-					// single press
-					but_pull_counter_ms = 25;
 					--but_long_pull_counter_ms;
+					
+					// reset pull counter to allow to detect long press
+					but_pull_counter_ms = 25;
 					
 					if(!but_pull_single_press)
 					{
@@ -298,13 +308,7 @@ void core_callback_t_1ms(void)
 				}
 				else
 				{
-					// long press
-					// we enter here every 25ms, it is more than time for another step but might need adjustments
-					app_regs.REG_DIR_STATE = 1;
-					app_regs.REG_STEP_STATE = 1;
-					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-					but_pull_counter_ms = 25;
+					but_pull_long_press = true;
 				}
 			}
 		}
@@ -313,6 +317,7 @@ void core_callback_t_1ms(void)
 			but_pull_counter_ms = 0;
 			but_long_pull_counter_ms = 0;
 			but_pull_single_press = false;
+			but_pull_long_press = false;
 		}
 	}
 	
