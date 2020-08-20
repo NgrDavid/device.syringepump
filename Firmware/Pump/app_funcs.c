@@ -457,7 +457,7 @@ void app_read_REG_PROTOCOL_PERIOD(void)
 
 bool app_write_REG_PROTOCOL_PERIOD(void *a)
 {
-	uint8_t reg = *((uint8_t*)a);
+	uint16_t reg = *((uint16_t*)a);
 
 	app_regs.REG_PROTOCOL_PERIOD = reg;
 	return true;
@@ -474,7 +474,7 @@ void app_read_REG_PROTOCOL_VOLUME(void)
 
 bool app_write_REG_PROTOCOL_VOLUME(void *a)
 {
-	uint16_t reg = *((uint16_t*)a);
+	float reg = *((float*)a);
 
 	app_regs.REG_PROTOCOL_VOLUME = reg;
 	return true;
