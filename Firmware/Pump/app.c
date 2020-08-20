@@ -81,6 +81,8 @@ bool but_pull_single_press = false;
 bool but_pull_long_press = false;
 
 uint8_t but_reset_counter_ms = 0;
+bool but_reset_pressed = false;
+bool but_reset_dir_change = false;
 
 uint8_t curr_dir = 0;
 bool disable_steps = false;
@@ -196,6 +198,20 @@ void core_callback_t_before_exec(void)
 			clr_OUT01;
 		}
 		step_period_counter = 0;
+		
+		if(but_reset_pressed)
+		{
+			// change direction once and continue steps
+			if(!but_reset_dir_change)
+			{
+				app_regs.REG_DIR_STATE = app_regs.REG_DIR_STATE == 0? 1 : 0;
+				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+				but_reset_dir_change = true;
+			}
+			
+			app_regs.REG_STEP_STATE = 1;
+			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+		}
 		
 		// long press STEP handling (generates new STEP immediately if in long press)
 		if (but_push_long_press)
@@ -328,11 +344,7 @@ void core_callback_t_1ms(void)
 		{
 			if (!--but_reset_counter_ms)
 			{
-				// steps in the opposite direction until we get the SW_F or SW_R interrupt
-				
-				// pseudo-code:
-					// activate flag here that will be caught on the interrupt for SW_F or SW_R
-					// in the interrupt
+				but_reset_pressed = true;
 			}
 		}
 		else

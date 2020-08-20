@@ -9,6 +9,8 @@
 /************************************************************************/
 extern AppRegs app_regs;
 extern bool disable_steps;
+extern bool but_reset_pressed;
+extern bool but_reset_dir_change;
 
 /************************************************************************/
 /* Interrupts from Timers                                               */
@@ -67,6 +69,8 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 	if(read_SW_F || read_SW_R)
 	{
 		disable_steps = true;
+		but_reset_pressed = false;
+		but_reset_dir_change = false;
 		if(read_SW_F)
 			if(app_regs.REG_EVT_ENABLE & B_EVT_SW_FORWARD_STATE)
 				core_func_send_event(ADD_REG_SW_FORWARD_STATE, true);
