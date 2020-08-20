@@ -185,12 +185,12 @@ void core_callback_device_to_speed(void) {}
 /* Callbacks: 1 ms timer                                                */
 /************************************************************************/
 
-#define STEP_PERIOD_MILLISECONDS 8
+#define STEP_PERIOD_HALF_MILLISECONDS 8
 
 void core_callback_t_before_exec(void) 
 {
 	// this is called every 500ms, we should handle the steps here
-	if (++step_period_counter == STEP_PERIOD_MILLISECONDS)
+	if (++step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
 	{
 		clr_STEP;
 		if((app_regs.REG_DO1_CONFIG & MSK_DI0_CONF) == GM_OUT1_STEP_STATE)
