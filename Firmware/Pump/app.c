@@ -5,6 +5,7 @@
 #include "app.h"
 #include "app_funcs.h"
 #include "app_ios_and_regs.h"
+
 #define F_CPU 32000000
 #include <util/delay.h>
 
@@ -67,7 +68,25 @@ void core_callback_catastrophic_error_detected(void)
 /************************************************************************/
 /* User functions                                                       */
 /************************************************************************/
-/* Add your functions here or load external functions if needed */
+
+
+uint8_t but_push_counter_ms = 0;
+uint8_t but_long_push_counter_ms = 0;
+bool but_push_single_press = false;
+bool but_push_long_press = false;
+
+uint8_t but_pull_counter_ms = 0;
+uint8_t but_long_pull_counter_ms = 0;
+bool but_pull_single_press = false;
+bool but_pull_long_press = false;
+
+uint8_t but_reset_counter_ms = 0;
+bool but_reset_pressed = false;
+bool but_reset_dir_change = false;
+
+uint8_t curr_dir = 0;
+bool disable_steps = false;
+uint8_t step_period_counter = 0;
 
 /************************************************************************/
 /* Initialization Callbacks                                             */
@@ -78,7 +97,9 @@ void core_callback_1st_config_hw_after_boot(void)
 	/* Don't delete this function!!! */
 	init_ios();
 	
+	// TODO: find out if this should be done here or if it is enough to set them on core_callback_registers_were_reinitialized
 	/* Initialize hardware */
+	clr_BUF_EN;
 	set_DIR;
 	clr_MS1;
 	clr_MS2;
@@ -86,9 +107,9 @@ void core_callback_1st_config_hw_after_boot(void)
 	clr_SLEEP;
 	
 	// RESET -> clear, wait 10ms, set
-	clr_RESET;
-	_delay_ms(10);
 	set_RESET;
+	_delay_ms(10);
+	clr_RESET;
 	
 	clr_EN_DRIVER;
 }
@@ -97,6 +118,7 @@ void core_callback_reset_registers(void)
 {
 	/* Initialize registers */
 	app_regs.REG_ENABLE_MOTOR_DRIVER = B_MOTOR_ENABLE;
+	app_regs.REG_ENABLE_MOTOR_UC = B_MOTOR_UC_ENABLE;
 	app_regs.REG_SET_DOS |= (B_SET_DO0 | B_SET_DO1);
 	app_regs.REG_CLEAR_DOS |= (B_CLR_DO0 | B_CLR_DO1);
 	app_regs.REG_DO0_CONFIG = GM_OUT0_SOFTWARE;
@@ -114,6 +136,7 @@ void core_callback_registers_were_reinitialized(void)
 {
 	/* Update registers if needed */
 	app_regs.REG_ENABLE_MOTOR_DRIVER = 0;
+	app_regs.REG_ENABLE_MOTOR_UC = 0;
 	
 	app_regs.REG_STEP_STATE = 0;
 	app_regs.REG_DIR_STATE = 0;
@@ -161,11 +184,175 @@ void core_callback_device_to_speed(void) {}
 /************************************************************************/
 /* Callbacks: 1 ms timer                                                */
 /************************************************************************/
-void core_callback_t_before_exec(void) {}
+
+#define STEP_PERIOD_HALF_MILLISECONDS 8
+
+void core_callback_t_before_exec(void) 
+{
+	// this is called every 500ms, we should handle the steps here
+	if (++step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
+	{
+		clr_STEP;
+		if((app_regs.REG_DO1_CONFIG & MSK_DI0_CONF) == GM_OUT1_STEP_STATE)
+		{
+			clr_OUT01;
+		}
+		step_period_counter = 0;
+		
+		if(but_reset_pressed)
+		{
+			// change direction once and continue steps
+			if(!but_reset_dir_change)
+			{
+				app_regs.REG_DIR_STATE = app_regs.REG_DIR_STATE == 0? 1 : 0;
+				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+				but_reset_dir_change = true;
+			}
+			
+			app_regs.REG_STEP_STATE = 1;
+			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+		}
+		
+		// long press STEP handling (generates new STEP immediately if in long press)
+		if (but_push_long_press)
+			app_regs.REG_DIR_STATE = 0;
+		
+		if(but_pull_long_press)
+			app_regs.REG_DIR_STATE = 1;
+		
+		if(but_pull_long_press || but_push_long_press)
+		{
+			app_regs.REG_STEP_STATE = 1;
+			app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+		}
+		
+		return;
+	}
+	
+	/* when reaching either switch limit, this flag will be true */
+	if(disable_steps)
+		return;
+	
+	if (app_regs.REG_ENABLE_MOTOR_DRIVER == B_MOTOR_ENABLE)
+	{
+		// keep the current direction
+		if(curr_dir)
+			set_DIR;
+		else
+			clr_DIR;
+		
+		app_regs.REG_DIR_STATE = curr_dir;
+		app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+	}
+}
 void core_callback_t_after_exec(void) {}
-void core_callback_t_new_second(void) {}
+void core_callback_t_new_second(void)
+{
+	if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_DATA_SEC)
+	{
+		tgl_OUT01;
+	}	
+}
 void core_callback_t_500us(void) {}
-void core_callback_t_1ms(void) {}
+	
+void core_callback_t_1ms(void) 
+{	
+	/* handle buttons */
+	/* De-bounce PUSH button */
+	if (but_push_counter_ms)
+	{
+		if (!(read_BUT_PUSH))
+		{
+			if (!--but_push_counter_ms)
+			{
+				// long press detection
+				if(but_long_push_counter_ms)
+				{
+					--but_long_push_counter_ms;
+					
+					// reset push counter to allow to detect long press
+					but_push_counter_ms = 25;
+					
+					if(!but_push_single_press)
+					{
+						app_regs.REG_DIR_STATE = 0;
+						app_regs.REG_STEP_STATE = 1;
+						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						but_push_single_press = true;
+					}
+				}
+				else
+				{
+					but_push_long_press = true;
+				}
+			}
+		}
+		else
+		{
+			but_push_counter_ms = 0;
+			but_long_push_counter_ms = 0;
+			but_push_single_press = false;
+			but_push_long_press = false;
+		}
+	}
+	
+	/* De-bounce PULL button */
+	if (but_pull_counter_ms)
+	{
+		if (!(read_BUT_PULL))
+		{
+			if (!--but_pull_counter_ms)
+			{
+				// long press detection
+				if(but_long_pull_counter_ms)
+				{
+					--but_long_pull_counter_ms;
+					
+					// reset pull counter to allow to detect long press
+					but_pull_counter_ms = 25;
+					
+					if(!but_pull_single_press)
+					{
+						app_regs.REG_DIR_STATE = 1;
+						app_regs.REG_STEP_STATE = 1;
+						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						but_pull_single_press = true;
+					}
+				}
+				else
+				{
+					but_pull_long_press = true;
+				}
+			}
+		}
+		else
+		{
+			but_pull_counter_ms = 0;
+			but_long_pull_counter_ms = 0;
+			but_pull_single_press = false;
+			but_pull_long_press = false;
+		}
+	}
+	
+	/* De-bounce RESET button */
+	if (but_reset_counter_ms)
+	{
+		if (!(read_BUT_RESET))
+		{
+			if (!--but_reset_counter_ms)
+			{
+				but_reset_pressed = true;
+			}
+		}
+		else
+		{
+			but_reset_counter_ms = 0;
+		}
+	}
+}
 
 /************************************************************************/
 /* Callbacks: uart control                                              */

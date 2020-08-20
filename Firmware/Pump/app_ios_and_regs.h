@@ -110,6 +110,8 @@ void init_ios(void);
 typedef struct
 {
 	uint8_t REG_ENABLE_MOTOR_DRIVER;
+	uint8_t REG_ENABLE_MOTOR_UC;
+	uint8_t REG_START_PROTOCOL;
 	uint8_t REG_STEP_STATE;
 	uint8_t REG_DIR_STATE;
 	uint8_t REG_SW_FORWARD_STATE;
@@ -123,9 +125,11 @@ typedef struct
 	uint8_t REG_MOTOR_MICROSTEP;
 	uint16_t REG_PROTOCOL_NUMBER_STEPS;
 	float REG_PROTOCOL_FLOWRATE;
-	uint8_t REG_PROTOCOL_VAR0;
-	uint16_t REG_PROTOCOL_VAR1;
-	float REG_PROTOCOL_VAR2;
+	uint16_t REG_PROTOCOL_PERIOD;
+	float REG_PROTOCOL_VOLUME;
+	uint8_t REG_PROTOCOL_TYPE;
+	uint8_t REG_CALIBRATION_VALUE_1;
+	uint8_t REG_CALIBRATION_VALUE_2;
 	uint8_t REG_EVT_ENABLE;
 } AppRegs;
 
@@ -134,23 +138,27 @@ typedef struct
 /************************************************************************/
 /* Registers */
 #define ADD_REG_ENABLE_MOTOR_DRIVER         32 // U8     Enable the motor driver
-#define ADD_REG_STEP_STATE                  33 // U8     Control the step of the motor controller
-#define ADD_REG_DIR_STATE                   34 // U8     Control the direction of the motor controller
-#define ADD_REG_SW_FORWARD_STATE            35 // U8     State of the forward switch limit
-#define ADD_REG_SW_REVERSE_STATE            36 // U8     State of the reverse switch limit
-#define ADD_REG_INPUT_STATE                 37 // U8     Value of input 0 pin
-#define ADD_REG_SET_DOS                     38 // U8     Set digital outputs
-#define ADD_REG_CLEAR_DOS                   39 // U8     Clear digital outputs
-#define ADD_REG_DO0_CONFIG                  40 // U8     Configures which signal is connected to the digital output 0
-#define ADD_REG_DO1_CONFIG                  41 // U8     Configures which signal is connected to the digital output 1
-#define ADD_REG_DI0_CONFIG                  42 // U8     Configuration of the digital input 0 (DI0)
-#define ADD_REG_MOTOR_MICROSTEP             43 // U8     Defines the motor microstep
-#define ADD_REG_PROTOCOL_NUMBER_STEPS       44 // U16    Number of steps [1;65535]
-#define ADD_REG_PROTOCOL_FLOWRATE           45 // FLOAT  Flowrate value [0.5;2000.0]?
-#define ADD_REG_PROTOCOL_VAR0               46 // U8     Dummy
-#define ADD_REG_PROTOCOL_VAR1               47 // U16    Dummy
-#define ADD_REG_PROTOCOL_VAR2               48 // FLOAT  Dummy
-#define ADD_REG_EVT_ENABLE                  49 // U8     Enable the Events
+#define ADD_REG_ENABLE_MOTOR_UC             33 // U8     Enable the motor micro controller
+#define ADD_REG_START_PROTOCOL              34 // U8     Enable the defined protocol
+#define ADD_REG_STEP_STATE                  35 // U8     Control the step of the motor controller
+#define ADD_REG_DIR_STATE                   36 // U8     Control the direction of the motor controller
+#define ADD_REG_SW_FORWARD_STATE            37 // U8     State of the forward switch limit
+#define ADD_REG_SW_REVERSE_STATE            38 // U8     State of the reverse switch limit
+#define ADD_REG_INPUT_STATE                 39 // U8     Value of input 0 pin
+#define ADD_REG_SET_DOS                     40 // U8     Set digital outputs
+#define ADD_REG_CLEAR_DOS                   41 // U8     Clear digital outputs
+#define ADD_REG_DO0_CONFIG                  42 // U8     Configures which signal is connected to the digital output 0
+#define ADD_REG_DO1_CONFIG                  43 // U8     Configures which signal is connected to the digital output 1
+#define ADD_REG_DI0_CONFIG                  44 // U8     Configuration of the digital input 0 (DI0)
+#define ADD_REG_MOTOR_MICROSTEP             45 // U8     Defines the motor microstep
+#define ADD_REG_PROTOCOL_NUMBER_STEPS       46 // U16    Number of steps [1;65535]
+#define ADD_REG_PROTOCOL_FLOWRATE           47 // FLOAT  Flowrate value [0.5;2000.0]
+#define ADD_REG_PROTOCOL_PERIOD             48 // U16    Period for each step in ms [1;65535]
+#define ADD_REG_PROTOCOL_VOLUME             49 // FLOAT  Volume value in uL [0.5;2000.0]
+#define ADD_REG_PROTOCOL_TYPE               50 // U8     Step-based (0) or Volume-based protocol (1)
+#define ADD_REG_CALIBRATION_VALUE_1         51 // U8     Calibration value 1
+#define ADD_REG_CALIBRATION_VALUE_2         52 // U8     Calibration value 2
+#define ADD_REG_EVT_ENABLE                  53 // U8     Enable the Events
 
 /************************************************************************/
 /* PWM Generator registers' memory limits                               */
@@ -160,13 +168,15 @@ typedef struct
 /************************************************************************/
 /* Memory limits */
 #define APP_REGS_ADD_MIN                    0x20
-#define APP_REGS_ADD_MAX                    0x31
-#define APP_NBYTES_OF_REG_BANK              26
+#define APP_REGS_ADD_MAX                    0x35
+#define APP_NBYTES_OF_REG_BANK              30
 
 /************************************************************************/
 /* Registers' bits                                                      */
 /************************************************************************/
 #define B_MOTOR_ENABLE                     (1<<0)       // Enable motor when equal to 1
+#define B_MOTOR_UC_ENABLE                  (1<<0)       // Enable motor when equal to 1
+#define B_PROTOCOL_START                   (1<<0)       // Start the procotol when equal to 1
 #define B_STEP_PIN                         (1<<0)       // Status of the STEP motor controller pin
 #define B_DIR_PIN                          (1<<1)       // Status of the DIR motor controller pin
 #define B_SW_F_PIN                         (1<<0)       // Status of the forward switch limit
@@ -176,18 +186,18 @@ typedef struct
 #define B_SET_DO1                          (1<<1)       // Write one to this bit will put digital out 1 into High state
 #define B_CLR_DO0                          (1<<0)       // Write one to this bit will put digital out 0 into Low state
 #define B_CLR_DO1                          (1<<1)       // Write one to this bit will put digital out 1 into Low state
-#define MSK_OUT0_CONF                      (2<<0)       // Select OUT0 function
+#define MSK_OUT0_CONF                      (3<<0)       // Select OUT0 function
 #define GM_OUT0_SOFTWARE                   (0<<0)       // Digital output controlled by software
 #define GM_OUT0_SWLIMIT                    (1<<0)       // Either limits reached (register SW_FORWARD_STATE OR SW_REVERSE_STATE)
 #define MSK_OUT1_CONF                      (3<<0)       // Select OUT1 function
 #define GM_OUT1_SOFTWARE                   (0<<0)       // Digital output controlled by software (SET_DO1 and CLEAR_DO1)
-#define GM_DO0_DATA_SEC                    (1<<0)       // Toggles each second when is acquiring
-#define GM_OUT0_STEP_STATE                 (2<<0)       // Equal to register STEP_STATE
+#define GM_OUT1_DATA_SEC                   (1<<0)       // Toggles each second when is acquiring
+#define GM_OUT1_STEP_STATE                 (2<<0)       // Equal to register STEP_STATE
 #define MSK_DI0_CONF                       (3<<0)       // Select IN0 function
 #define GM_DI0_SYNC                        (0<<0)       // Use as a pure digital input
 #define GM_DI0_RISE_FALL_UPDATE_STEP       (1<<0)       // Update STEP with a rising edge
 #define GM_DI0_RISE_START_PROTOCOL         (2<<0)       // Will trigger the predefined protocol on a rising edge
-#define MSK_MICROSTEP                      (5<<0)       // 
+#define MSK_MICROSTEP                      (7<<0)       // 
 #define GM_STEP_FULL                       (0<<0)       // Full step (2 phase)
 #define GM_STEP_HALF                       (1<<0)       // Half step
 #define GM_STEP_QUARTER                    (2<<0)       // Quarter step

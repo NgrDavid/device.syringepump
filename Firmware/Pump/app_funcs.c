@@ -2,14 +2,18 @@
 #include "app_ios_and_regs.h"
 #include "hwbp_core.h"
 
-
 /************************************************************************/
 /* Create pointers to functions                                         */
 /************************************************************************/
 extern AppRegs app_regs;
+extern uint8_t curr_dir;
+extern bool disable_steps;
+extern uint8_t step_period_counter;
 
 void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_ENABLE_MOTOR_DRIVER,
+	&app_read_REG_ENABLE_MOTOR_UC,
+	&app_read_REG_START_PROTOCOL,
 	&app_read_REG_STEP_STATE,
 	&app_read_REG_DIR_STATE,
 	&app_read_REG_SW_FORWARD_STATE,
@@ -23,14 +27,18 @@ void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_MOTOR_MICROSTEP,
 	&app_read_REG_PROTOCOL_NUMBER_STEPS,
 	&app_read_REG_PROTOCOL_FLOWRATE,
-	&app_read_REG_PROTOCOL_VAR0,
-	&app_read_REG_PROTOCOL_VAR1,
-	&app_read_REG_PROTOCOL_VAR2,
+	&app_read_REG_PROTOCOL_PERIOD,
+	&app_read_REG_PROTOCOL_VOLUME,
+	&app_read_REG_PROTOCOL_TYPE,
+	&app_read_REG_CALIBRATION_VALUE_1,
+	&app_read_REG_CALIBRATION_VALUE_2,
 	&app_read_REG_EVT_ENABLE
 };
 
 bool (*app_func_wr_pointer[])(void*) = {
 	&app_write_REG_ENABLE_MOTOR_DRIVER,
+	&app_write_REG_ENABLE_MOTOR_UC,
+	&app_write_REG_START_PROTOCOL,
 	&app_write_REG_STEP_STATE,
 	&app_write_REG_DIR_STATE,
 	&app_write_REG_SW_FORWARD_STATE,
@@ -44,9 +52,11 @@ bool (*app_func_wr_pointer[])(void*) = {
 	&app_write_REG_MOTOR_MICROSTEP,
 	&app_write_REG_PROTOCOL_NUMBER_STEPS,
 	&app_write_REG_PROTOCOL_FLOWRATE,
-	&app_write_REG_PROTOCOL_VAR0,
-	&app_write_REG_PROTOCOL_VAR1,
-	&app_write_REG_PROTOCOL_VAR2,
+	&app_write_REG_PROTOCOL_PERIOD,
+	&app_write_REG_PROTOCOL_VOLUME,
+	&app_write_REG_PROTOCOL_TYPE,
+	&app_write_REG_CALIBRATION_VALUE_1,
+	&app_write_REG_CALIBRATION_VALUE_2,
 	&app_write_REG_EVT_ENABLE
 };
 
@@ -54,17 +64,70 @@ bool (*app_func_wr_pointer[])(void*) = {
 /************************************************************************/
 /* REG_ENABLE_MOTOR_DRIVER                                              */
 /************************************************************************/
-void app_read_REG_ENABLE_MOTOR_DRIVER(void)
-{
-	//app_regs.REG_ENABLE_MOTOR_DRIVER = 0;
-
-}
-
+void app_read_REG_ENABLE_MOTOR_DRIVER(void){}
 bool app_write_REG_ENABLE_MOTOR_DRIVER(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
-
+	
+	if(reg)
+		set_EN_DRIVER;
+	else
+		clr_EN_DRIVER;
+	
 	app_regs.REG_ENABLE_MOTOR_DRIVER = reg;
+
+	return true;
+}
+
+
+/************************************************************************/
+/* REG_ENABLE_MOTOR_UC		                                            */
+/************************************************************************/
+void app_read_REG_ENABLE_MOTOR_UC(void){}
+bool app_write_REG_ENABLE_MOTOR_UC(void *a)
+{
+	uint8_t reg = *((uint8_t*)a);
+	
+	app_write_REG_ENABLE_MOTOR_DRIVER(&reg);
+	
+	if(reg)
+	{
+		set_BUF_EN;
+			
+		// change STEP, DIR and MSx as tristate
+		io_pin2out(&PORTA, 0, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);			// STEP
+		io_pin2out(&PORTA, 1, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // DIR
+		io_pin2out(&PORTA, 2, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS1
+		io_pin2out(&PORTA, 3, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS2
+		io_pin2out(&PORTA, 4, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS3
+	}
+	else
+	{
+		clr_BUF_EN;
+		
+		// change STEP, DIR and MSx to default mode
+		io_pin2out(&PORTA, 0, OUT_IO_DIGITAL, IN_EN_IO_EN);                  // STEP
+		io_pin2out(&PORTA, 1, OUT_IO_DIGITAL, IN_EN_IO_EN);                  // DIR
+		io_pin2out(&PORTA, 2, OUT_IO_DIGITAL, IN_EN_IO_DIS);                 // MS1
+		io_pin2out(&PORTA, 3, OUT_IO_DIGITAL, IN_EN_IO_DIS);                 // MS2
+		io_pin2out(&PORTA, 4, OUT_IO_DIGITAL, IN_EN_IO_DIS);                 // MS3
+	}
+	app_regs.REG_ENABLE_MOTOR_UC = reg;
+
+	return true;
+}
+
+
+/************************************************************************/
+/* REG_START_PROTOCOL		                                            */
+/************************************************************************/
+void app_read_REG_START_PROTOCOL(void){}
+bool app_write_REG_START_PROTOCOL(void *a)
+{
+	uint8_t reg = *((uint8_t*)a);
+
+	app_regs.REG_START_PROTOCOL = reg;
+
 	return true;
 }
 
@@ -81,6 +144,22 @@ void app_read_REG_STEP_STATE(void)
 bool app_write_REG_STEP_STATE(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
+	
+	if(reg)
+	{
+		// force starting counting from the start
+		step_period_counter = 0;
+		set_STEP;
+		if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
+		{
+			set_OUT01;
+		}
+		
+		if (app_regs.REG_EVT_ENABLE & B_EVT_STEP_STATE)
+		{
+			core_func_send_event(ADD_REG_STEP_STATE, true);
+		}
+	}
 
 	app_regs.REG_STEP_STATE = reg;
 	return true;
@@ -99,6 +178,16 @@ void app_read_REG_DIR_STATE(void)
 bool app_write_REG_DIR_STATE(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
+	
+	if(reg != curr_dir)
+	{
+		curr_dir = reg;
+		if(app_regs.REG_ENABLE_MOTOR_DRIVER == B_MOTOR_ENABLE)
+		{
+			if(app_regs.REG_EVT_ENABLE & B_EVT_DIR_STATE)
+				core_func_send_event(ADD_REG_DIR_STATE, true);
+		}
+	}
 
 	app_regs.REG_DIR_STATE = reg;
 	return true;
@@ -171,6 +260,14 @@ void app_read_REG_SET_DOS(void)
 bool app_write_REG_SET_DOS(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
+	
+	if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SOFTWARE)
+		if(reg & B_SET_DO0)
+			set_OUT00;
+	
+	if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_SOFTWARE)
+		if(reg & B_SET_DO1)
+			set_OUT01;
 
 	app_regs.REG_SET_DOS = reg;
 	return true;
@@ -189,6 +286,14 @@ void app_read_REG_CLEAR_DOS(void)
 bool app_write_REG_CLEAR_DOS(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
+	
+	if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SOFTWARE)
+		if((reg & B_CLR_DO0) == 0)
+			clr_OUT00;
+	
+	if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_SOFTWARE)
+		if((reg & B_CLR_DO1) == 0)
+			clr_OUT01;
 
 	app_regs.REG_CLEAR_DOS = reg;
 	return true;
@@ -252,16 +357,47 @@ bool app_write_REG_DI0_CONFIG(void *a)
 /************************************************************************/
 /* REG_MOTOR_MICROSTEP                                                  */
 /************************************************************************/
-void app_read_REG_MOTOR_MICROSTEP(void)
-{
-	//app_regs.REG_MOTOR_MICROSTEP = 0;
-
-}
-
+void app_read_REG_MOTOR_MICROSTEP(void){}
 bool app_write_REG_MOTOR_MICROSTEP(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
+	
+	switch (reg)
+	{
+		case GM_STEP_FULL:
+			clr_MS1;
+			clr_MS2;
+			clr_MS3;
+			break;
+		
+		case GM_STEP_HALF:
+			set_MS1;
+			clr_MS2;
+			clr_MS3;
+			break;
+		
+		case GM_STEP_QUARTER:
+			clr_MS1;
+			set_MS2;
+			clr_MS3;
+			break;
+		
+		case GM_STEP_EIGHTH:
+			set_MS1;
+			set_MS2;
+			clr_MS3;
+			break;
 
+		case GM_STEP_SIXTEENTH:
+			set_MS1;
+			set_MS2;
+			set_MS3;
+			break;
+
+		default:
+			return false;
+	}
+	
 	app_regs.REG_MOTOR_MICROSTEP = reg;
 	return true;
 }
@@ -312,55 +448,89 @@ bool app_write_REG_PROTOCOL_FLOWRATE(void *a)
 
 
 /************************************************************************/
-/* REG_PROTOCOL_VAR0                                                    */
+/* REG_PROTOCOL_PERIOD                                                  */
 /************************************************************************/
-void app_read_REG_PROTOCOL_VAR0(void)
+void app_read_REG_PROTOCOL_PERIOD(void)
 {
-	//app_regs.REG_PROTOCOL_VAR0 = 0;
-
+	//app_regs.REG_PROTOCOL_PERIOD = 0;
 }
 
-bool app_write_REG_PROTOCOL_VAR0(void *a)
-{
-	uint8_t reg = *((uint8_t*)a);
-
-	app_regs.REG_PROTOCOL_VAR0 = reg;
-	return true;
-}
-
-
-/************************************************************************/
-/* REG_PROTOCOL_VAR1                                                    */
-/************************************************************************/
-void app_read_REG_PROTOCOL_VAR1(void)
-{
-	//app_regs.REG_PROTOCOL_VAR1 = 0;
-
-}
-
-bool app_write_REG_PROTOCOL_VAR1(void *a)
+bool app_write_REG_PROTOCOL_PERIOD(void *a)
 {
 	uint16_t reg = *((uint16_t*)a);
 
-	app_regs.REG_PROTOCOL_VAR1 = reg;
+	app_regs.REG_PROTOCOL_PERIOD = reg;
 	return true;
 }
 
 
 /************************************************************************/
-/* REG_PROTOCOL_VAR2                                                    */
+/* REG_PROTOCOL_VOLUME                                                  */
 /************************************************************************/
-void app_read_REG_PROTOCOL_VAR2(void)
+void app_read_REG_PROTOCOL_VOLUME(void)
 {
-	//app_regs.REG_PROTOCOL_VAR2 = 0;
-
+	//app_regs.REG_PROTOCOL_VOLUME = 0;
 }
 
-bool app_write_REG_PROTOCOL_VAR2(void *a)
+bool app_write_REG_PROTOCOL_VOLUME(void *a)
 {
 	float reg = *((float*)a);
 
-	app_regs.REG_PROTOCOL_VAR2 = reg;
+	app_regs.REG_PROTOCOL_VOLUME = reg;
+	return true;
+}
+
+
+/************************************************************************/
+/* REG_PROTOCOL_TYPE                                                    */
+/************************************************************************/
+void app_read_REG_PROTOCOL_TYPE(void)
+{
+	//app_regs.REG_PROTOCOL_TYPE = 0;
+
+}
+
+bool app_write_REG_PROTOCOL_TYPE(void *a)
+{
+	float reg = *((float*)a);
+
+	app_regs.REG_PROTOCOL_TYPE = reg;
+	return true;
+}
+
+
+/************************************************************************/
+/* REG_CALIBRATION_VALUE_1                                              */
+/************************************************************************/
+void app_read_REG_CALIBRATION_VALUE_1(void)
+{
+	//app_regs.REG_CALIBRATION_VALUE_1 = 0;
+
+}
+
+bool app_write_REG_CALIBRATION_VALUE_1(void *a)
+{
+	float reg = *((float*)a);
+
+	app_regs.REG_CALIBRATION_VALUE_1 = reg;
+	return true;
+}
+
+
+/************************************************************************/
+/* REG_CALIBRATION_VALUE_2                                              */
+/************************************************************************/
+void app_read_REG_CALIBRATION_VALUE_2(void)
+{
+	//app_regs.REG_CALIBRATION_VALUE_2 = 0;
+
+}
+
+bool app_write_REG_CALIBRATION_VALUE_2(void *a)
+{
+	float reg = *((float*)a);
+
+	app_regs.REG_CALIBRATION_VALUE_2 = reg;
 	return true;
 }
 
