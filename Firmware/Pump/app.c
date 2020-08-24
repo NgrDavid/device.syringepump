@@ -94,7 +94,8 @@ uint16_t prot_step_period = 0;
 
 void reset_protocol_variables()
 {
-	prot_remaining_steps = app_regs.REG_PROTOCOL_NUMBER_STEPS;
+	//note: + 1 because it starts counting from 1
+	prot_remaining_steps = app_regs.REG_PROTOCOL_NUMBER_STEPS + 1;
 	prot_step_period = app_regs.REG_PROTOCOL_PERIOD * 2;
 	app_regs.REG_START_PROTOCOL = 0;
 }
