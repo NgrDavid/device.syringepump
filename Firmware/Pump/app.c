@@ -208,6 +208,7 @@ void core_callback_device_to_speed(void) {}
 /************************************************************************/
 
 #define STEP_PERIOD_HALF_MILLISECONDS 8
+#define STEP_UPTIME_MILLISECONDS 4
 
 void core_callback_t_before_exec(void) 
 {
@@ -215,9 +216,8 @@ void core_callback_t_before_exec(void)
 	{
 		if(!disable_steps)
 		{
-			// this is called every 500 us, so we need to check twice the protocol's step period
 			++step_period_counter;
-			if(step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
+			if(step_period_counter == STEP_UPTIME_MILLISECONDS)
 			{
 				clear_step();
 			}
@@ -245,11 +245,9 @@ void core_callback_t_before_exec(void)
 	else
 	{
 		// normal counting, outside of protocol
-		// this is called every 500us, we should handle the steps here
 		++step_period_counter;
-		if(step_period_counter == (STEP_PERIOD_HALF_MILLISECONDS / 2))
+		if(step_period_counter == STEP_UPTIME_MILLISECONDS)
 			clear_step();
-		
 		
 		if(step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
 		{
