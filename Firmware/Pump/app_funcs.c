@@ -117,6 +117,13 @@ bool app_write_REG_STEP_STATE(void *a)
 	{
 		// force starting counting from the start
 		step_period_counter = 0;
+		
+		if(app_regs.REG_ENABLE_MOTOR_DRIVER == 0)
+		{
+			app_regs.REG_ENABLE_MOTOR_DRIVER = 1;
+			app_write_REG_ENABLE_MOTOR_DRIVER(&app_regs.REG_ENABLE_MOTOR_DRIVER);
+		}
+		
 		set_STEP;
 		if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
 		{
