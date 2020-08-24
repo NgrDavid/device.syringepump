@@ -86,7 +86,7 @@ bool but_reset_dir_change = false;
 
 uint8_t curr_dir = 0;
 bool disable_steps = false;
-uint8_t step_period_counter = 0;
+volatile uint16_t step_period_counter = 0;
 
 bool running_protocol = false;
 uint16_t prot_remaining_steps = 0;
