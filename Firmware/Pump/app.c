@@ -140,7 +140,6 @@ void core_callback_reset_registers(void)
 {
 	/* Initialize registers */
 	app_regs.REG_ENABLE_MOTOR_DRIVER = B_MOTOR_ENABLE;
-	app_regs.REG_ENABLE_MOTOR_UC = B_MOTOR_UC_ENABLE;
 	app_regs.REG_START_PROTOCOL = B_START_PROTOCOL;
 	app_regs.REG_SET_DOS |= (B_SET_DO0 | B_SET_DO1);
 	app_regs.REG_CLEAR_DOS |= (B_CLR_DO0 | B_CLR_DO1);
@@ -159,7 +158,6 @@ void core_callback_registers_were_reinitialized(void)
 {
 	/* Update registers if needed */
 	app_regs.REG_ENABLE_MOTOR_DRIVER = 0;
-	app_regs.REG_ENABLE_MOTOR_UC = 0;
 	app_regs.REG_START_PROTOCOL = 0;
 	
 	app_regs.REG_STEP_STATE = 0;
