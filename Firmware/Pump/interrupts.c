@@ -76,15 +76,15 @@ ISR(PORTB_INT0_vect, ISR_NAKED)
 /************************************************************************/
 ISR(PORTC_INT0_vect, ISR_NAKED)
 {
-	if(read_SW_F || read_SW_R)
+	if(!(read_SW_F) || !(read_SW_R))
 	{
 		disable_steps = true;
 		but_reset_pressed = false;
 		but_reset_dir_change = false;
-		if(read_SW_F)
+		if(!(read_SW_F))
 			if(app_regs.REG_EVT_ENABLE & B_EVT_SW_FORWARD_STATE)
 				core_func_send_event(ADD_REG_SW_FORWARD_STATE, true);
-		if(read_SW_R)
+		if(!(read_SW_R))
 			if(app_regs.REG_EVT_ENABLE & B_EVT_SW_REVERSE_STATE)
 				core_func_send_event(ADD_REG_SW_REVERSE_STATE, true);
 	}
@@ -95,7 +95,7 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 		
 	if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
 	{
-		if(read_SW_F | read_SW_R)
+		if(!(read_SW_F )| !(read_SW_R))
 			set_OUT00;
 		else
 			clr_OUT00;
