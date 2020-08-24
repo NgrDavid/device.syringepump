@@ -176,7 +176,7 @@ typedef struct
 /************************************************************************/
 #define B_MOTOR_ENABLE                     (1<<0)       // Enable motor when equal to 1
 #define B_MOTOR_UC_ENABLE                  (1<<0)       // Enable motor when equal to 1
-#define B_PROTOCOL_START                   (1<<0)       // Start the procotol when equal to 1
+#define B_START_PROTOCOL                   (1<<0)       // Start the protocol when equal to 1
 #define B_STEP_PIN                         (1<<0)       // Status of the STEP motor controller pin
 #define B_DIR_PIN                          (1<<1)       // Status of the DIR motor controller pin
 #define B_SW_F_PIN                         (1<<0)       // Status of the forward switch limit
