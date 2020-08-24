@@ -128,8 +128,7 @@ bool app_write_REG_START_PROTOCOL(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
-	// FIXME: this probably should be running_protocol = reg > 0; to prevent bad values injection
-	running_protocol = reg;
+	running_protocol = reg > 0;
 	
 	//NOTE: after enabling the protocol, even if those values change they	
 	//		will only be updated after stopping and starting the protocol again
@@ -472,6 +471,10 @@ void app_read_REG_PROTOCOL_PERIOD(void)
 bool app_write_REG_PROTOCOL_PERIOD(void *a)
 {
 	uint16_t reg = *((uint16_t*)a);
+	
+	/* Check range */
+	if (reg < 1)
+		return false;
 
 	app_regs.REG_PROTOCOL_PERIOD = reg;
 	return true;
@@ -489,6 +492,10 @@ void app_read_REG_PROTOCOL_VOLUME(void)
 bool app_write_REG_PROTOCOL_VOLUME(void *a)
 {
 	float reg = *((float*)a);
+	
+	/* Check range */
+	if (reg < 0.5 || reg > 2000.0)
+		return false;
 
 	app_regs.REG_PROTOCOL_VOLUME = reg;
 	return true;
