@@ -95,7 +95,8 @@ uint16_t prot_step_period = 0;
 void reset_protocol_variables()
 {
 	prot_remaining_steps = app_regs.REG_PROTOCOL_NUMBER_STEPS;
-	prot_step_period = app_regs.REG_PROTOCOL_PERIOD;
+	prot_step_period = app_regs.REG_PROTOCOL_PERIOD * 2;
+	app_regs.REG_START_PROTOCOL = 0;
 }
 
 void clear_step()
@@ -105,7 +106,6 @@ void clear_step()
 	{
 		clr_OUT01;
 	}
-	step_period_counter = 0;
 }
 
 
@@ -215,10 +215,15 @@ void core_callback_t_before_exec(void)
 		if(!disable_steps)
 		{
 			// this is called every 500 us, so we need to check twice the protocol's step period
-			if(++step_period_counter == (prot_step_period * 2))
+			++step_period_counter;
+			if(step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
 			{
 				clear_step();
-							
+			}
+			
+			if(step_period_counter == prot_step_period)
+			{
+				step_period_counter = 0;
 				// make step if there are still steps remaining in the current running protocol
 				if(--prot_remaining_steps)
 				{
@@ -240,9 +245,14 @@ void core_callback_t_before_exec(void)
 	{
 		// normal counting, outside of protocol
 		// this is called every 500us, we should handle the steps here
-		if (++step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
-		{
+		++step_period_counter;
+		if(step_period_counter == (STEP_PERIOD_HALF_MILLISECONDS / 2))
 			clear_step();
+		
+		
+		if(step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
+		{
+			step_period_counter = 0;
 			
 			if(but_reset_pressed)
 			{
