@@ -134,8 +134,25 @@ ISR(PORTD_INT0_vect, ISR_NAKED)
 	
 	if(read_EN_DRIVER_UC)
 	{
-		app_regs.REG_ENABLE_MOTOR_UC = 1;
-		app_write_REG_ENABLE_MOTOR_UC(&app_regs.REG_ENABLE_MOTOR_UC);
+		set_BUF_EN;
+
+		// change STEP, DIR and MSx as tristate
+		io_pin2out(&PORTA, 0, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);			// STEP
+		io_pin2out(&PORTA, 1, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // DIR
+		io_pin2out(&PORTA, 2, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS1
+		io_pin2out(&PORTA, 3, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS2
+		io_pin2out(&PORTA, 4, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS3
+	}
+	else
+	{
+		clr_BUF_EN;
+		
+		// change STEP, DIR and MSx to default mode
+		io_pin2out(&PORTA, 0, OUT_IO_DIGITAL, IN_EN_IO_EN);                  // STEP
+		io_pin2out(&PORTA, 1, OUT_IO_DIGITAL, IN_EN_IO_EN);                  // DIR
+		io_pin2out(&PORTA, 2, OUT_IO_DIGITAL, IN_EN_IO_DIS);                 // MS1
+		io_pin2out(&PORTA, 3, OUT_IO_DIGITAL, IN_EN_IO_DIS);                 // MS2
+		io_pin2out(&PORTA, 4, OUT_IO_DIGITAL, IN_EN_IO_DIS);                 // MS3
 	}
 	
 	reti();
