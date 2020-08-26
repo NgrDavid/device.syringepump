@@ -71,13 +71,11 @@ void core_callback_catastrophic_error_detected(void)
 
 
 uint8_t but_push_counter_ms = 0;
-uint8_t but_long_push_counter_ms = 0;
-bool but_push_single_press = false;
+uint16_t but_long_push_counter_ms = 0;
 bool but_push_long_press = false;
 
 uint8_t but_pull_counter_ms = 0;
-uint8_t but_long_pull_counter_ms = 0;
-bool but_pull_single_press = false;
+uint16_t but_long_pull_counter_ms = 0;
 bool but_pull_long_press = false;
 
 uint8_t but_reset_counter_ms = 0;
