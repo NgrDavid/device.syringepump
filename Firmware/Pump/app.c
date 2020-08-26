@@ -321,33 +321,37 @@ void core_callback_t_1ms(void)
 {	
 	/* handle buttons */
 	/* De-bounce PUSH button */
-	if (but_push_counter_ms)
+	if(but_push_counter_ms)
 	{
 		if (!(read_BUT_PUSH))
 		{
 			if (!--but_push_counter_ms)
 			{
-				// long press detection
-				if(but_long_push_counter_ms)
+				// single press
+				if(!running_protocol)
 				{
-					--but_long_push_counter_ms;
-					
-					// reset push counter to allow to detect long press
-					but_push_counter_ms = 25;
-					
-					if(!but_push_single_press && !running_protocol)
-					{
-						app_regs.REG_DIR_STATE = 0;
-						app_regs.REG_STEP_STATE = 1;
-						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-						but_push_single_press = true;
-					}
+					app_regs.REG_DIR_STATE = 0;
+					app_regs.REG_STEP_STATE = 1;
+					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 				}
-				else
-				{
-					but_push_long_press = true;
-				}
+			}
+		}
+		else
+		{
+			clear_but_push();
+		}
+	}
+	
+	// detect PUSH button long press
+	if(!but_push_counter_ms && but_long_push_counter_ms)
+	{
+		if (!(read_BUT_PUSH))
+		{
+			// long press detection
+			if(!--but_long_push_counter_ms)
+			{
+				but_push_long_press = true;
 			}
 		}
 		else
@@ -363,27 +367,31 @@ void core_callback_t_1ms(void)
 		{
 			if (!--but_pull_counter_ms)
 			{
-				// long press detection
-				if(but_long_pull_counter_ms)
+				// single press
+				if(!running_protocol)
 				{
-					--but_long_pull_counter_ms;
-					
-					// reset pull counter to allow to detect long press
-					but_pull_counter_ms = 25;
-					
-					if(!but_pull_single_press && !running_protocol)
-					{
-						app_regs.REG_DIR_STATE = 1;
-						app_regs.REG_STEP_STATE = 1;
-						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-						but_pull_single_press = true;
-					}
+					app_regs.REG_DIR_STATE = 1;
+					app_regs.REG_STEP_STATE = 1;
+					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 				}
-				else
-				{
-					but_pull_long_press = true;
-				}
+			}
+		}
+		else
+		{
+			clear_but_pull();
+		}
+	}
+	
+	// detect PULL button long press
+	if(!but_pull_counter_ms && but_long_pull_counter_ms)
+	{
+		if (!(read_BUT_PULL))
+		{
+			// long press detection
+			if(!--but_long_pull_counter_ms)
+			{
+				but_pull_long_press = true;
 			}
 		}
 		else
