@@ -102,6 +102,8 @@ void reset_protocol_variables()
 
 void clear_step()
 {
+	app_regs.REG_STEP_STATE = 0;
+
 	clr_STEP;
 	if((app_regs.REG_DO1_CONFIG & MSK_DI0_CONF) == GM_OUT1_STEP_STATE)
 	{
