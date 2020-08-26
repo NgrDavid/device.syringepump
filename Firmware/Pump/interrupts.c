@@ -118,13 +118,13 @@ ISR(PORTD_INT0_vect, ISR_NAKED)
 	if(!(read_BUT_PUSH))
 	{
 		but_push_counter_ms = 25;
-		but_long_push_counter_ms = 20;		// 20 x 25ms = 500ms
+		but_long_push_counter_ms = 500;
 	}
 	
 	if(!(read_BUT_PULL))
 	{
 		but_pull_counter_ms = 25;
-		but_long_pull_counter_ms = 20;		// 20 x 25ms = 500ms
+		but_long_pull_counter_ms = 500;
 	}
 	
 	if(!(read_BUT_RESET))
