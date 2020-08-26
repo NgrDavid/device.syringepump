@@ -226,6 +226,12 @@ void core_callback_device_to_speed(void) {}
 
 void core_callback_t_before_exec(void) 
 {
+	//FIXME: ugly fix for clearing long button presses if still active
+	if(read_BUT_PUSH)
+		clear_but_push();
+	if(read_BUT_PULL)
+		clear_but_pull();
+
 	if(running_protocol)
 	{
 		if(!disable_steps)
