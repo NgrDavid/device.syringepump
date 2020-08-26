@@ -109,6 +109,22 @@ void clear_step()
 	}
 }
 
+void clear_but_push()
+{
+	but_push_counter_ms = 0;
+	but_long_push_counter_ms = 0;
+	but_push_single_press = false;
+	but_push_long_press = false;
+}
+
+void clear_but_pull()
+{
+	but_pull_counter_ms = 0;
+	but_long_pull_counter_ms = 0;
+	but_pull_single_press = false;
+	but_pull_long_press = false;
+}
+
 
 /************************************************************************/
 /* Initialization Callbacks                                             */
@@ -336,10 +352,7 @@ void core_callback_t_1ms(void)
 		}
 		else
 		{
-			but_push_counter_ms = 0;
-			but_long_push_counter_ms = 0;
-			but_push_single_press = false;
-			but_push_long_press = false;
+			clear_but_push();
 		}
 	}
 	
@@ -375,10 +388,7 @@ void core_callback_t_1ms(void)
 		}
 		else
 		{
-			but_pull_counter_ms = 0;
-			but_long_pull_counter_ms = 0;
-			but_pull_single_press = false;
-			but_pull_long_press = false;
+			clear_but_pull();
 		}
 	}
 	
