@@ -70,7 +70,6 @@ uint8_t app_regs_type[] = {
 	TYPE_U8,
 	TYPE_U8,
 	TYPE_U8,
-	TYPE_U8,
 	TYPE_U16,
 	TYPE_FLOAT,
 	TYPE_U16,
@@ -102,13 +101,11 @@ uint16_t app_regs_n_elements[] = {
 	1,
 	1,
 	1,
-	1,
 	1
 };
 
 uint8_t *app_regs_pointer[] = {
 	(uint8_t*)(&app_regs.REG_ENABLE_MOTOR_DRIVER),
-	(uint8_t*)(&app_regs.REG_ENABLE_MOTOR_UC),
 	(uint8_t*)(&app_regs.REG_START_PROTOCOL),
 	(uint8_t*)(&app_regs.REG_STEP_STATE),
 	(uint8_t*)(&app_regs.REG_DIR_STATE),

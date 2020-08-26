@@ -86,7 +86,45 @@ bool but_reset_dir_change = false;
 
 uint8_t curr_dir = 0;
 bool disable_steps = false;
-uint8_t step_period_counter = 0;
+volatile uint16_t step_period_counter = 0;
+
+bool running_protocol = false;
+uint16_t prot_remaining_steps = 0;
+uint16_t prot_step_period = 0;
+
+void reset_protocol_variables()
+{
+	//note: + 1 because it starts counting from 1
+	prot_remaining_steps = app_regs.REG_PROTOCOL_NUMBER_STEPS + 1;
+	prot_step_period = app_regs.REG_PROTOCOL_PERIOD * 2;
+	app_regs.REG_START_PROTOCOL = 0;
+}
+
+void clear_step()
+{
+	clr_STEP;
+	if((app_regs.REG_DO1_CONFIG & MSK_DI0_CONF) == GM_OUT1_STEP_STATE)
+	{
+		clr_OUT01;
+	}
+}
+
+void clear_but_push()
+{
+	but_push_counter_ms = 0;
+	but_long_push_counter_ms = 0;
+	but_push_single_press = false;
+	but_push_long_press = false;
+}
+
+void clear_but_pull()
+{
+	but_pull_counter_ms = 0;
+	but_long_pull_counter_ms = 0;
+	but_pull_single_press = false;
+	but_pull_long_press = false;
+}
+
 
 /************************************************************************/
 /* Initialization Callbacks                                             */
@@ -118,7 +156,7 @@ void core_callback_reset_registers(void)
 {
 	/* Initialize registers */
 	app_regs.REG_ENABLE_MOTOR_DRIVER = B_MOTOR_ENABLE;
-	app_regs.REG_ENABLE_MOTOR_UC = B_MOTOR_UC_ENABLE;
+	app_regs.REG_START_PROTOCOL = B_START_PROTOCOL;
 	app_regs.REG_SET_DOS |= (B_SET_DO0 | B_SET_DO1);
 	app_regs.REG_CLEAR_DOS |= (B_CLR_DO0 | B_CLR_DO1);
 	app_regs.REG_DO0_CONFIG = GM_OUT0_SOFTWARE;
@@ -136,7 +174,7 @@ void core_callback_registers_were_reinitialized(void)
 {
 	/* Update registers if needed */
 	app_regs.REG_ENABLE_MOTOR_DRIVER = 0;
-	app_regs.REG_ENABLE_MOTOR_UC = 0;
+	app_regs.REG_START_PROTOCOL = 0;
 	
 	app_regs.REG_STEP_STATE = 0;
 	app_regs.REG_DIR_STATE = 0;
@@ -186,64 +224,87 @@ void core_callback_device_to_speed(void) {}
 /************************************************************************/
 
 #define STEP_PERIOD_HALF_MILLISECONDS 8
+#define STEP_UPTIME_MILLISECONDS 4
 
 void core_callback_t_before_exec(void) 
 {
-	// this is called every 500ms, we should handle the steps here
-	if (++step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
+	if(running_protocol)
 	{
-		clr_STEP;
-		if((app_regs.REG_DO1_CONFIG & MSK_DI0_CONF) == GM_OUT1_STEP_STATE)
+		if(!disable_steps)
 		{
-			clr_OUT01;
-		}
-		step_period_counter = 0;
-		
-		if(but_reset_pressed)
-		{
-			// change direction once and continue steps
-			if(!but_reset_dir_change)
+			++step_period_counter;
+			if(step_period_counter == STEP_UPTIME_MILLISECONDS)
 			{
-				app_regs.REG_DIR_STATE = app_regs.REG_DIR_STATE == 0? 1 : 0;
-				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-				but_reset_dir_change = true;
+				clear_step();
 			}
 			
-			app_regs.REG_STEP_STATE = 1;
-			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+			if(step_period_counter == prot_step_period)
+			{
+				step_period_counter = 0;
+				// make step if there are still steps remaining in the current running protocol
+				if(--prot_remaining_steps)
+				{
+					app_regs.REG_DIR_STATE = curr_dir;
+					app_regs.REG_STEP_STATE = 1;
+					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+				}
+				else
+				{
+					// we reached the end, lets stop everything and reset variables
+					running_protocol = false;
+					reset_protocol_variables();
+				}
+			}
 		}
-		
-		// long press STEP handling (generates new STEP immediately if in long press)
-		if (but_push_long_press)
-			app_regs.REG_DIR_STATE = 0;
-		
-		if(but_pull_long_press)
-			app_regs.REG_DIR_STATE = 1;
-		
-		if(but_pull_long_press || but_push_long_press)
-		{
-			app_regs.REG_STEP_STATE = 1;
-			app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-		}
-		
-		return;
 	}
-	
-	/* when reaching either switch limit, this flag will be true */
-	if(disable_steps)
-		return;
-	
-	if (app_regs.REG_ENABLE_MOTOR_DRIVER == B_MOTOR_ENABLE)
+	else
 	{
-		// keep the current direction
-		if(curr_dir)
-			set_DIR;
-		else
-			clr_DIR;
+		// normal counting, outside of protocol
+		++step_period_counter;
+		if(step_period_counter == STEP_UPTIME_MILLISECONDS)
+			clear_step();
 		
-		app_regs.REG_DIR_STATE = curr_dir;
-		app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+		if(step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
+		{
+			step_period_counter = 0;
+			
+			if(but_reset_pressed)
+			{
+				// change direction once and continue steps
+				if(!but_reset_dir_change)
+				{
+					app_regs.REG_DIR_STATE = app_regs.REG_DIR_STATE == 0? 1 : 0;
+					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+					but_reset_dir_change = true;
+				}
+				
+				app_regs.REG_STEP_STATE = 1;
+				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+				
+				// if reset was pressed, we don't really want to do anything else
+				return;
+			}
+			
+			// long press STEP handling (generates new STEP immediately if in long press)
+			if (but_push_long_press)
+				app_regs.REG_DIR_STATE = 0;
+			
+			if(but_pull_long_press)
+				app_regs.REG_DIR_STATE = 1;
+			
+			if(but_pull_long_press || but_push_long_press)
+			{
+				if(!disable_steps)
+				{
+					app_regs.REG_STEP_STATE = 1;
+					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+				}
+			}
+			
+			return;
+		}	
 	}
 }
 void core_callback_t_after_exec(void) {}
@@ -274,7 +335,7 @@ void core_callback_t_1ms(void)
 					// reset push counter to allow to detect long press
 					but_push_counter_ms = 25;
 					
-					if(!but_push_single_press)
+					if(!but_push_single_press && !running_protocol)
 					{
 						app_regs.REG_DIR_STATE = 0;
 						app_regs.REG_STEP_STATE = 1;
@@ -291,10 +352,7 @@ void core_callback_t_1ms(void)
 		}
 		else
 		{
-			but_push_counter_ms = 0;
-			but_long_push_counter_ms = 0;
-			but_push_single_press = false;
-			but_push_long_press = false;
+			clear_but_push();
 		}
 	}
 	
@@ -313,7 +371,7 @@ void core_callback_t_1ms(void)
 					// reset pull counter to allow to detect long press
 					but_pull_counter_ms = 25;
 					
-					if(!but_pull_single_press)
+					if(!but_pull_single_press && !running_protocol)
 					{
 						app_regs.REG_DIR_STATE = 1;
 						app_regs.REG_STEP_STATE = 1;
@@ -330,10 +388,7 @@ void core_callback_t_1ms(void)
 		}
 		else
 		{
-			but_pull_counter_ms = 0;
-			but_long_pull_counter_ms = 0;
-			but_pull_single_press = false;
-			but_pull_long_press = false;
+			clear_but_pull();
 		}
 	}
 	
@@ -345,6 +400,7 @@ void core_callback_t_1ms(void)
 			if (!--but_reset_counter_ms)
 			{
 				but_reset_pressed = true;
+				running_protocol = false;
 			}
 		}
 		else

@@ -9,10 +9,11 @@ extern AppRegs app_regs;
 extern uint8_t curr_dir;
 extern bool disable_steps;
 extern uint8_t step_period_counter;
+extern bool running_protocol;
+extern void reset_protocol_variables();
 
 void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_ENABLE_MOTOR_DRIVER,
-	&app_read_REG_ENABLE_MOTOR_UC,
 	&app_read_REG_START_PROTOCOL,
 	&app_read_REG_STEP_STATE,
 	&app_read_REG_DIR_STATE,
@@ -37,7 +38,6 @@ void (*app_func_rd_pointer[])(void) = {
 
 bool (*app_func_wr_pointer[])(void*) = {
 	&app_write_REG_ENABLE_MOTOR_DRIVER,
-	&app_write_REG_ENABLE_MOTOR_UC,
 	&app_write_REG_START_PROTOCOL,
 	&app_write_REG_STEP_STATE,
 	&app_write_REG_DIR_STATE,
@@ -81,50 +81,18 @@ bool app_write_REG_ENABLE_MOTOR_DRIVER(void *a)
 
 
 /************************************************************************/
-/* REG_ENABLE_MOTOR_UC		                                            */
-/************************************************************************/
-void app_read_REG_ENABLE_MOTOR_UC(void){}
-bool app_write_REG_ENABLE_MOTOR_UC(void *a)
-{
-	uint8_t reg = *((uint8_t*)a);
-	
-	app_write_REG_ENABLE_MOTOR_DRIVER(&reg);
-	
-	if(reg)
-	{
-		set_BUF_EN;
-			
-		// change STEP, DIR and MSx as tristate
-		io_pin2out(&PORTA, 0, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);			// STEP
-		io_pin2out(&PORTA, 1, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // DIR
-		io_pin2out(&PORTA, 2, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS1
-		io_pin2out(&PORTA, 3, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS2
-		io_pin2out(&PORTA, 4, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS3
-	}
-	else
-	{
-		clr_BUF_EN;
-		
-		// change STEP, DIR and MSx to default mode
-		io_pin2out(&PORTA, 0, OUT_IO_DIGITAL, IN_EN_IO_EN);                  // STEP
-		io_pin2out(&PORTA, 1, OUT_IO_DIGITAL, IN_EN_IO_EN);                  // DIR
-		io_pin2out(&PORTA, 2, OUT_IO_DIGITAL, IN_EN_IO_DIS);                 // MS1
-		io_pin2out(&PORTA, 3, OUT_IO_DIGITAL, IN_EN_IO_DIS);                 // MS2
-		io_pin2out(&PORTA, 4, OUT_IO_DIGITAL, IN_EN_IO_DIS);                 // MS3
-	}
-	app_regs.REG_ENABLE_MOTOR_UC = reg;
-
-	return true;
-}
-
-
-/************************************************************************/
 /* REG_START_PROTOCOL		                                            */
 /************************************************************************/
 void app_read_REG_START_PROTOCOL(void){}
 bool app_write_REG_START_PROTOCOL(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
+	
+	running_protocol = reg > 0;
+	
+	//NOTE: after enabling the protocol, even if those values change they	
+	//		will only be updated after stopping and starting the protocol again
+	reset_protocol_variables();
 
 	app_regs.REG_START_PROTOCOL = reg;
 
@@ -149,6 +117,13 @@ bool app_write_REG_STEP_STATE(void *a)
 	{
 		// force starting counting from the start
 		step_period_counter = 0;
+		
+		if(app_regs.REG_ENABLE_MOTOR_DRIVER == 0)
+		{
+			app_regs.REG_ENABLE_MOTOR_DRIVER = 1;
+			app_write_REG_ENABLE_MOTOR_DRIVER(&app_regs.REG_ENABLE_MOTOR_DRIVER);
+		}
+		
 		set_STEP;
 		if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
 		{
@@ -188,6 +163,11 @@ bool app_write_REG_DIR_STATE(void *a)
 				core_func_send_event(ADD_REG_DIR_STATE, true);
 		}
 	}
+	
+	if(curr_dir)
+		set_DIR;
+	else
+		clr_DIR;
 
 	app_regs.REG_DIR_STATE = reg;
 	return true;
@@ -458,6 +438,10 @@ void app_read_REG_PROTOCOL_PERIOD(void)
 bool app_write_REG_PROTOCOL_PERIOD(void *a)
 {
 	uint16_t reg = *((uint16_t*)a);
+	
+	/* Check range */
+	if (reg < 1)
+		return false;
 
 	app_regs.REG_PROTOCOL_PERIOD = reg;
 	return true;
@@ -475,6 +459,10 @@ void app_read_REG_PROTOCOL_VOLUME(void)
 bool app_write_REG_PROTOCOL_VOLUME(void *a)
 {
 	float reg = *((float*)a);
+	
+	/* Check range */
+	if (reg < 0.5 || reg > 2000.0)
+		return false;
 
 	app_regs.REG_PROTOCOL_VOLUME = reg;
 	return true;
