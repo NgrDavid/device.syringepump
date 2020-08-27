@@ -276,9 +276,10 @@ void core_callback_t_before_exec(void)
 			if(but_reset_pressed)
 			{
 				// change direction once and continue steps
+				// note: this flag is required so that the DIR change only happens near the first reset step
 				if(!but_reset_dir_change)
 				{
-					app_regs.REG_DIR_STATE = app_regs.REG_DIR_STATE == 0? 1 : 0;
+					app_regs.REG_DIR_STATE = !app_regs.REG_DIR_STATE;
 					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
 					but_reset_dir_change = true;
 				}
