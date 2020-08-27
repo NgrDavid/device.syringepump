@@ -335,10 +335,26 @@ void core_callback_t_1ms(void)
 				// single press
 				if(!running_protocol)
 				{
-					app_regs.REG_DIR_STATE = 0;
-					app_regs.REG_STEP_STATE = 1;
-					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+					if(!but_reset_pressed)
+					{
+						app_regs.REG_DIR_STATE = 0;
+						app_regs.REG_STEP_STATE = 1;
+						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+					}
+					else
+					{
+						// if we are going on the opposite direction with this next step, we need to allow it and allow subsequent steps
+						if(curr_dir == 1)
+						{
+							disable_steps = false;
+							but_reset_pressed = false;
+							app_regs.REG_DIR_STATE = 0;
+							app_regs.REG_STEP_STATE = 1;
+							app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+							app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						}
+					}
 				}
 			}
 		}
@@ -375,10 +391,26 @@ void core_callback_t_1ms(void)
 				// single press
 				if(!running_protocol)
 				{
-					app_regs.REG_DIR_STATE = 1;
-					app_regs.REG_STEP_STATE = 1;
-					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+					if(!but_reset_pressed)
+					{
+						app_regs.REG_DIR_STATE = 1;
+						app_regs.REG_STEP_STATE = 1;
+						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+					}
+					else
+					{
+						// if we are going on the opposite direction with this next step, we need to allow it and allow subsequent steps
+						if(curr_dir == 0)
+						{
+							disable_steps = false;
+							but_reset_pressed = false;
+							app_regs.REG_DIR_STATE = 1;
+							app_regs.REG_STEP_STATE = 1;
+							app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+							app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						}
+					}
 				}
 			}
 		}
