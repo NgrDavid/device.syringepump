@@ -81,6 +81,8 @@ bool but_pull_long_press = false;
 uint8_t but_reset_counter_ms = 0;
 bool but_reset_pressed = false;
 bool but_reset_dir_change = false;
+bool switch_f_active = false;
+bool switch_r_active = false;
 
 uint8_t curr_dir = 0;
 bool disable_steps = false;
