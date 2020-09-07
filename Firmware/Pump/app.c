@@ -71,18 +71,18 @@ void core_callback_catastrophic_error_detected(void)
 
 
 uint8_t but_push_counter_ms = 0;
-uint8_t but_long_push_counter_ms = 0;
-bool but_push_single_press = false;
+uint16_t but_long_push_counter_ms = 0;
 bool but_push_long_press = false;
 
 uint8_t but_pull_counter_ms = 0;
-uint8_t but_long_pull_counter_ms = 0;
-bool but_pull_single_press = false;
+uint16_t but_long_pull_counter_ms = 0;
 bool but_pull_long_press = false;
 
 uint8_t but_reset_counter_ms = 0;
 bool but_reset_pressed = false;
 bool but_reset_dir_change = false;
+bool switch_f_active = false;
+bool switch_r_active = false;
 
 uint8_t curr_dir = 0;
 bool disable_steps = false;
@@ -102,6 +102,8 @@ void reset_protocol_variables()
 
 void clear_step()
 {
+	app_regs.REG_STEP_STATE = 0;
+
 	clr_STEP;
 	if((app_regs.REG_DO1_CONFIG & MSK_DI0_CONF) == GM_OUT1_STEP_STATE)
 	{
@@ -111,17 +113,15 @@ void clear_step()
 
 void clear_but_push()
 {
-	but_push_counter_ms = 0;
-	but_long_push_counter_ms = 0;
-	but_push_single_press = false;
+	but_push_counter_ms = 25;
+	but_long_push_counter_ms = 500;
 	but_push_long_press = false;
 }
 
 void clear_but_pull()
 {
-	but_pull_counter_ms = 0;
-	but_long_pull_counter_ms = 0;
-	but_pull_single_press = false;
+	but_pull_counter_ms = 25;
+	but_long_pull_counter_ms = 500;
 	but_pull_long_press = false;
 }
 
@@ -228,6 +228,12 @@ void core_callback_device_to_speed(void) {}
 
 void core_callback_t_before_exec(void) 
 {
+	//FIXME: ugly fix for clearing long button presses if still active
+	if(read_BUT_PUSH)
+		clear_but_push();
+	if(read_BUT_PULL)
+		clear_but_pull();
+
 	if(running_protocol)
 	{
 		if(!disable_steps)
@@ -272,9 +278,10 @@ void core_callback_t_before_exec(void)
 			if(but_reset_pressed)
 			{
 				// change direction once and continue steps
+				// note: this flag is required so that the DIR change only happens near the first reset step
 				if(!but_reset_dir_change)
 				{
-					app_regs.REG_DIR_STATE = app_regs.REG_DIR_STATE == 0? 1 : 0;
+					app_regs.REG_DIR_STATE = !app_regs.REG_DIR_STATE;
 					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
 					but_reset_dir_change = true;
 				}
@@ -321,33 +328,54 @@ void core_callback_t_1ms(void)
 {	
 	/* handle buttons */
 	/* De-bounce PUSH button */
-	if (but_push_counter_ms)
+	if(but_push_counter_ms)
 	{
 		if (!(read_BUT_PUSH))
 		{
 			if (!--but_push_counter_ms)
 			{
-				// long press detection
-				if(but_long_push_counter_ms)
+				// single press
+				if(!running_protocol)
 				{
-					--but_long_push_counter_ms;
+					// if we are going on the opposite direction with this next step, we need to allow it and allow subsequent steps
+					if(but_reset_pressed || switch_r_active)
+					{
+						if(curr_dir == 1)
+						{
+							disable_steps = false;
+							but_reset_pressed = false;
+							app_regs.REG_DIR_STATE = 0;
+							app_regs.REG_STEP_STATE = 1;
+							app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+							app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						}
+					}
 					
-					// reset push counter to allow to detect long press
-					but_push_counter_ms = 25;
-					
-					if(!but_push_single_press && !running_protocol)
+					if(!but_reset_pressed && !switch_r_active)
 					{
 						app_regs.REG_DIR_STATE = 0;
 						app_regs.REG_STEP_STATE = 1;
 						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
 						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-						but_push_single_press = true;
 					}
 				}
-				else
-				{
-					but_push_long_press = true;
-				}
+			}
+		}
+		else
+		{
+			clear_but_push();
+		}
+	}
+	
+	// detect PUSH button long press
+	if(!but_push_counter_ms && but_long_push_counter_ms)
+	{
+		if (!(read_BUT_PUSH))
+		{
+			// long press detection
+			if(!--but_long_push_counter_ms)
+			{
+				but_push_long_press = true;
 			}
 		}
 		else
@@ -363,27 +391,48 @@ void core_callback_t_1ms(void)
 		{
 			if (!--but_pull_counter_ms)
 			{
-				// long press detection
-				if(but_long_pull_counter_ms)
+				// single press
+				if(!running_protocol)
 				{
-					--but_long_pull_counter_ms;
+					// if we are going on the opposite direction with this next step, we need to allow it and allow subsequent steps
+					if(but_reset_pressed || switch_f_active)
+					{
+						if(curr_dir == 0)
+						{
+							disable_steps = false;
+							but_reset_pressed = false;
+							app_regs.REG_DIR_STATE = 1;
+							app_regs.REG_STEP_STATE = 1;
+							app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+							app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						}
+					}
 					
-					// reset pull counter to allow to detect long press
-					but_pull_counter_ms = 25;
-					
-					if(!but_pull_single_press && !running_protocol)
+					if(!but_reset_pressed && !switch_f_active)
 					{
 						app_regs.REG_DIR_STATE = 1;
 						app_regs.REG_STEP_STATE = 1;
 						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
 						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-						but_pull_single_press = true;
 					}
 				}
-				else
-				{
-					but_pull_long_press = true;
-				}
+			}
+		}
+		else
+		{
+			clear_but_pull();
+		}
+	}
+	
+	// detect PULL button long press
+	if(!but_pull_counter_ms && but_long_pull_counter_ms)
+	{
+		if (!(read_BUT_PULL))
+		{
+			// long press detection
+			if(!--but_long_pull_counter_ms)
+			{
+				but_pull_long_press = true;
 			}
 		}
 		else
