@@ -68,7 +68,7 @@ void core_callback_catastrophic_error_detected(void)
 /************************************************************************/
 /* User functions                                                       */
 /************************************************************************/
-
+uint16_t inactivity_counter = 0;
 
 uint8_t but_push_counter_ms = 0;
 uint16_t but_long_push_counter_ms = 0;
@@ -100,8 +100,18 @@ void reset_protocol_variables()
 	app_regs.REG_START_PROTOCOL = 0;
 }
 
-void clear_step()
+void take_step(uint8_t direction)
 {
+	inactivity_counter = 0;
+	
+	app_regs.REG_DIR_STATE = direction;
+	app_regs.REG_STEP_STATE = 1;
+	app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+	app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+}
+
+void clear_step()
+{	
 	app_regs.REG_STEP_STATE = 0;
 
 	clr_STEP;
@@ -225,6 +235,7 @@ void core_callback_device_to_speed(void) {}
 
 #define STEP_PERIOD_HALF_MILLISECONDS 8
 #define STEP_UPTIME_MILLISECONDS 4
+#define INACTIVITY_TIME 30000
 
 void core_callback_t_before_exec(void) 
 {
@@ -325,7 +336,15 @@ void core_callback_t_new_second(void)
 void core_callback_t_500us(void) {}
 	
 void core_callback_t_1ms(void) 
-{	
+{
+	// disable motor if there's no activity for a while
+	++inactivity_counter;
+	if(inactivity_counter == INACTIVITY_TIME)
+	{
+		app_write_REG_ENABLE_MOTOR_DRIVER(0);
+		inactivity_counter = 0;
+	}
+	
 	/* handle buttons */
 	/* De-bounce PUSH button */
 	if(but_push_counter_ms)
@@ -344,19 +363,13 @@ void core_callback_t_1ms(void)
 						{
 							disable_steps = false;
 							but_reset_pressed = false;
-							app_regs.REG_DIR_STATE = 0;
-							app_regs.REG_STEP_STATE = 1;
-							app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-							app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+							take_step(0);						
 						}
 					}
 					
 					if(!but_reset_pressed && !switch_r_active)
 					{
-						app_regs.REG_DIR_STATE = 0;
-						app_regs.REG_STEP_STATE = 1;
-						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						take_step(0);
 					}
 				}
 			}
@@ -401,19 +414,13 @@ void core_callback_t_1ms(void)
 						{
 							disable_steps = false;
 							but_reset_pressed = false;
-							app_regs.REG_DIR_STATE = 1;
-							app_regs.REG_STEP_STATE = 1;
-							app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-							app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+							take_step(1);
 						}
 					}
 					
 					if(!but_reset_pressed && !switch_f_active)
 					{
-						app_regs.REG_DIR_STATE = 1;
-						app_regs.REG_STEP_STATE = 1;
-						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						take_step(1);
 					}
 				}
 			}
