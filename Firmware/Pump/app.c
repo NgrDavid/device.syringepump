@@ -174,8 +174,12 @@ void core_callback_reset_registers(void)
 	app_regs.REG_DI0_CONFIG = GM_DI0_SYNC;
 	app_regs.REG_MOTOR_MICROSTEP = GM_STEP_FULL;
 	
-	app_regs.REG_PROTOCOL_NUMBER_STEPS = 100;
+	app_regs.REG_PROTOCOL_NUMBER_STEPS = 15;
 	app_regs.REG_PROTOCOL_FLOWRATE = 0.5;
+	app_regs.REG_PROTOCOL_PERIOD = 10;
+	app_regs.REG_PROTOCOL_VOLUME = 0.5;
+	app_regs.REG_PROTOCOL_TYPE = 0;
+	// TODO: missing calibration values
 	
 	app_regs.REG_EVT_ENABLE = (B_EVT_STEP_STATE | B_EVT_DIR_STATE | B_EVT_SW_FORWARD_STATE | B_EVT_SW_REVERSE_STATE | B_EVT_INPUT_STATE);
 }
