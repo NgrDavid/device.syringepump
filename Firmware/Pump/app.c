@@ -111,7 +111,11 @@ void take_step(uint8_t direction)
 }
 
 void clear_step()
-{	
+{
+	// FIXME: this is because it is being called too many times and we don't want events every time
+	if(app_regs.REG_STEP_STATE == 0)
+		return;
+
 	app_regs.REG_STEP_STATE = 0;
 
 	clr_STEP;
@@ -119,6 +123,8 @@ void clear_step()
 	{
 		clr_OUT01;
 	}
+	
+	app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 }
 
 void clear_but_push()
