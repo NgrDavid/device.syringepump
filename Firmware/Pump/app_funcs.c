@@ -481,7 +481,7 @@ void app_read_REG_PROTOCOL_TYPE(void)
 
 bool app_write_REG_PROTOCOL_TYPE(void *a)
 {
-	float reg = *((float*)a);
+	uint8_t reg = *((uint8_t*)a);
 
 	app_regs.REG_PROTOCOL_TYPE = reg;
 	return true;
@@ -499,7 +499,7 @@ void app_read_REG_CALIBRATION_VALUE_1(void)
 
 bool app_write_REG_CALIBRATION_VALUE_1(void *a)
 {
-	float reg = *((float*)a);
+	uint8_t reg = *((uint8_t*)a);
 
 	app_regs.REG_CALIBRATION_VALUE_1 = reg;
 	return true;
@@ -517,7 +517,7 @@ void app_read_REG_CALIBRATION_VALUE_2(void)
 
 bool app_write_REG_CALIBRATION_VALUE_2(void *a)
 {
-	float reg = *((float*)a);
+	uint8_t reg = *((uint8_t*)a);
 
 	app_regs.REG_CALIBRATION_VALUE_2 = reg;
 	return true;
