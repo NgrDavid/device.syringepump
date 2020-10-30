@@ -244,7 +244,7 @@ void core_callback_device_to_speed(void) {}
 /************************************************************************/
 
 #define STEP_PERIOD_HALF_MILLISECONDS 8
-#define STEP_UPTIME_MILLISECONDS 4
+#define STEP_UPTIME_HALF_MILLISECONDS 4
 #define INACTIVITY_TIME 30000
 
 void core_callback_t_before_exec(void) 
@@ -260,10 +260,8 @@ void core_callback_t_before_exec(void)
 		if(!disable_steps)
 		{
 			++step_period_counter;
-			if(step_period_counter == STEP_UPTIME_MILLISECONDS)
-			{
+			if(step_period_counter == STEP_UPTIME_HALF_MILLISECONDS)
 				clear_step();
-			}
 			
 			if(step_period_counter == prot_step_period)
 			{
@@ -289,7 +287,7 @@ void core_callback_t_before_exec(void)
 	{
 		// normal counting, outside of protocol
 		++step_period_counter;
-		if(step_period_counter == STEP_UPTIME_MILLISECONDS)
+		if(step_period_counter == STEP_UPTIME_HALF_MILLISECONDS)
 			clear_step();
 		
 		if(step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
