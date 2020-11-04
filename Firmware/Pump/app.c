@@ -254,6 +254,14 @@ void core_callback_t_before_exec(void)
 		clear_but_push();
 	if(read_BUT_PULL)
 		clear_but_pull();
+		
+	//FIXME: ugly fix for when the switch is released and a interrupt is not generated
+	if(!(read_SW_F) && !(read_SW_R))
+	{
+		disable_steps = false;
+		switch_f_active = false;
+		switch_r_active = false;
+	}
 
 	if(running_protocol)
 	{
