@@ -130,7 +130,7 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 		
 	if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
 	{
-		if(read_SW_F | read_SW_R)
+		if(read_SW_F || read_SW_R)
 			set_OUT00;
 		else
 			clr_OUT00;
