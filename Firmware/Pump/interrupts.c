@@ -167,7 +167,7 @@ ISR(PORTD_INT0_vect, ISR_NAKED)
 		but_reset_counter_ms = 25;
 	}
 	
-	if(read_EN_DRIVER_UC)
+	if(!(read_EN_DRIVER_UC))
 	{
 		set_BUF_EN;
 
