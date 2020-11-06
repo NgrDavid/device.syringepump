@@ -72,7 +72,11 @@ bool app_write_REG_ENABLE_MOTOR_DRIVER(void *a)
 	if(reg)
 		set_EN_DRIVER;
 	else
-		clr_EN_DRIVER;
+	{
+		// only clear on normal microcontroller mode 
+		if(read_EN_DRIVER_UC)
+			clr_EN_DRIVER;
+	}
 	
 	app_regs.REG_ENABLE_MOTOR_DRIVER = reg;
 
