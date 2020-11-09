@@ -86,7 +86,7 @@ bool switch_r_active = false;
 
 uint8_t curr_dir = 0;
 bool disable_steps = false;
-volatile uint16_t step_period_counter = 0;
+uint16_t step_period_counter = 0;
 
 bool running_protocol = false;
 uint16_t prot_remaining_steps = 0;
@@ -305,12 +305,17 @@ void core_callback_t_before_exec(void)
 					but_reset_dir_change = true;
 				}
 				
-				app_regs.REG_STEP_STATE = 1;
-				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+				take_step(curr_dir);
 				
 				// if reset was pressed, we don't really want to do anything else
 				return;
 			}
+								
+			// prevent steps on long press if switch on the same direction is active
+			if(but_push_long_press && switch_f_active)
+				return;
+			if(but_pull_long_press && switch_r_active)
+				return;
 			
 			// long press STEP handling (generates new STEP immediately if in long press)
 			if (but_push_long_press)
