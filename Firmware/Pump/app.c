@@ -205,7 +205,7 @@ void core_callback_registers_were_reinitialized(void)
 	app_regs.REG_SET_DOS = 0;
 	app_regs.REG_CLEAR_DOS = 0;
 	
-	// TODO: PROTOCOL VALUES should be changed?
+	reset_protocol_variables();
 	
 	/* Update config */
 	app_write_REG_DO0_CONFIG(&app_regs.REG_DO0_CONFIG);
@@ -465,6 +465,9 @@ void core_callback_t_1ms(void)
 			{
 				but_reset_pressed = true;
 				running_protocol = false;
+				reset_protocol_variables();
+				// if 0 and the period is too long, it will only stop after that time
+				step_period_counter = 0;
 			}
 		}
 		else
