@@ -93,8 +93,11 @@ uint16_t prot_step_period = 0;
 
 #define DIR_FORWARD 1
 #define DIR_REVERSE 0
-void reset_protocol_variables()
+
+
+void stop_and_reset_protocol()
 {
+	running_protocol = false;
 	//note: + 1 because it starts counting from 1
 	prot_remaining_steps = app_regs.REG_PROTOCOL_NUMBER_STEPS + 1;
 	prot_step_period = app_regs.REG_PROTOCOL_PERIOD * 2;
@@ -115,8 +118,7 @@ void switch_pressed(uint8_t direction)
 		app_regs.REG_SW_REVERSE_STATE = 1;
 	}
 	
-	reset_protocol_variables();
-	running_protocol = false;
+	stop_and_reset_protocol();
 	but_reset_pressed = false;
 	but_reset_dir_change = false;
 	step_period_counter = 0;
@@ -234,7 +236,7 @@ void core_callback_registers_were_reinitialized(void)
 	app_regs.REG_SET_DOS = 0;
 	app_regs.REG_CLEAR_DOS = 0;
 	
-	reset_protocol_variables();
+	stop_and_reset_protocol();
 	
 	/* Update config */
 	app_write_REG_DO0_CONFIG(&app_regs.REG_DO0_CONFIG);
@@ -304,8 +306,7 @@ void core_callback_t_before_exec(void)
 			else
 			{
 				// we reached the end, lets stop everything and reset variables
-				running_protocol = false;
-				reset_protocol_variables();
+				stop_and_reset_protocol();
 			}
 		}
 	}
@@ -484,8 +485,7 @@ void core_callback_t_1ms(void)
 			if (!--but_reset_counter_ms)
 			{
 				but_reset_pressed = true;
-				running_protocol = false;
-				reset_protocol_variables();
+				stop_and_reset_protocol();
 				// if 0 and the period is too long, it will only stop after that time
 				step_period_counter = 0;
 			}

@@ -9,7 +9,7 @@ extern AppRegs app_regs;
 extern uint8_t curr_dir;
 extern uint8_t step_period_counter;
 extern bool running_protocol;
-extern void reset_protocol_variables();
+extern void stop_and_reset_protocol();
 
 void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_ENABLE_MOTOR_DRIVER,
@@ -91,11 +91,11 @@ bool app_write_REG_START_PROTOCOL(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
-	running_protocol = reg > 0;
-	
 	//NOTE: after enabling the protocol, even if those values change they	
 	//		will only be updated after stopping and starting the protocol again
-	reset_protocol_variables();
+	stop_and_reset_protocol();
+	
+	running_protocol = reg > 0;	
 
 	app_regs.REG_START_PROTOCOL = reg;
 
