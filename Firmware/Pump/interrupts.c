@@ -14,6 +14,7 @@ extern bool but_reset_dir_change;
 extern bool running_protocol;
 extern bool switch_f_active;
 extern bool switch_r_active;
+extern void switch_pressed(uint8_t direction);
 
 /************************************************************************/
 /* Interrupts from Timers                                               */
@@ -80,18 +81,14 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 {
 	if(read_SW_F)
 	{
-		disable_steps = true;
-		but_reset_pressed = false;
-		but_reset_dir_change = false;
-		switch_f_active = true;
-		app_regs.REG_SW_FORWARD_STATE = 1;
+		// TODO: change this to use DIR_FORWARD
+		switch_pressed(1);
+		
 		if(app_regs.REG_EVT_ENABLE & B_EVT_SW_FORWARD_STATE)
 			core_func_send_event(ADD_REG_SW_FORWARD_STATE, true);
 	}
 	else
 	{
-		disable_steps = false;
-		
 		// should send event when down (only if previously was up)
 		if(switch_f_active)
 		{
@@ -105,11 +102,9 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 
 	if(read_SW_R)
 	{
-		disable_steps = true;
-		but_reset_pressed = false;
-		but_reset_dir_change = false;
-		switch_r_active = true;
-		app_regs.REG_SW_REVERSE_STATE = 1;
+		// TODO: change this to use DIR_REVERSE
+		switch_pressed(0);
+
 		if(app_regs.REG_EVT_ENABLE & B_EVT_SW_REVERSE_STATE)
 			core_func_send_event(ADD_REG_SW_REVERSE_STATE, true);
 	}
