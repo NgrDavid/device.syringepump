@@ -100,6 +100,27 @@ void reset_protocol_variables()
 	app_regs.REG_START_PROTOCOL = 0;
 }
 
+void switch_pressed(uint8_t direction)
+{
+	if(direction == DIR_FORWARD)
+	{
+		switch_f_active = true;
+		app_regs.REG_SW_FORWARD_STATE = 1;
+	}
+	
+	if(direction == DIR_REVERSE)
+	{
+		switch_r_active = true;
+		app_regs.REG_SW_REVERSE_STATE = 1;
+	}
+	
+	reset_protocol_variables();
+	running_protocol = false;
+	but_reset_pressed = false;
+	but_reset_dir_change = false;
+	step_period_counter = 0;
+}
+
 void take_step(uint8_t direction)
 {
 	inactivity_counter = 0;
@@ -188,6 +209,13 @@ void core_callback_reset_registers(void)
 	// TODO: missing calibration values
 	
 	app_regs.REG_EVT_ENABLE = (B_EVT_STEP_STATE | B_EVT_DIR_STATE | B_EVT_SW_FORWARD_STATE | B_EVT_SW_REVERSE_STATE | B_EVT_INPUT_STATE);
+	
+	// update switches initial state
+	if(read_SW_F)
+		switch_pressed(DIR_FORWARD);
+	
+	if(read_SW_R)
+		switch_pressed(DIR_REVERSE);
 }
 
 void core_callback_registers_were_reinitialized(void)
