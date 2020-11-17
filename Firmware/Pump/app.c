@@ -92,6 +92,8 @@ bool running_protocol = false;
 uint16_t prot_remaining_steps = 0;
 uint16_t prot_step_period = 0;
 
+#define DIR_FORWARD 1
+#define DIR_REVERSE 0
 void reset_protocol_variables()
 {
 	//note: + 1 because it starts counting from 1
@@ -285,29 +287,26 @@ void core_callback_t_before_exec(void)
 
 	if(running_protocol)
 	{
-		if(!disable_steps)
-		{
-			++step_period_counter;
-			if(step_period_counter == STEP_UPTIME_HALF_MILLISECONDS)
-				clear_step();
+		++step_period_counter;
+		if(step_period_counter == STEP_UPTIME_HALF_MILLISECONDS)
+			clear_step();
 			
-			if(step_period_counter == prot_step_period)
+		if(step_period_counter == prot_step_period)
+		{
+			step_period_counter = 0;
+			// make step if there are still steps remaining in the current running protocol
+			if(--prot_remaining_steps)
 			{
-				step_period_counter = 0;
-				// make step if there are still steps remaining in the current running protocol
-				if(--prot_remaining_steps)
-				{
-					app_regs.REG_DIR_STATE = curr_dir;
-					app_regs.REG_STEP_STATE = 1;
-					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-				}
-				else
-				{
-					// we reached the end, lets stop everything and reset variables
-					running_protocol = false;
-					reset_protocol_variables();
-				}
+				app_regs.REG_DIR_STATE = curr_dir;
+				app_regs.REG_STEP_STATE = 1;
+				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+			}
+			else
+			{
+				// we reached the end, lets stop everything and reset variables
+				running_protocol = false;
+				reset_protocol_variables();
 			}
 		}
 	}
@@ -338,28 +337,22 @@ void core_callback_t_before_exec(void)
 				// if reset was pressed, we don't really want to do anything else
 				return;
 			}
-								
-			// prevent steps on long press if switch on the same direction is active
-			if(but_push_long_press && switch_f_active)
-				return;
-			if(but_pull_long_press && switch_r_active)
-				return;
 			
-			// long press STEP handling (generates new STEP immediately if in long press)
-			if (but_push_long_press)
-				app_regs.REG_DIR_STATE = 0;
-			
-			if(but_pull_long_press)
-				app_regs.REG_DIR_STATE = 1;
-			
-			if(but_pull_long_press || but_push_long_press)
+			// prevent steps on long press only if switch on the same direction is active
+			if(but_push_long_press && !switch_f_active)
 			{
-				if(!disable_steps)
-				{
-					app_regs.REG_STEP_STATE = 1;
-					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-				}
+				app_regs.REG_DIR_STATE = 0;
+				app_regs.REG_STEP_STATE = 1;
+				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+			}
+			
+			if(but_pull_long_press && !switch_r_active)
+			{
+				app_regs.REG_DIR_STATE = 1;
+				app_regs.REG_STEP_STATE = 1;
+				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 			}
 			
 			return;
@@ -397,20 +390,18 @@ void core_callback_t_1ms(void)
 				// single press
 				if(!running_protocol)
 				{
-					// if we are going on the opposite direction with this next step, we need to allow it and allow subsequent steps
-					if(but_reset_pressed || switch_r_active)
+					//FIXME: this enters here twice on every button press... why?
+					// takes step except on active switch on same direction and reset was pressed
+					if(!switch_f_active && !but_reset_pressed)
 					{
-						if(curr_dir == 1)
-						{
-							disable_steps = false;
-							but_reset_pressed = false;
-							take_step(0);						
-						}
+						take_step(DIR_FORWARD);
 					}
 					
-					if(!but_reset_pressed && !switch_r_active)
+					// if reset is pressed and going in opposite direction, it should stop reset steps
+					if(but_reset_pressed && curr_dir == DIR_REVERSE)
 					{
-						take_step(0);
+						but_reset_pressed = false;
+						but_reset_dir_change = false;
 					}
 				}
 			}
@@ -448,20 +439,17 @@ void core_callback_t_1ms(void)
 				// single press
 				if(!running_protocol)
 				{
-					// if we are going on the opposite direction with this next step, we need to allow it and allow subsequent steps
-					if(but_reset_pressed || switch_f_active)
+					// takes step except on switch on same direction is active and reset was pressed
+					if(!switch_r_active && !but_reset_pressed)
 					{
-						if(curr_dir == 0)
-						{
-							disable_steps = false;
-							but_reset_pressed = false;
-							take_step(1);
-						}
+						take_step(DIR_REVERSE);
 					}
 					
-					if(!but_reset_pressed && !switch_f_active)
+					// if reset is pressed and going in opposite direction, it should stop reset steps
+					if(but_reset_pressed && curr_dir == DIR_FORWARD)
 					{
-						take_step(1);
+						but_reset_pressed = false;
+						but_reset_dir_change = false;
 					}
 				}
 			}
