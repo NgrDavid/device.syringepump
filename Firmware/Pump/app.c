@@ -68,7 +68,7 @@ void core_callback_catastrophic_error_detected(void)
 /************************************************************************/
 /* User functions                                                       */
 /************************************************************************/
-
+uint16_t inactivity_counter = 0;
 
 uint8_t but_push_counter_ms = 0;
 uint16_t but_long_push_counter_ms = 0;
@@ -85,23 +85,61 @@ bool switch_f_active = false;
 bool switch_r_active = false;
 
 uint8_t curr_dir = 0;
-bool disable_steps = false;
-volatile uint16_t step_period_counter = 0;
+uint16_t step_period_counter = 0;
 
 bool running_protocol = false;
 uint16_t prot_remaining_steps = 0;
 uint16_t prot_step_period = 0;
 
-void reset_protocol_variables()
+#define DIR_FORWARD 1
+#define DIR_REVERSE 0
+
+
+void stop_and_reset_protocol()
 {
+	running_protocol = false;
 	//note: + 1 because it starts counting from 1
 	prot_remaining_steps = app_regs.REG_PROTOCOL_NUMBER_STEPS + 1;
 	prot_step_period = app_regs.REG_PROTOCOL_PERIOD * 2;
 	app_regs.REG_START_PROTOCOL = 0;
 }
 
+void switch_pressed(uint8_t direction)
+{
+	if(direction == DIR_FORWARD)
+	{
+		switch_f_active = true;
+		app_regs.REG_SW_FORWARD_STATE = 1;
+	}
+	
+	if(direction == DIR_REVERSE)
+	{
+		switch_r_active = true;
+		app_regs.REG_SW_REVERSE_STATE = 1;
+	}
+	
+	stop_and_reset_protocol();
+	but_reset_pressed = false;
+	but_reset_dir_change = false;
+	step_period_counter = 0;
+}
+
+void take_step(uint8_t direction)
+{
+	inactivity_counter = 0;
+	
+	app_regs.REG_DIR_STATE = direction;
+	app_regs.REG_STEP_STATE = 1;
+	app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+	app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+}
+
 void clear_step()
 {
+	// FIXME: this is because it is being called too many times and we don't want events every time
+	if(app_regs.REG_STEP_STATE == 0)
+		return;
+
 	app_regs.REG_STEP_STATE = 0;
 
 	clr_STEP;
@@ -109,6 +147,8 @@ void clear_step()
 	{
 		clr_OUT01;
 	}
+	
+	app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 }
 
 void clear_but_push()
@@ -164,10 +204,21 @@ void core_callback_reset_registers(void)
 	app_regs.REG_DI0_CONFIG = GM_DI0_SYNC;
 	app_regs.REG_MOTOR_MICROSTEP = GM_STEP_FULL;
 	
-	app_regs.REG_PROTOCOL_NUMBER_STEPS = 100;
+	app_regs.REG_PROTOCOL_NUMBER_STEPS = 15;
 	app_regs.REG_PROTOCOL_FLOWRATE = 0.5;
+	app_regs.REG_PROTOCOL_PERIOD = 10;
+	app_regs.REG_PROTOCOL_VOLUME = 0.5;
+	app_regs.REG_PROTOCOL_TYPE = 0;
+	// TODO: missing calibration values
 	
 	app_regs.REG_EVT_ENABLE = (B_EVT_STEP_STATE | B_EVT_DIR_STATE | B_EVT_SW_FORWARD_STATE | B_EVT_SW_REVERSE_STATE | B_EVT_INPUT_STATE);
+	
+	// update switches initial state
+	if(read_SW_F)
+		switch_pressed(DIR_FORWARD);
+	
+	if(read_SW_R)
+		switch_pressed(DIR_REVERSE);
 }
 
 void core_callback_registers_were_reinitialized(void)
@@ -185,7 +236,7 @@ void core_callback_registers_were_reinitialized(void)
 	app_regs.REG_SET_DOS = 0;
 	app_regs.REG_CLEAR_DOS = 0;
 	
-	// TODO: PROTOCOL VALUES should be changed?
+	stop_and_reset_protocol();
 	
 	/* Update config */
 	app_write_REG_DO0_CONFIG(&app_regs.REG_DO0_CONFIG);
@@ -224,7 +275,8 @@ void core_callback_device_to_speed(void) {}
 /************************************************************************/
 
 #define STEP_PERIOD_HALF_MILLISECONDS 8
-#define STEP_UPTIME_MILLISECONDS 4
+#define STEP_UPTIME_HALF_MILLISECONDS 4
+#define INACTIVITY_TIME 30000
 
 void core_callback_t_before_exec(void) 
 {
@@ -236,31 +288,25 @@ void core_callback_t_before_exec(void)
 
 	if(running_protocol)
 	{
-		if(!disable_steps)
-		{
-			++step_period_counter;
-			if(step_period_counter == STEP_UPTIME_MILLISECONDS)
-			{
-				clear_step();
-			}
+		++step_period_counter;
+		if(step_period_counter == STEP_UPTIME_HALF_MILLISECONDS)
+			clear_step();
 			
-			if(step_period_counter == prot_step_period)
+		if(step_period_counter == prot_step_period)
+		{
+			step_period_counter = 0;
+			// make step if there are still steps remaining in the current running protocol
+			if(--prot_remaining_steps)
 			{
-				step_period_counter = 0;
-				// make step if there are still steps remaining in the current running protocol
-				if(--prot_remaining_steps)
-				{
-					app_regs.REG_DIR_STATE = curr_dir;
-					app_regs.REG_STEP_STATE = 1;
-					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-				}
-				else
-				{
-					// we reached the end, lets stop everything and reset variables
-					running_protocol = false;
-					reset_protocol_variables();
-				}
+				app_regs.REG_DIR_STATE = curr_dir;
+				app_regs.REG_STEP_STATE = 1;
+				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+			}
+			else
+			{
+				// we reached the end, lets stop everything and reset variables
+				stop_and_reset_protocol();
 			}
 		}
 	}
@@ -268,7 +314,7 @@ void core_callback_t_before_exec(void)
 	{
 		// normal counting, outside of protocol
 		++step_period_counter;
-		if(step_period_counter == STEP_UPTIME_MILLISECONDS)
+		if(step_period_counter == STEP_UPTIME_HALF_MILLISECONDS)
 			clear_step();
 		
 		if(step_period_counter == STEP_PERIOD_HALF_MILLISECONDS)
@@ -286,28 +332,27 @@ void core_callback_t_before_exec(void)
 					but_reset_dir_change = true;
 				}
 				
-				app_regs.REG_STEP_STATE = 1;
-				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+				take_step(curr_dir);
 				
 				// if reset was pressed, we don't really want to do anything else
 				return;
 			}
 			
-			// long press STEP handling (generates new STEP immediately if in long press)
-			if (but_push_long_press)
-				app_regs.REG_DIR_STATE = 0;
-			
-			if(but_pull_long_press)
-				app_regs.REG_DIR_STATE = 1;
-			
-			if(but_pull_long_press || but_push_long_press)
+			// prevent steps on long press only if switch on the same direction is active
+			if(but_push_long_press && !switch_f_active)
 			{
-				if(!disable_steps)
-				{
-					app_regs.REG_STEP_STATE = 1;
-					app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-					app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-				}
+				app_regs.REG_DIR_STATE = 0;
+				app_regs.REG_STEP_STATE = 1;
+				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+			}
+			
+			if(but_pull_long_press && !switch_r_active)
+			{
+				app_regs.REG_DIR_STATE = 1;
+				app_regs.REG_STEP_STATE = 1;
+				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
+				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 			}
 			
 			return;
@@ -325,7 +370,15 @@ void core_callback_t_new_second(void)
 void core_callback_t_500us(void) {}
 	
 void core_callback_t_1ms(void) 
-{	
+{
+	// disable motor if there's no activity for a while
+	++inactivity_counter;
+	if(inactivity_counter == INACTIVITY_TIME)
+	{
+		app_write_REG_ENABLE_MOTOR_DRIVER(0);
+		inactivity_counter = 0;
+	}
+	
 	/* handle buttons */
 	/* De-bounce PUSH button */
 	if(but_push_counter_ms)
@@ -337,26 +390,18 @@ void core_callback_t_1ms(void)
 				// single press
 				if(!running_protocol)
 				{
-					// if we are going on the opposite direction with this next step, we need to allow it and allow subsequent steps
-					if(but_reset_pressed || switch_r_active)
+					//FIXME: this enters here twice on every button press... why?
+					// takes step except on active switch on same direction and reset was pressed
+					if(!switch_f_active && !but_reset_pressed)
 					{
-						if(curr_dir == 1)
-						{
-							disable_steps = false;
-							but_reset_pressed = false;
-							app_regs.REG_DIR_STATE = 0;
-							app_regs.REG_STEP_STATE = 1;
-							app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-							app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-						}
+						take_step(DIR_FORWARD);
 					}
 					
-					if(!but_reset_pressed && !switch_r_active)
+					// if reset is pressed and going in opposite direction, it should stop reset steps
+					if(but_reset_pressed && curr_dir == DIR_REVERSE)
 					{
-						app_regs.REG_DIR_STATE = 0;
-						app_regs.REG_STEP_STATE = 1;
-						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						but_reset_pressed = false;
+						but_reset_dir_change = false;
 					}
 				}
 			}
@@ -394,26 +439,17 @@ void core_callback_t_1ms(void)
 				// single press
 				if(!running_protocol)
 				{
-					// if we are going on the opposite direction with this next step, we need to allow it and allow subsequent steps
-					if(but_reset_pressed || switch_f_active)
+					// takes step except on switch on same direction is active and reset was pressed
+					if(!switch_r_active && !but_reset_pressed)
 					{
-						if(curr_dir == 0)
-						{
-							disable_steps = false;
-							but_reset_pressed = false;
-							app_regs.REG_DIR_STATE = 1;
-							app_regs.REG_STEP_STATE = 1;
-							app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-							app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
-						}
+						take_step(DIR_REVERSE);
 					}
 					
-					if(!but_reset_pressed && !switch_f_active)
+					// if reset is pressed and going in opposite direction, it should stop reset steps
+					if(but_reset_pressed && curr_dir == DIR_FORWARD)
 					{
-						app_regs.REG_DIR_STATE = 1;
-						app_regs.REG_STEP_STATE = 1;
-						app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
-						app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
+						but_reset_pressed = false;
+						but_reset_dir_change = false;
 					}
 				}
 			}
@@ -449,7 +485,9 @@ void core_callback_t_1ms(void)
 			if (!--but_reset_counter_ms)
 			{
 				but_reset_pressed = true;
-				running_protocol = false;
+				stop_and_reset_protocol();
+				// if 0 and the period is too long, it will only stop after that time
+				step_period_counter = 0;
 			}
 		}
 		else

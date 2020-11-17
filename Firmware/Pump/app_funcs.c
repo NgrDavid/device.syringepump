@@ -7,10 +7,9 @@
 /************************************************************************/
 extern AppRegs app_regs;
 extern uint8_t curr_dir;
-extern bool disable_steps;
 extern uint8_t step_period_counter;
 extern bool running_protocol;
-extern void reset_protocol_variables();
+extern void stop_and_reset_protocol();
 
 void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_ENABLE_MOTOR_DRIVER,
@@ -72,7 +71,11 @@ bool app_write_REG_ENABLE_MOTOR_DRIVER(void *a)
 	if(reg)
 		set_EN_DRIVER;
 	else
-		clr_EN_DRIVER;
+	{
+		// only clear on normal microcontroller mode 
+		if(read_EN_DRIVER_UC)
+			clr_EN_DRIVER;
+	}
 	
 	app_regs.REG_ENABLE_MOTOR_DRIVER = reg;
 
@@ -88,11 +91,11 @@ bool app_write_REG_START_PROTOCOL(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
-	running_protocol = reg > 0;
-	
 	//NOTE: after enabling the protocol, even if those values change they	
 	//		will only be updated after stopping and starting the protocol again
-	reset_protocol_variables();
+	stop_and_reset_protocol();
+	
+	running_protocol = reg > 0;	
 
 	app_regs.REG_START_PROTOCOL = reg;
 
@@ -129,12 +132,12 @@ bool app_write_REG_STEP_STATE(void *a)
 		{
 			set_OUT01;
 		}
-		
-		if(app_regs.REG_ENABLE_MOTOR_DRIVER == B_MOTOR_ENABLE)
-		{
-			if (app_regs.REG_EVT_ENABLE & B_EVT_STEP_STATE)
-				core_func_send_event(ADD_REG_STEP_STATE, true);
-		}
+	}
+	
+	if(app_regs.REG_ENABLE_MOTOR_DRIVER == B_MOTOR_ENABLE)
+	{
+		if (app_regs.REG_EVT_ENABLE & B_EVT_STEP_STATE)
+			core_func_send_event(ADD_REG_STEP_STATE, true);
 	}
 
 	app_regs.REG_STEP_STATE = reg;
@@ -269,11 +272,11 @@ bool app_write_REG_CLEAR_DOS(void *a)
 	uint8_t reg = *((uint8_t*)a);
 	
 	if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SOFTWARE)
-		if((reg & B_CLR_DO0) == 0)
+		if(reg & B_CLR_DO0)
 			clr_OUT00;
 	
 	if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_SOFTWARE)
-		if((reg & B_CLR_DO1) == 0)
+		if(reg & B_CLR_DO1)
 			clr_OUT01;
 
 	app_regs.REG_CLEAR_DOS = reg;
@@ -481,7 +484,7 @@ void app_read_REG_PROTOCOL_TYPE(void)
 
 bool app_write_REG_PROTOCOL_TYPE(void *a)
 {
-	float reg = *((float*)a);
+	uint8_t reg = *((uint8_t*)a);
 
 	app_regs.REG_PROTOCOL_TYPE = reg;
 	return true;
@@ -499,7 +502,7 @@ void app_read_REG_CALIBRATION_VALUE_1(void)
 
 bool app_write_REG_CALIBRATION_VALUE_1(void *a)
 {
-	float reg = *((float*)a);
+	uint8_t reg = *((uint8_t*)a);
 
 	app_regs.REG_CALIBRATION_VALUE_1 = reg;
 	return true;
@@ -517,7 +520,7 @@ void app_read_REG_CALIBRATION_VALUE_2(void)
 
 bool app_write_REG_CALIBRATION_VALUE_2(void *a)
 {
-	float reg = *((float*)a);
+	uint8_t reg = *((uint8_t*)a);
 
 	app_regs.REG_CALIBRATION_VALUE_2 = reg;
 	return true;
