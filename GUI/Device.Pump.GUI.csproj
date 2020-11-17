@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
+    <AssemblyName>Syringe Pump</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <CFBundleName>Syringe Pump</CFBundleName> <!-- Also defines .app file name -->
+    <CFBundleDisplayName>Syringe Pump</CFBundleDisplayName>
+    <CFBundleIdentifier>org.fchampalimaud</CFBundleIdentifier>
+    <CFBundleVersion>0.0.1</CFBundleVersion>
+    <CFBundleShortVersionString>0.0.1</CFBundleShortVersionString>
+    <CFBundlePackageType>AAPL</CFBundlePackageType>
+    <CFBundleSignature>.</CFBundleSignature>
+    <CFBundleExecutable>Syringe Pump</CFBundleExecutable>
+    <CFBundleIconFile>fc-logo.icns</CFBundleIconFile> <!-- Will be copied from output directory -->
+    <NSPrincipalClass>NSApplication</NSPrincipalClass>
+    <NSHighResolutionCapable>true</NSHighResolutionCapable>
+  </PropertyGroup>
+  <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
+    <Copy SourceFiles="cf-logo.icns" DestinationFolder="$(OutDir)" />
+  </Target>
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Compile Update="**\*.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <AvaloniaResource Include="**\*.xaml">
+      <SubType>Designer</SubType>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.0-preview6" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.0-preview6" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0-preview6" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0-preview6" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0-preview6" />
+    <PackageReference Include="Dotnet.Bundle" Version="0.9.13" />
+  </ItemGroup>
+</Project>
