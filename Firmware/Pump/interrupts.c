@@ -8,7 +8,6 @@
 /* Declare application registers                                        */
 /************************************************************************/
 extern AppRegs app_regs;
-extern bool disable_steps;
 extern bool but_reset_pressed;
 extern bool but_reset_dir_change;
 extern bool running_protocol;
@@ -109,11 +108,7 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 			core_func_send_event(ADD_REG_SW_REVERSE_STATE, true);
 	}
 	else
-	{
-		// only disable steps when the forward switch wasn't pressed on this interrupt call
-		if(!switch_f_active)
-			disable_steps = false;
-		
+	{		
 		// should send event when down (only if previously was up)
 		if(switch_r_active)
 		{

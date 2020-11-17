@@ -7,7 +7,6 @@
 /************************************************************************/
 extern AppRegs app_regs;
 extern uint8_t curr_dir;
-extern bool disable_steps;
 extern uint8_t step_period_counter;
 extern bool running_protocol;
 extern void reset_protocol_variables();

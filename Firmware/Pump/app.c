@@ -85,7 +85,6 @@ bool switch_f_active = false;
 bool switch_r_active = false;
 
 uint8_t curr_dir = 0;
-bool disable_steps = false;
 uint16_t step_period_counter = 0;
 
 bool running_protocol = false;
