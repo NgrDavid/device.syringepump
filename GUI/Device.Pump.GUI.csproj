@@ -61,7 +61,9 @@
     <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0-preview6" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0-preview6" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0-preview6" />
+    <PackageReference Include="Bonsai.Harp" Version="3.2.1" />
     <PackageReference Include="Dotnet.Bundle" Version="0.9.13" />
     <PackageReference Include="Svg.Skia.Avalonia" Version="0.10.0-preview7" />
+    <PackageReference Include="System.IO.Ports" Version="5.0.0" />
   </ItemGroup>
 </Project>
