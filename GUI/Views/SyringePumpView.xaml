@@ -20,5 +20,30 @@
       </Image>
     </Grid>
     
+    <Grid DockPanel.Dock="Bottom" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto" Margin="10">
+      <Button Grid.Row="0" Command="{Binding SaveConfiguration}" Content="Save configuration" Margin="0,0,10,0"/>
+      <Button Grid.Row="0" Grid.Column="1" Command="{Binding SaveConfiguration}" CommandParameter="true" Content="Save configuration permanently"/>
+    </Grid>
+    
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" Padding="0">
+      <StackPanel Spacing="12" Margin="0,20,0,0">
+      <Panel Background="#ECF0F3" Height="50">
+        <TextBlock Text="Device information" Foreground="#465f6b" VerticalAlignment="Center" FontSize="22" FontWeight="SemiLight" Margin="10,0"/>
+      </Panel>
+      <StackPanel Margin="10" Orientation="Horizontal" Spacing="20">
+        <TextBlock Text="Select a device" VerticalAlignment="Center"/>
+        <ComboBox Name="ports" Items="{Binding Ports}" MinWidth="70"/>
+        <Button Command="{Binding LoadDeviceInformation}">
+          <DrawingPresenter Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <DrawingPresenter.Drawing>
+                <GeometryDrawing  Brush="#ff000000" Geometry="M256 388c-72.597 0-132-59.405-132-132 0-72.601 59.403-132 132-132 36.3 0 69.299 15.4 92.406 39.601L278 234h154V80l-51.698 51.702C348.406 99.798 304.406 80 256 80c-96.797 0-176 79.203-176 176s78.094 176 176 176c81.045 0 148.287-54.134 169.401-128H378.85c-18.745 49.561-67.138 84-122.85 84z"   />
+            </DrawingPresenter.Drawing>
+          </DrawingPresenter>
+        </Button>
+        <Button Content="Connect" Command="{Binding ConnectAndGetBaseInfo}" CommandParameter="{Binding #ports.SelectedItem}"/>
+      </StackPanel>  
+      </StackPanel>
+    </ScrollViewer>
+    
   </DockPanel>
 </UserControl>
