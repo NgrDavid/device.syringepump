@@ -8,5 +8,11 @@ namespace Device.Pump.GUI.ViewModels
 {
     public class SyringePumpViewModel : ViewModelBase
     {
+        public string AppVersion { get; set; }
+
+        public SyringePumpViewModel()
+        {
+            AppVersion = "v"+ typeof(SyringePumpViewModel).Assembly.GetName().Version?.ToString(3);
+        }
     }
 }
