@@ -6,6 +6,11 @@ namespace Device.Pump.GUI.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public string Greeting => "Hello World!";
+        public SyringePumpViewModel SyringePump { get; set; }
+
+        public MainWindowViewModel()
+        {
+            SyringePump = new SyringePumpViewModel();
+        }
     }
 }
