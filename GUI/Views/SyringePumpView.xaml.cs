@@ -1,10 +1,10 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
+using Device.Pump.GUI.ViewModels;
 
 namespace Device.Pump.GUI.Views
 {
-    public class SyringePumpView : UserControl
+    public class SyringePumpView : ReactiveUserControl<SyringePumpViewModel>
     {
         public SyringePumpView()
         {
