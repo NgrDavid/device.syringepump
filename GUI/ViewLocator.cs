@@ -4,7 +4,7 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Device.Pump.GUI.ViewModels;
+using ReactiveUI;
 
 namespace Device.Pump.GUI
 {
@@ -29,7 +29,7 @@ namespace Device.Pump.GUI
 
         public bool Match(object data)
         {
-            return data is ViewModelBase;
+            return data is ReactiveObject;
         }
     }
 }
