@@ -49,6 +49,7 @@ namespace Device.Pump.GUI.ViewModels
 
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<string, Unit> ConnectAndGetBaseInfoCommand{ get; }
+        public ReactiveCommand<bool, Unit> SaveConfigurationCommand{ get; }
         private Bonsai.Harp.Device _dev;
 
         public SyringePumpViewModel()
@@ -63,6 +64,7 @@ namespace Device.Pump.GUI.ViewModels
             ConnectAndGetBaseInfoCommand = ReactiveCommand.Create<string>(ConnectAndGetBaseInfo, canConnect);
             ConnectAndGetBaseInfoCommand.ThrownExceptions.Subscribe(ex => Console.WriteLine(ex.Message));
 
+            SaveConfigurationCommand = ReactiveCommand.Create<bool>(SaveConfiguration);
             HarpMessages = new ObservableCollection<string>();
             
             // Validation rules
@@ -93,6 +95,103 @@ namespace Device.Pump.GUI.ViewModels
                 Ports = devices?.ToList();
         }
 
+        private void SaveConfiguration(bool savePermanently)
+        {
+            if (_dev == null)
+                throw new Exception("You need to connect to the device first");
+            
+            var msgs = new List<HarpMessage>();
+            
+            if (savePermanently)
+            {
+                var resetMessage = HarpCommand.Reset(ResetMode.Save);
+                msgs.Add(resetMessage);
+            }
+            else
+            {
+                // send commands to save every config (verify each step for board's reply)
+
+                // events
+                byte events = (byte) ((Convert.ToByte(StepStateEvent) << 0) |
+                                      (Convert.ToByte(DirectionStateEvent) << 1) |
+                                      (Convert.ToByte(SwitchForwardStateEvent) << 2) |
+                                      (Convert.ToByte(SwitchReverseStateEvent) << 3) |
+                                      (Convert.ToByte(InputStateEvent) << 4));
+                var eventsMessage = HarpCommand.WriteByte(52, events);
+                msgs.Add(eventsMessage);
+
+                // motor microstep
+                byte motor = Convert.ToByte(MotorMicrostep);
+                var motorMessage = HarpCommand.WriteByte(44, motor);
+                msgs.Add(motorMessage);
+
+                // di0, do0 and do1
+                byte di0 = Convert.ToByte(DigitalInput0Config);
+                var di0Message = HarpCommand.WriteByte(43, di0);
+                msgs.Add(di0Message);
+
+                byte do0 = Convert.ToByte(DigitalOutput0Config);
+                var do0Message = HarpCommand.WriteByte(41, do0);
+                msgs.Add(do0Message);
+
+                byte do1 = Convert.ToByte(DigitalOutput1Config);
+                var do1Message = HarpCommand.WriteByte(42, do1);
+                msgs.Add(do1Message);
+
+                // protocol
+                // protocol type
+                byte protocolType = Convert.ToByte(ProtocolType);
+                var protocolTypeMessage = HarpCommand.WriteByte(49, protocolType);
+                msgs.Add(protocolTypeMessage);
+                // if step:
+                if (protocolType == 0)
+                {
+                    // number of steps
+                    ushort numberOfSteps = Convert.ToUInt16(NumberOfSteps);
+                    var numberOfStepsMessage = HarpCommand.WriteUInt16(45, numberOfSteps);
+                    msgs.Add(numberOfStepsMessage);
+
+                    // step period
+                    ushort stepPeriod = Convert.ToUInt16(StepPeriod);
+                    var stepPeriodMessage = HarpCommand.WriteUInt16(47, stepPeriod);
+                    msgs.Add(stepPeriodMessage);
+                }
+                else
+                {
+                    // flowrate
+                    float flowrate = Convert.ToSingle(Flowrate);
+                    var flowrateMessage = HarpCommand.WriteSingle(46, flowrate);
+                    msgs.Add(flowrateMessage);
+                    // volume
+                    float volume = Convert.ToSingle(Volume);
+                    var volumeMessage = HarpCommand.WriteSingle(48, volume);
+                    msgs.Add(volumeMessage);
+
+                    // calibration val 1
+                    // calibration val 2
+                }
+            }
+            
+            // send all messages independently of the save type
+            HarpMessages.Clear();
+
+            var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
+                (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
+                () => HarpMessages.Add("Completed sending commands to device"));
+
+            var msgsSubject = new Subject<HarpMessage>();
+
+            var observable = _dev.Generate(msgsSubject)
+                .Subscribe(observer);
+
+            foreach (var harpMessage in msgs)
+            {
+                msgsSubject.OnNext(harpMessage);
+            }
+
+            Thread.Sleep(500);
+            observable.Dispose();
+        }
         private async void ConnectAndGetBaseInfo(string selectedPort)
         {
             if(string.IsNullOrEmpty(selectedPort))
