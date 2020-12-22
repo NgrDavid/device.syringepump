@@ -9,6 +9,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using Bonsai;
 using Bonsai.Harp;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -26,6 +27,8 @@ namespace Device.Pump.GUI.ViewModels
         [Reactive] public List<string> Ports { get; set; }
 
         [Reactive] public string SelectedPort { get; set; }
+
+        [Reactive] public ObservableCollection<string> HarpMessages { get; set; }
 
         [Reactive] public bool StepStateEvent { get; set; } = true;
         [Reactive] public bool DirectionStateEvent { get; set; } = true;
@@ -46,6 +49,7 @@ namespace Device.Pump.GUI.ViewModels
 
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<string, Unit> ConnectAndGetBaseInfoCommand{ get; }
+        private Bonsai.Harp.Device _dev;
 
         public SyringePumpViewModel()
         {
@@ -59,6 +63,8 @@ namespace Device.Pump.GUI.ViewModels
             ConnectAndGetBaseInfoCommand = ReactiveCommand.Create<string>(ConnectAndGetBaseInfo, canConnect);
             ConnectAndGetBaseInfoCommand.ThrownExceptions.Subscribe(ex => Console.WriteLine(ex.Message));
 
+            HarpMessages = new ObservableCollection<string>();
+            
             // Validation rules
             this.ValidationRule(viewModel => viewModel.NumberOfSteps,
                 steps => steps > 0 && steps < 65535,
@@ -91,6 +97,15 @@ namespace Device.Pump.GUI.ViewModels
         {
             if(string.IsNullOrEmpty(selectedPort))
                 throw new Exception("invalid parameter");
+
+            _dev = new Bonsai.Harp.Device();
+            _dev.PortName = SelectedPort;
+            
+            // to guarantee that we give enough time to get the data from the device
+            Thread.Sleep(200);
+
+            HarpMessages.Clear();
+            HarpMessages.Add(((INamedElement)_dev).Name.TrimEnd('\0'));
         }
     }
 }
