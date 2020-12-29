@@ -11,6 +11,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using Bonsai;
 using Bonsai.Harp;
+using Device.Pump.GUI.Models;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Extensions;
@@ -117,54 +118,54 @@ namespace Device.Pump.GUI.ViewModels
                                       (Convert.ToByte(SwitchForwardStateEvent) << 2) |
                                       (Convert.ToByte(SwitchReverseStateEvent) << 3) |
                                       (Convert.ToByte(InputStateEvent) << 4));
-                var eventsMessage = HarpCommand.WriteByte(52, events);
+                var eventsMessage = HarpCommand.WriteByte((int) PumpRegisters.EventsEnable, events);
                 msgs.Add(eventsMessage);
 
                 // motor microstep
                 byte motor = Convert.ToByte(MotorMicrostep);
-                var motorMessage = HarpCommand.WriteByte(44, motor);
+                var motorMessage = HarpCommand.WriteByte((int) PumpRegisters.MotorMicrostep, motor);
                 msgs.Add(motorMessage);
 
                 // di0, do0 and do1
                 byte di0 = Convert.ToByte(DigitalInput0Config);
-                var di0Message = HarpCommand.WriteByte(43, di0);
+                var di0Message = HarpCommand.WriteByte((int) PumpRegisters.DigitalInput0Config, di0);
                 msgs.Add(di0Message);
 
                 byte do0 = Convert.ToByte(DigitalOutput0Config);
-                var do0Message = HarpCommand.WriteByte(41, do0);
+                var do0Message = HarpCommand.WriteByte((int) PumpRegisters.DigitalOutput0Config, do0);
                 msgs.Add(do0Message);
 
                 byte do1 = Convert.ToByte(DigitalOutput1Config);
-                var do1Message = HarpCommand.WriteByte(42, do1);
+                var do1Message = HarpCommand.WriteByte((int) PumpRegisters.DigitalOutput1Config, do1);
                 msgs.Add(do1Message);
 
                 // protocol
                 // protocol type
                 byte protocolType = Convert.ToByte(ProtocolType);
-                var protocolTypeMessage = HarpCommand.WriteByte(49, protocolType);
+                var protocolTypeMessage = HarpCommand.WriteByte((int) PumpRegisters.ProtocolType, protocolType);
                 msgs.Add(protocolTypeMessage);
                 // if step:
                 if (protocolType == 0)
                 {
                     // number of steps
                     ushort numberOfSteps = Convert.ToUInt16(NumberOfSteps);
-                    var numberOfStepsMessage = HarpCommand.WriteUInt16(45, numberOfSteps);
+                    var numberOfStepsMessage = HarpCommand.WriteUInt16((int) PumpRegisters.ProtocolNumberOfSteps, numberOfSteps);
                     msgs.Add(numberOfStepsMessage);
 
                     // step period
                     ushort stepPeriod = Convert.ToUInt16(StepPeriod);
-                    var stepPeriodMessage = HarpCommand.WriteUInt16(47, stepPeriod);
+                    var stepPeriodMessage = HarpCommand.WriteUInt16((int) PumpRegisters.ProtocolStepPeriod, stepPeriod);
                     msgs.Add(stepPeriodMessage);
                 }
                 else
                 {
                     // flowrate
                     float flowrate = Convert.ToSingle(Flowrate);
-                    var flowrateMessage = HarpCommand.WriteSingle(46, flowrate);
+                    var flowrateMessage = HarpCommand.WriteSingle((int) PumpRegisters.ProtocolFlowrate, flowrate);
                     msgs.Add(flowrateMessage);
                     // volume
                     float volume = Convert.ToSingle(Volume);
-                    var volumeMessage = HarpCommand.WriteSingle(48, volume);
+                    var volumeMessage = HarpCommand.WriteSingle((int) PumpRegisters.ProtocolVolume, volume);
                     msgs.Add(volumeMessage);
 
                     // calibration val 1
