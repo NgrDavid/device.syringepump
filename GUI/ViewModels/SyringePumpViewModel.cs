@@ -61,7 +61,10 @@ namespace Device.Pump.GUI.ViewModels
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<string, Unit> ConnectAndGetBaseInfoCommand{ get; }
         public ReactiveCommand<bool, Unit> SaveConfigurationCommand{ get; }
+        public ReactiveCommand<Unit, Unit> ResetConfigurationCommand{ get; }
+
         private Bonsai.Harp.Device _dev;
+        private Subject<HarpMessage> _msgsSubject;
 
         public SyringePumpViewModel()
         {
@@ -75,8 +78,13 @@ namespace Device.Pump.GUI.ViewModels
             ConnectAndGetBaseInfoCommand = ReactiveCommand.Create<string>(ConnectAndGetBaseInfo, canConnect);
             ConnectAndGetBaseInfoCommand.ThrownExceptions.Subscribe(ex => Console.WriteLine(ex.Message));
 
-            SaveConfigurationCommand = ReactiveCommand.Create<bool>(SaveConfiguration);
+            var canChangeConfig = this.WhenAnyValue(x => x.Connected).Select(connected => connected);
+            SaveConfigurationCommand = ReactiveCommand.Create<bool>(SaveConfiguration, canChangeConfig);
+            ResetConfigurationCommand = ReactiveCommand.Create(ResetConfiguration, canChangeConfig);
+
             HarpMessages = new ObservableCollection<string>();
+            // TODO: missing properly dispose of this
+            _msgsSubject = new Subject<HarpMessage>();
             
             // Validation rules
             this.ValidationRule(viewModel => viewModel.NumberOfSteps,
@@ -190,19 +198,38 @@ namespace Device.Pump.GUI.ViewModels
                 (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
                 () => HarpMessages.Add("Completed sending commands to device"));
 
-            var msgsSubject = new Subject<HarpMessage>();
-
-            var observable = _dev.Generate(msgsSubject)
+            // TODO: missing properly dispose of this observable
+            var observable = _dev.Generate(_msgsSubject)
                 .Subscribe(observer);
 
             foreach (var harpMessage in msgs)
             {
-                msgsSubject.OnNext(harpMessage);
+                _msgsSubject.OnNext(harpMessage);
             }
 
             Thread.Sleep(500);
             observable.Dispose();
         }
+
+        private void ResetConfiguration()
+        {
+            var resetMessage = HarpCommand.Reset(ResetMode.RestoreDefault);
+
+            var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
+                (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
+                () => HarpMessages.Add("Completed sending commands to device"));
+            
+            var observable = _dev.Generate(_msgsSubject)
+                .Subscribe(observer);
+
+            _msgsSubject.OnNext(resetMessage);
+
+            Thread.Sleep(200);
+
+            // send message to opened device
+            // //TODO: when we have the observable from the receiving data, we should present a message stating if the operation completed successfully
+        }
+
         private async void ConnectAndGetBaseInfo(string selectedPort)
         {
             if(string.IsNullOrEmpty(selectedPort))
