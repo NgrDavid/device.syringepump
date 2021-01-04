@@ -37,7 +37,12 @@ namespace Device.Pump.GUI.ViewModels
         [Reactive] public bool SwitchReverseStateEvent { get; set; } = true;
         [Reactive] public bool InputStateEvent { get; set; } = true;
 
-        [Reactive] public int ProtocolType { get; set; } = 0;
+        [Reactive] public int ProtocolType { get; set; }
+
+        [Reactive] public string DeviceName { get; set; }
+        [Reactive] public int DeviceID { get; set; }
+        [Reactive] public HarpVersion HardwareVersion { get; set; }
+        [Reactive] public HarpVersion FirmwareVersion { get; set; }
         
         [Reactive] public int NumberOfSteps { get; set; } = 15;
         [Reactive] public int StepPeriod { get; set; } = 10;
@@ -46,7 +51,9 @@ namespace Device.Pump.GUI.ViewModels
         [Reactive] public int MotorMicrostep { get; set; } = 0;
         [Reactive] public int DigitalInput0Config { get; set; } = 0;
         [Reactive] public int DigitalOutput0Config { get; set; } = 0;
-        [Reactive] public int DigitalOutput1Config { get; set; } = 0;
+        [Reactive] public int DigitalOutput1Config { get; set; }
+        [Reactive] public int CalibrationValue1 { get; set; }
+        [Reactive] public int CalibrationValue2 { get; set; }
 
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<string, Unit> ConnectAndGetBaseInfoCommand{ get; }
