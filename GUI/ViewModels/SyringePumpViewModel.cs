@@ -3,11 +3,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
 using System.Threading;
 using Bonsai;
 using Bonsai.Harp;
@@ -28,6 +30,7 @@ namespace Device.Pump.GUI.ViewModels
         [Reactive] public List<string> Ports { get; set; }
 
         [Reactive] public string SelectedPort { get; set; }
+        [Reactive] public bool Connected { get; set; }
 
         [Reactive] public ObservableCollection<string> HarpMessages { get; set; }
 
@@ -205,14 +208,124 @@ namespace Device.Pump.GUI.ViewModels
             if(string.IsNullOrEmpty(selectedPort))
                 throw new Exception("invalid parameter");
 
+            StringBuilder sb = new StringBuilder();
+            var writer = new StringWriter(sb);
+            Console.SetOut(writer);
+
             _dev = new Bonsai.Harp.Device();
             _dev.PortName = SelectedPort;
             
             // to guarantee that we give enough time to get the data from the device
-            Thread.Sleep(200);
+            Thread.Sleep(150);
 
             HarpMessages.Clear();
-            HarpMessages.Add(((INamedElement)_dev).Name.TrimEnd('\0'));
+
+            var observer = Observer.Create<HarpMessage>(UpdateUI,
+                (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
+                () => HarpMessages.Add("Completed sending commands to device"));
+            
+            var observable = _dev.Generate().Where(item => item.MessageType == MessageType.Read && item.Address >= (int)(PumpRegisters.EnableMotorDriver))
+                .Subscribe(observer);
+
+            Thread.Sleep(300);
+
+            Connected = true;
+
+            var info = sb.ToString().Split(Environment.NewLine);
+            // [1] = WhoAmI: 1280
+            // [2] = Hw: 1.0
+            // [3] = Fw: 1.0
+            // [5] = DeviceName: Pump \0\0\0\0\0\0
+            if (info.Length < 6)
+            {
+                // TODO: something went wrong, handle this
+            }
+
+            int id = Convert.ToInt32(info[1].Split(':')[1].Trim());
+
+            DeviceName = ((INamedElement) _dev).Name.TrimEnd('\0').ToUpper();
+            DeviceID = id;
+
+            // convert Hw and Fw version
+            HardwareVersion = HarpVersion.Parse(info[2].Split(':')[1].Trim());
+            FirmwareVersion = HarpVersion.Parse(info[3].Split(':')[1].Trim());
+
+            writer.Close();
+
+            // return Console output to default
+            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()));
+            await writer.DisposeAsync();
+        }
+
+        private void UpdateUI(HarpMessage item)
+        {
+            switch ((PumpRegisters)item.Address)
+            {
+                case PumpRegisters.EnableMotorDriver:
+                case PumpRegisters.StartProtocol:
+                case PumpRegisters.StepState:
+                case PumpRegisters.DirState:
+                case PumpRegisters.SwitchForwardState:
+                case PumpRegisters.SwitchReverseState:
+                case PumpRegisters.InputState:
+                    break;
+                case PumpRegisters.SetDigitalOutputs:
+                    //TODO: add this element to the UI
+                    break;
+                case PumpRegisters.ClearDigitalOutputs:
+                    //TODO: add this element to the UI
+                    break;
+                case PumpRegisters.DigitalOutput0Config:
+                    DigitalOutput0Config = item.GetPayloadByte();
+                    break;
+                case PumpRegisters.DigitalOutput1Config:
+                    DigitalOutput1Config = item.GetPayloadByte();
+                    break;
+                case PumpRegisters.DigitalInput0Config:
+                    DigitalInput0Config = item.GetPayloadByte();
+                    break;
+                case PumpRegisters.MotorMicrostep:
+                    MotorMicrostep = item.GetPayloadByte();
+                    break;
+                case PumpRegisters.ProtocolNumberOfSteps:
+                    NumberOfSteps = item.GetPayloadUInt16();
+                    break;
+                case PumpRegisters.ProtocolFlowrate:
+                    Flowrate = item.GetPayloadSingle();
+                    break;
+                case PumpRegisters.ProtocolStepPeriod:
+                    StepPeriod = item.GetPayloadUInt16();
+                    break;
+                case PumpRegisters.ProtocolVolume:
+                    Volume = item.GetPayloadSingle();
+                    break;
+                case PumpRegisters.ProtocolType:
+                    ProtocolType = item.GetPayloadByte();
+                    break;
+                case PumpRegisters.CalibrationValue1:
+                    CalibrationValue1 = item.GetPayloadByte();
+                    break;
+                case PumpRegisters.CalibrationValue2:
+                    CalibrationValue2 = item.GetPayloadByte();
+                    break;
+                case PumpRegisters.EventsEnable:
+                    byte all = item.GetPayloadByte();
+
+                    StepStateEvent = GetBit(all, 0);
+                    DirectionStateEvent = GetBit(all, 1);
+                    SwitchForwardStateEvent = GetBit(all, 2);
+                    SwitchReverseStateEvent = GetBit(all, 3);
+                    InputStateEvent = GetBit(all, 4);
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+        
+        private bool GetBit(byte b, int pos)
+        {
+            return Convert.ToBoolean((b >> pos) & 1);
         }
     }
 }
