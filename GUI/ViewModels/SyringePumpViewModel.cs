@@ -58,6 +58,9 @@ namespace Device.Pump.GUI.ViewModels
         [Reactive] public int CalibrationValue1 { get; set; }
         [Reactive] public int CalibrationValue2 { get; set; }
 
+        [ObservableAsProperty]
+        public bool IsLoadingPorts { get; }
+
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<string, Unit> ConnectAndGetBaseInfoCommand{ get; }
         public ReactiveCommand<bool, Unit> SaveConfigurationCommand{ get; }
@@ -70,7 +73,8 @@ namespace Device.Pump.GUI.ViewModels
         {
             AppVersion = "v"+ typeof(SyringePumpViewModel).Assembly.GetName().Version?.ToString(3);
 
-            LoadDeviceInformation = ReactiveCommand.Create(LoadUSBInformation);
+            LoadDeviceInformation = ReactiveCommand.CreateFromObservable(LoadUSBInformation);
+            LoadDeviceInformation.IsExecuting.ToPropertyEx(this, x => x.IsLoadingPorts);
 
             var canConnect = this.WhenAnyValue(x => x.SelectedPort)
                 .Select(selectedPort => !string.IsNullOrEmpty(selectedPort));
@@ -104,14 +108,17 @@ namespace Device.Pump.GUI.ViewModels
             LoadUSBInformation();
         }
 
-        public void LoadUSBInformation()
+        public IObservable<Unit> LoadUSBInformation()
         {
-            var devices = SerialPort.GetPortNames();
+            return Observable.Start(() =>
+            {
+                var devices = SerialPort.GetPortNames();
 
-            if (OperatingSystem.IsMacOS())
-                Ports = devices?.Where(d => d.Contains("cu.")).ToList();
-            else
-                Ports = devices?.ToList();
+                if (OperatingSystem.IsMacOS())
+                    Ports = devices?.Where(d => d.Contains("cu.")).ToList();
+                else
+                    Ports = devices?.ToList();
+            });
         }
 
         private void SaveConfiguration(bool savePermanently)
