@@ -11,6 +11,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Bonsai;
 using Bonsai.Harp;
 using Device.Pump.GUI.Models;
@@ -61,6 +62,9 @@ namespace Device.Pump.GUI.ViewModels
         [ObservableAsProperty]
         public bool IsLoadingPorts { get; }
 
+        [ObservableAsProperty]
+        public bool IsResetting { get; }
+
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<string, Unit> ConnectAndGetBaseInfoCommand{ get; }
         public ReactiveCommand<bool, Unit> SaveConfigurationCommand{ get; }
@@ -84,7 +88,8 @@ namespace Device.Pump.GUI.ViewModels
 
             var canChangeConfig = this.WhenAnyValue(x => x.Connected).Select(connected => connected);
             SaveConfigurationCommand = ReactiveCommand.Create<bool>(SaveConfiguration, canChangeConfig);
-            ResetConfigurationCommand = ReactiveCommand.Create(ResetConfiguration, canChangeConfig);
+            ResetConfigurationCommand = ReactiveCommand.CreateFromObservable(ResetConfiguration, canChangeConfig);
+            ResetConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsResetting);
 
             HarpMessages = new ObservableCollection<string>();
             // TODO: missing properly dispose of this
@@ -225,23 +230,33 @@ namespace Device.Pump.GUI.ViewModels
             observable.Dispose();
         }
 
-        private void ResetConfiguration()
+        private IObservable<Unit> ResetConfiguration()
         {
-            var resetMessage = HarpCommand.Reset(ResetMode.RestoreDefault);
+            return Observable.StartAsync(async () =>
+            {
+                var resetMessage = HarpCommand.Reset(ResetMode.RestoreDefault);
 
-            var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
-                (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
-                () => HarpMessages.Add("Completed sending commands to device"));
+                var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
+                    (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
+                    () => HarpMessages.Add("Completed sending commands to device"));
             
-            var observable = _dev.Generate(_msgsSubject)
-                .Subscribe(observer);
+                var observable = _dev.Generate(_msgsSubject)
+                    .Subscribe(observer);
 
-            _msgsSubject.OnNext(resetMessage);
+                _msgsSubject.OnNext(resetMessage);
 
-            Thread.Sleep(200);
+                await Task.Delay(200);
 
-            // send message to opened device
-            // //TODO: when we have the observable from the receiving data, we should present a message stating if the operation completed successfully
+                observable.Dispose();
+
+                await Task.Delay(2000);
+
+                // TODO: convert this to Observable
+                ConnectAndGetBaseInfo(SelectedPort);
+
+                // send message to opened device
+                // //TODO: when we have the observable from the receiving data, we should present a message stating if the operation completed successfully
+            });
         }
 
         private async void ConnectAndGetBaseInfo(string selectedPort)
