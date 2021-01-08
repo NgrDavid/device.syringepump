@@ -52,7 +52,7 @@
                           </DrawingPresenter.Drawing>
                       </DrawingPresenter>
                   </Button>
-                  <Button Content="Connect" Command="{Binding ConnectAndGetBaseInfoCommand}" CommandParameter="{Binding #ports.SelectedItem}"/>
+                  <Button Content="Connect" Command="{Binding ConnectAndGetBaseInfoCommand}" />
               </StackPanel>
               <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="4" Text="{Binding DeviceName}" Foreground="#465f6b" FontWeight="Bold" FontSize="30" />
               <TextBlock Grid.Row="1" Grid.Column="2" Text="Hw " IsVisible="{Binding Connected}"/>

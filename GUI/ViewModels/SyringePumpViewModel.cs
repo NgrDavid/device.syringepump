@@ -63,10 +63,13 @@ namespace Device.Pump.GUI.ViewModels
         public bool IsLoadingPorts { get; }
 
         [ObservableAsProperty]
+        public bool IsConnecting { get; }
+        
+        [ObservableAsProperty]
         public bool IsResetting { get; }
 
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
-        public ReactiveCommand<string, Unit> ConnectAndGetBaseInfoCommand{ get; }
+        public ReactiveCommand<Unit, Unit> ConnectAndGetBaseInfoCommand{ get; }
         public ReactiveCommand<bool, Unit> SaveConfigurationCommand{ get; }
         public ReactiveCommand<Unit, Unit> ResetConfigurationCommand{ get; }
 
@@ -83,7 +86,8 @@ namespace Device.Pump.GUI.ViewModels
             var canConnect = this.WhenAnyValue(x => x.SelectedPort)
                 .Select(selectedPort => !string.IsNullOrEmpty(selectedPort));
 
-            ConnectAndGetBaseInfoCommand = ReactiveCommand.Create<string>(ConnectAndGetBaseInfo, canConnect);
+            ConnectAndGetBaseInfoCommand = ReactiveCommand.CreateFromObservable(ConnectAndGetBaseInfo, canConnect);
+            ConnectAndGetBaseInfoCommand.IsExecuting.ToPropertyEx(this, x => x.IsConnecting);
             ConnectAndGetBaseInfoCommand.ThrownExceptions.Subscribe(ex => Console.WriteLine(ex.Message));
 
             var canChangeConfig = this.WhenAnyValue(x => x.Connected).Select(connected => connected);
@@ -251,66 +255,79 @@ namespace Device.Pump.GUI.ViewModels
 
                 await Task.Delay(2000);
 
-                // TODO: convert this to Observable
-                ConnectAndGetBaseInfo(SelectedPort);
+                await ConnectAndGetBaseInfo();
 
                 // send message to opened device
                 // //TODO: when we have the observable from the receiving data, we should present a message stating if the operation completed successfully
             });
         }
 
-        private async void ConnectAndGetBaseInfo(string selectedPort)
+        private IObservable<Unit> ConnectAndGetBaseInfo()
         {
-            if(string.IsNullOrEmpty(selectedPort))
-                throw new Exception("invalid parameter");
-
-            StringBuilder sb = new StringBuilder();
-            var writer = new StringWriter(sb);
-            Console.SetOut(writer);
-
-            _dev = new Bonsai.Harp.Device();
-            _dev.PortName = SelectedPort;
-            
-            // to guarantee that we give enough time to get the data from the device
-            Thread.Sleep(150);
-
-            HarpMessages.Clear();
-
-            var observer = Observer.Create<HarpMessage>(UpdateUI,
-                (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
-                () => HarpMessages.Add("Completed sending commands to device"));
-            
-            var observable = _dev.Generate().Where(item => item.MessageType == MessageType.Read && item.Address >= (int)(PumpRegisters.EnableMotorDriver))
-                .Subscribe(observer);
-
-            Thread.Sleep(300);
-
-            Connected = true;
-
-            var info = sb.ToString().Split(Environment.NewLine);
-            // [1] = WhoAmI: 1280
-            // [2] = Hw: 1.0
-            // [3] = Fw: 1.0
-            // [5] = DeviceName: Pump \0\0\0\0\0\0
-            if (info.Length < 6)
+            return Observable.StartAsync(async () =>
             {
-                // TODO: something went wrong, handle this
-            }
+                if (string.IsNullOrEmpty(SelectedPort))
+                    throw new Exception("invalid parameter");
 
-            int id = Convert.ToInt32(info[1].Split(':')[1].Trim());
+                StringBuilder sb = new StringBuilder();
+                var writer = new StringWriter(sb);
+                Console.SetOut(writer);
 
-            DeviceName = ((INamedElement) _dev).Name.TrimEnd('\0').ToUpper();
-            DeviceID = id;
+                if (_dev == null || string.Compare(_dev.PortName, SelectedPort, StringComparison.Ordinal) != 0)
+                {
+                    _dev = new Bonsai.Harp.Device();
+                    _dev.PortName = SelectedPort;
+                }
 
-            // convert Hw and Fw version
-            HardwareVersion = HarpVersion.Parse(info[2].Split(':')[1].Trim());
-            FirmwareVersion = HarpVersion.Parse(info[3].Split(':')[1].Trim());
+                // to guarantee that we give enough time to get the data from the device
+                await Task.Delay(250);
 
-            writer.Close();
+                HarpMessages.Clear();
 
-            // return Console output to default
-            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()));
-            await writer.DisposeAsync();
+                var observer = Observer.Create<HarpMessage>(UpdateUI,
+                    (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
+                    () => HarpMessages.Add("Completed sending commands to device"));
+
+                var observable = _dev.Generate().Where(item =>
+                        item.MessageType == MessageType.Read && item.Address >= (int) (PumpRegisters.EnableMotorDriver))
+                    .Subscribe(observer);
+
+                await Task.Delay(300);
+
+                var info = sb.ToString().Split(Environment.NewLine);
+                // [1] = WhoAmI: 1280
+                // [2] = Hw: 1.0
+                // [3] = Fw: 1.0
+                // [5] = DeviceName: Pump \0\0\0\0\0\0
+                if (info.Length < 6)
+                {
+                    // TODO: something went wrong, handle this
+                }
+                else
+                {
+                    int id = Convert.ToInt32(info[1].Split(':')[1].Trim());
+                    if (id != 1280)
+                    {
+                        //TODO: Although it's a Harp device, it is not the right one, so we should present an error.
+
+                    }
+
+                    DeviceName = ((INamedElement) _dev).Name.TrimEnd('\0').ToUpper();
+                    DeviceID = id;
+
+                    // convert Hw and Fw version
+                    HardwareVersion = HarpVersion.Parse(info[2].Split(':')[1].Trim());
+                    FirmwareVersion = HarpVersion.Parse(info[3].Split(':')[1].Trim());
+                }
+
+                writer.Close();
+
+                // return Console output to default
+                Console.SetOut(new StreamWriter(Console.OpenStandardOutput()));
+                await writer.DisposeAsync();
+
+                Connected = true;
+            });
         }
 
         private void UpdateUI(HarpMessage item)
