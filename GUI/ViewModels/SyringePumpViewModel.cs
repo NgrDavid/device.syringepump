@@ -68,6 +68,9 @@ namespace Device.Pump.GUI.ViewModels
         [ObservableAsProperty]
         public bool IsResetting { get; }
 
+        [ObservableAsProperty]
+        public bool IsSaving { get; }
+
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<Unit, Unit> ConnectAndGetBaseInfoCommand{ get; }
         public ReactiveCommand<bool, Unit> SaveConfigurationCommand{ get; }
@@ -91,7 +94,9 @@ namespace Device.Pump.GUI.ViewModels
             ConnectAndGetBaseInfoCommand.ThrownExceptions.Subscribe(ex => Console.WriteLine(ex.Message));
 
             var canChangeConfig = this.WhenAnyValue(x => x.Connected).Select(connected => connected);
-            SaveConfigurationCommand = ReactiveCommand.Create<bool>(SaveConfiguration, canChangeConfig);
+            SaveConfigurationCommand = ReactiveCommand.CreateFromObservable<bool, Unit>(SaveConfiguration, canChangeConfig);
+            SaveConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsSaving);
+
             ResetConfigurationCommand = ReactiveCommand.CreateFromObservable(ResetConfiguration, canChangeConfig);
             ResetConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsResetting);
 
@@ -130,108 +135,114 @@ namespace Device.Pump.GUI.ViewModels
             });
         }
 
-        private void SaveConfiguration(bool savePermanently)
+        private IObservable<Unit> SaveConfiguration(bool savePermanently)
         {
-            if (_dev == null)
-                throw new Exception("You need to connect to the device first");
-
-            var msgs = new List<HarpMessage>();
-
-            // send commands to save every config (verify each step for board's reply)
-
-            // events
-            byte events = (byte) ((Convert.ToByte(StepStateEvent) << 0) |
-                                  (Convert.ToByte(DirectionStateEvent) << 1) |
-                                  (Convert.ToByte(SwitchForwardStateEvent) << 2) |
-                                  (Convert.ToByte(SwitchReverseStateEvent) << 3) |
-                                  (Convert.ToByte(InputStateEvent) << 4));
-            var eventsMessage = HarpCommand.WriteByte((int) PumpRegisters.EventsEnable, events);
-            msgs.Add(eventsMessage);
-
-            // motor microstep
-            byte motor = Convert.ToByte(MotorMicrostep);
-            var motorMessage = HarpCommand.WriteByte((int) PumpRegisters.MotorMicrostep, motor);
-            msgs.Add(motorMessage);
-
-            // di0, do0 and do1
-            byte di0 = Convert.ToByte(DigitalInput0Config);
-            var di0Message = HarpCommand.WriteByte((int) PumpRegisters.DigitalInput0Config, di0);
-            msgs.Add(di0Message);
-
-            byte do0 = Convert.ToByte(DigitalOutput0Config);
-            var do0Message = HarpCommand.WriteByte((int) PumpRegisters.DigitalOutput0Config, do0);
-            msgs.Add(do0Message);
-
-            byte do1 = Convert.ToByte(DigitalOutput1Config);
-            var do1Message = HarpCommand.WriteByte((int) PumpRegisters.DigitalOutput1Config, do1);
-            msgs.Add(do1Message);
-
-            // protocol
-            // protocol type
-            byte protocolType = Convert.ToByte(ProtocolType);
-            var protocolTypeMessage = HarpCommand.WriteByte((int) PumpRegisters.ProtocolType, protocolType);
-            msgs.Add(protocolTypeMessage);
-            // if step:
-            if (protocolType == 0)
+            return Observable.StartAsync(async () =>
             {
-                // number of steps
-                ushort numberOfSteps = Convert.ToUInt16(NumberOfSteps);
-                var numberOfStepsMessage =
-                    HarpCommand.WriteUInt16((int) PumpRegisters.ProtocolNumberOfSteps, numberOfSteps);
-                msgs.Add(numberOfStepsMessage);
+                if (_dev == null)
+                    throw new Exception("You need to connect to the device first");
 
-                // step period
-                ushort stepPeriod = Convert.ToUInt16(StepPeriod);
-                var stepPeriodMessage = HarpCommand.WriteUInt16((int) PumpRegisters.ProtocolStepPeriod, stepPeriod);
-                msgs.Add(stepPeriodMessage);
-            }
-            else
-            {
-                // flowrate
-                float flowrate = Convert.ToSingle(Flowrate);
-                var flowrateMessage = HarpCommand.WriteSingle((int) PumpRegisters.ProtocolFlowrate, flowrate);
-                msgs.Add(flowrateMessage);
-                // volume
-                float volume = Convert.ToSingle(Volume);
-                var volumeMessage = HarpCommand.WriteSingle((int) PumpRegisters.ProtocolVolume, volume);
-                msgs.Add(volumeMessage);
+                var msgs = new List<HarpMessage>();
 
-                // calibration val 1
-                byte calValue1 = Convert.ToByte(CalibrationValue1);
-                var calValue1Message = HarpCommand.WriteByte((int) PumpRegisters.CalibrationValue1, calValue1);
-                msgs.Add(calValue1Message);
+                // send commands to save every config (verify each step for board's reply)
 
-                // calibration val 2
-                byte calValue2 = Convert.ToByte(CalibrationValue2);
-                var calValue2Message = HarpCommand.WriteByte((int) PumpRegisters.CalibrationValue2, calValue2);
-                msgs.Add(calValue2Message);
-            }
-            
+                // events
+                byte events = (byte) ((Convert.ToByte(StepStateEvent) << 0) |
+                                      (Convert.ToByte(DirectionStateEvent) << 1) |
+                                      (Convert.ToByte(SwitchForwardStateEvent) << 2) |
+                                      (Convert.ToByte(SwitchReverseStateEvent) << 3) |
+                                      (Convert.ToByte(InputStateEvent) << 4));
+                var eventsMessage = HarpCommand.WriteByte((int) PumpRegisters.EventsEnable, events);
+                msgs.Add(eventsMessage);
 
-            if (savePermanently)
-            {
-                var resetMessage = HarpCommand.Reset(ResetMode.Save);
-                msgs.Add(resetMessage);
-            }
+                // motor microstep
+                byte motor = Convert.ToByte(MotorMicrostep);
+                var motorMessage = HarpCommand.WriteByte((int) PumpRegisters.MotorMicrostep, motor);
+                msgs.Add(motorMessage);
 
-            // send all messages independently of the save type
-            HarpMessages.Clear();
+                // di0, do0 and do1
+                byte di0 = Convert.ToByte(DigitalInput0Config);
+                var di0Message = HarpCommand.WriteByte((int) PumpRegisters.DigitalInput0Config, di0);
+                msgs.Add(di0Message);
 
-            var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
-                (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
-                () => HarpMessages.Add("Completed sending commands to device"));
+                byte do0 = Convert.ToByte(DigitalOutput0Config);
+                var do0Message = HarpCommand.WriteByte((int) PumpRegisters.DigitalOutput0Config, do0);
+                msgs.Add(do0Message);
 
-            // TODO: missing properly dispose of this observable
-            var observable = _dev.Generate(_msgsSubject)
-                .Subscribe(observer);
+                byte do1 = Convert.ToByte(DigitalOutput1Config);
+                var do1Message = HarpCommand.WriteByte((int) PumpRegisters.DigitalOutput1Config, do1);
+                msgs.Add(do1Message);
 
-            foreach (var harpMessage in msgs)
-            {
-                _msgsSubject.OnNext(harpMessage);
-            }
+                // protocol
+                // protocol type
+                byte protocolType = Convert.ToByte(ProtocolType);
+                var protocolTypeMessage = HarpCommand.WriteByte((int) PumpRegisters.ProtocolType, protocolType);
+                msgs.Add(protocolTypeMessage);
+                // if step:
+                if (protocolType == 0)
+                {
+                    // number of steps
+                    ushort numberOfSteps = Convert.ToUInt16(NumberOfSteps);
+                    var numberOfStepsMessage =
+                        HarpCommand.WriteUInt16((int) PumpRegisters.ProtocolNumberOfSteps, numberOfSteps);
+                    msgs.Add(numberOfStepsMessage);
 
-            Thread.Sleep(500);
-            observable.Dispose();
+                    // step period
+                    ushort stepPeriod = Convert.ToUInt16(StepPeriod);
+                    var stepPeriodMessage = HarpCommand.WriteUInt16((int) PumpRegisters.ProtocolStepPeriod, stepPeriod);
+                    msgs.Add(stepPeriodMessage);
+                }
+                else
+                {
+                    // flowrate
+                    float flowrate = Convert.ToSingle(Flowrate);
+                    var flowrateMessage = HarpCommand.WriteSingle((int) PumpRegisters.ProtocolFlowrate, flowrate);
+                    msgs.Add(flowrateMessage);
+                    // volume
+                    float volume = Convert.ToSingle(Volume);
+                    var volumeMessage = HarpCommand.WriteSingle((int) PumpRegisters.ProtocolVolume, volume);
+                    msgs.Add(volumeMessage);
+
+                    // calibration val 1
+                    byte calValue1 = Convert.ToByte(CalibrationValue1);
+                    var calValue1Message = HarpCommand.WriteByte((int) PumpRegisters.CalibrationValue1, calValue1);
+                    msgs.Add(calValue1Message);
+
+                    // calibration val 2
+                    byte calValue2 = Convert.ToByte(CalibrationValue2);
+                    var calValue2Message = HarpCommand.WriteByte((int) PumpRegisters.CalibrationValue2, calValue2);
+                    msgs.Add(calValue2Message);
+                }
+
+                // FIXME: remove this, for testing purposes only
+                //HarpMessage startProtocolMessage = HarpCommand.WriteByte(address: (int) PumpRegisters.StartProtocol, 1);
+                //msgs.Add(startProtocolMessage);
+
+                if (savePermanently)
+                {
+                    var resetMessage = HarpCommand.Reset(ResetMode.Save);
+                    msgs.Add(resetMessage);
+                }
+
+                // send all messages independently of the save type
+                HarpMessages.Clear();
+
+                var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
+                    (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
+                    () => HarpMessages.Add("Completed sending commands to device"));
+
+                // TODO: missing properly dispose of this observable
+                var observable = _dev.Generate(_msgsSubject)
+                    .Subscribe(observer);
+
+                foreach (var harpMessage in msgs)
+                {
+                    _msgsSubject.OnNext(harpMessage);
+                }
+
+                await Task.Delay(500);
+                observable.Dispose();
+            });
         }
 
         private IObservable<Unit> ResetConfiguration()
