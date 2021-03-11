@@ -338,6 +338,8 @@ namespace Device.Pump.GUI.ViewModels
                 await writer.DisposeAsync();
 
                 Connected = true;
+
+                observable.Dispose();
             });
         }
 
