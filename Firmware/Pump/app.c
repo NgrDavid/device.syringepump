@@ -348,7 +348,7 @@ void core_callback_t_before_exec(void)
 			// prevent steps on long press only if switch on the same direction is active
 			if(but_push_long_press && !switch_f_active)
 			{
-				app_regs.REG_DIR_STATE = 0;
+				app_regs.REG_DIR_STATE = DIR_FORWARD;
 				app_regs.REG_STEP_STATE = 1;
 				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
 				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
@@ -356,14 +356,14 @@ void core_callback_t_before_exec(void)
 			
 			if(but_pull_long_press && !switch_r_active)
 			{
-				app_regs.REG_DIR_STATE = 1;
+				app_regs.REG_DIR_STATE = DIR_REVERSE;
 				app_regs.REG_STEP_STATE = 1;
 				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
 				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 			}
 			
 			return;
-		}	
+		}
 	}
 }
 void core_callback_t_after_exec(void) {}
