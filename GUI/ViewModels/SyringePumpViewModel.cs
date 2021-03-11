@@ -9,8 +9,8 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reflection;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Bonsai;
 using Bonsai.Harp;
@@ -52,9 +52,9 @@ namespace Device.Pump.GUI.ViewModels
         [Reactive] public int StepPeriod { get; set; } = 10;
         [Reactive] public float Flowrate { get; set; } = 0.5f;
         [Reactive] public float Volume { get; set; } = 0.5f;
-        [Reactive] public int MotorMicrostep { get; set; } = 0;
-        [Reactive] public int DigitalInput0Config { get; set; } = 0;
-        [Reactive] public int DigitalOutput0Config { get; set; } = 0;
+        [Reactive] public int MotorMicrostep { get; set; }
+        [Reactive] public int DigitalInput0Config { get; set; }
+        [Reactive] public int DigitalOutput0Config { get; set; }
         [Reactive] public int DigitalOutput1Config { get; set; }
         [Reactive] public int CalibrationValue1 { get; set; }
         [Reactive] public int CalibrationValue2 { get; set; }
@@ -81,11 +81,14 @@ namespace Device.Pump.GUI.ViewModels
 
         public SyringePumpViewModel()
         {
-            AppVersion = "v"+ typeof(SyringePumpViewModel).Assembly.GetName().Version?.ToString(3);
+            var assembly = typeof(SyringePumpViewModel).Assembly;
+            var informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+            AppVersion = "v" + informationVersion;
 
             LoadDeviceInformation = ReactiveCommand.CreateFromObservable(LoadUSBInformation);
             LoadDeviceInformation.IsExecuting.ToPropertyEx(this, x => x.IsLoadingPorts);
 
+            // can connect if there is a selection and also if the new selection is different than the old one
             var canConnect = this.WhenAnyValue(x => x.SelectedPort)
                 .Select(selectedPort => !string.IsNullOrEmpty(selectedPort));
 
