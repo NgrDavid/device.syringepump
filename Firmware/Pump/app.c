@@ -189,7 +189,20 @@ void core_callback_1st_config_hw_after_boot(void)
 	_delay_ms(10);
 	clr_RESET;
 	
-	clr_EN_DRIVER;
+	if(!(read_EN_DRIVER_UC))
+	{
+		set_BUF_EN;
+
+		// change STEP, DIR and MSx as tristate
+		io_pin2out(&PORTA, 0, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);			// STEP
+		io_pin2out(&PORTA, 1, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // DIR
+		io_pin2out(&PORTA, 2, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS1
+		io_pin2out(&PORTA, 3, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS2
+		io_pin2out(&PORTA, 4, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS3
+	}
+	
+	if(read_EN_DRIVER_UC)
+		clr_EN_DRIVER;
 }
 
 void core_callback_reset_registers(void)
