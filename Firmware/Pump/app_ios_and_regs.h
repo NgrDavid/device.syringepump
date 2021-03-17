@@ -7,6 +7,8 @@ void init_ios(void);
 /* Definition of input pins                                             */
 /************************************************************************/
 // IN00                   Description: Board digital input 0
+// TYPE0                  Description: Board type pin 0
+// TYPE1                  Description: Board type pin 1. If pin 0 == 1 -> FISH_FEEDER. If both are 0 == pump. If pin 1 == 1 STEP_MOTOR
 // SW_F                   Description: Limit switch signal (forward)
 // SW_R                   Description: Limit switch signal (reverse)
 // EN_DRIVER_UC           Description: Enable driver from user output
@@ -15,6 +17,8 @@ void init_ios(void);
 // BUT_RESET              Description: Button to reset to initial state
 
 #define read_IN00 read_io(PORTB, 0)             // IN00
+#define read_TYPE0 read_io(PORTC, 0)            // TYPE0
+#define read_TYPE1 read_io(PORTC, 1)            // TYPE1
 #define read_SW_F read_io(PORTC, 4)             // SW_F
 #define read_SW_R read_io(PORTC, 5)             // SW_R
 #define read_EN_DRIVER_UC read_io(PORTD, 0)     // EN_DRIVER_UC
@@ -130,6 +134,8 @@ typedef struct
 	uint8_t REG_CALIBRATION_VALUE_1;
 	uint8_t REG_CALIBRATION_VALUE_2;
 	uint8_t REG_EVT_ENABLE;
+	uint8_t REG_SET_BOARD_TYPE;
+	uint8_t REG_PROTOCOL_STATE;
 } AppRegs;
 
 /************************************************************************/
@@ -157,6 +163,8 @@ typedef struct
 #define ADD_REG_CALIBRATION_VALUE_1         50 // U8     Calibration value 1
 #define ADD_REG_CALIBRATION_VALUE_2         51 // U8     Calibration value 2
 #define ADD_REG_EVT_ENABLE                  52 // U8     Enable the Events
+#define ADD_REG_SET_BOARD_TYPE              53 // U8     Type of the board
+#define ADD_REG_PROTOCOL_STATE              54 // U8     State of the protocol (running or stopped)
 
 /************************************************************************/
 /* PWM Generator registers' memory limits                               */
@@ -166,8 +174,8 @@ typedef struct
 /************************************************************************/
 /* Memory limits */
 #define APP_REGS_ADD_MIN                    0x20
-#define APP_REGS_ADD_MAX                    0x34
-#define APP_NBYTES_OF_REG_BANK              29
+#define APP_REGS_ADD_MAX                    0x36
+#define APP_NBYTES_OF_REG_BANK              31
 
 /************************************************************************/
 /* Registers' bits                                                      */
@@ -205,5 +213,11 @@ typedef struct
 #define B_EVT_SW_FORWARD_STATE             (1<<2)       // Event of register SW_FORWARD_STATE
 #define B_EVT_SW_REVERSE_STATE             (1<<3)       // Event of register SW_REVERSE_STATE
 #define B_EVT_INPUT_STATE                  (1<<4)       // Event of register INPUT_STATE
+#define B_EVT_PROTOCOL_STATE               (1<<5)       // Event of register PROTOCOL_STATE
+#define MSK_BOARD_TYPE                     (3<<0)       // 
+#define GM_PUMP                            (0<<0)       // 
+#define GM_FISH_FEEDER                     (1<<0)       // 
+#define GM_STEP_MOTOR                      (2<<0)       // 
+#define B_PROTOCOL_STATE                   (1<<0)       // Status of the Protocol
 
 #endif /* _APP_REGS_H_ */

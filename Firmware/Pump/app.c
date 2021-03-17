@@ -210,6 +210,7 @@ void core_callback_reset_registers(void)
 	/* Initialize registers */
 	app_regs.REG_ENABLE_MOTOR_DRIVER = B_MOTOR_ENABLE;
 	app_regs.REG_START_PROTOCOL = B_START_PROTOCOL;
+	app_regs.REG_PROTOCOL_STATE = B_PROTOCOL_STATE;
 	app_regs.REG_SET_DOS |= (B_SET_DO0 | B_SET_DO1);
 	app_regs.REG_CLEAR_DOS |= (B_CLR_DO0 | B_CLR_DO1);
 	app_regs.REG_DO0_CONFIG = GM_OUT0_SOFTWARE;
@@ -224,7 +225,7 @@ void core_callback_reset_registers(void)
 	app_regs.REG_PROTOCOL_TYPE = 0;
 	// TODO: missing calibration values
 	
-	app_regs.REG_EVT_ENABLE = (B_EVT_STEP_STATE | B_EVT_DIR_STATE | B_EVT_SW_FORWARD_STATE | B_EVT_SW_REVERSE_STATE | B_EVT_INPUT_STATE);
+	app_regs.REG_EVT_ENABLE = (B_EVT_STEP_STATE | B_EVT_DIR_STATE | B_EVT_SW_FORWARD_STATE | B_EVT_SW_REVERSE_STATE | B_EVT_INPUT_STATE | B_EVT_PROTOCOL_STATE);
 	
 	// update switches initial state
 	if(read_SW_F)

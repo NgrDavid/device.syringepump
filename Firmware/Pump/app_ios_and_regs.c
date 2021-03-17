@@ -8,6 +8,8 @@
 void init_ios(void)
 {	/* Configure input pins */
 	io_pin2in(&PORTB, 0, PULL_IO_TRISTATE, SENSE_IO_EDGES_BOTH);         // IN00
+	io_pin2in(&PORTC, 0, PULL_IO_DOWN, SENSE_IO_EDGES_BOTH);             // TYPE0
+	io_pin2in(&PORTC, 1, PULL_IO_DOWN, SENSE_IO_EDGES_BOTH);             // TYPE1
 	io_pin2in(&PORTC, 4, PULL_IO_UP, SENSE_IO_EDGES_BOTH);               // SW_F
 	io_pin2in(&PORTC, 5, PULL_IO_UP, SENSE_IO_EDGES_BOTH);               // SW_R
 	io_pin2in(&PORTD, 0, PULL_IO_TRISTATE, SENSE_IO_EDGES_BOTH);         // EN_DRIVER_UC
@@ -17,6 +19,8 @@ void init_ios(void)
 
 	/* Configure input interrupts */
 	io_set_int(&PORTB, INT_LEVEL_LOW, 0, (1<<0), false);                 // IN00
+	io_set_int(&PORTC, INT_LEVEL_LOW, 0, (1<<0), false);                 // TYPE0
+	io_set_int(&PORTC, INT_LEVEL_LOW, 0, (1<<1), false);                 // TYPE1
 	io_set_int(&PORTC, INT_LEVEL_LOW, 0, (1<<4), false);                 // SW_F
 	io_set_int(&PORTC, INT_LEVEL_LOW, 0, (1<<5), false);                 // SW_R
 	io_set_int(&PORTD, INT_LEVEL_LOW, 0, (1<<0), false);                 // EN_DRIVER_UC
@@ -77,10 +81,14 @@ uint8_t app_regs_type[] = {
 	TYPE_U8,
 	TYPE_U8,
 	TYPE_U8,
+	TYPE_U8,
+	TYPE_U8,
 	TYPE_U8
 };
 
 uint16_t app_regs_n_elements[] = {
+	1,
+	1,
 	1,
 	1,
 	1,
@@ -125,5 +133,7 @@ uint8_t *app_regs_pointer[] = {
 	(uint8_t*)(&app_regs.REG_PROTOCOL_TYPE),
 	(uint8_t*)(&app_regs.REG_CALIBRATION_VALUE_1),
 	(uint8_t*)(&app_regs.REG_CALIBRATION_VALUE_2),
-	(uint8_t*)(&app_regs.REG_EVT_ENABLE)
+	(uint8_t*)(&app_regs.REG_EVT_ENABLE),
+	(uint8_t*)(&app_regs.REG_SET_BOARD_TYPE),
+	(uint8_t*)(&app_regs.REG_PROTOCOL_STATE)
 };

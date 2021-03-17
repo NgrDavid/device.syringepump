@@ -32,7 +32,9 @@ void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_PROTOCOL_TYPE,
 	&app_read_REG_CALIBRATION_VALUE_1,
 	&app_read_REG_CALIBRATION_VALUE_2,
-	&app_read_REG_EVT_ENABLE
+	&app_read_REG_EVT_ENABLE,
+	&app_read_REG_SET_BOARD_TYPE,
+	&app_read_REG_PROTOCOL_STATE
 };
 
 bool (*app_func_wr_pointer[])(void*) = {
@@ -56,7 +58,9 @@ bool (*app_func_wr_pointer[])(void*) = {
 	&app_write_REG_PROTOCOL_TYPE,
 	&app_write_REG_CALIBRATION_VALUE_1,
 	&app_write_REG_CALIBRATION_VALUE_2,
-	&app_write_REG_EVT_ENABLE
+	&app_write_REG_EVT_ENABLE,
+	&app_write_REG_SET_BOARD_TYPE,
+	&app_write_REG_PROTOCOL_STATE
 };
 
 
@@ -541,5 +545,38 @@ bool app_write_REG_EVT_ENABLE(void *a)
 	uint8_t reg = *((uint8_t*)a);
 
 	app_regs.REG_EVT_ENABLE = reg;
+	return true;
+}
+
+/************************************************************************/
+/* REG_SET_BOARD_TYPE                                                   */
+/************************************************************************/
+void app_read_REG_SET_BOARD_TYPE(void)
+{
+	//app_regs.REG_SET_BOARD_TYPE = 0;
+}
+
+bool app_write_REG_SET_BOARD_TYPE(void *a)
+{
+	uint8_t reg = *((uint8_t*)a);
+
+	app_regs.REG_SET_BOARD_TYPE = reg;
+	return true;
+}
+
+/************************************************************************/
+/* REG_PROTOCOL_STATE                                                   */
+/************************************************************************/
+void app_read_REG_PROTOCOL_STATE(void)
+{
+	//app_regs.REG_PROTOCOL_STATE = 0;
+}
+
+bool app_write_REG_PROTOCOL_STATE(void *a)
+{
+	uint8_t reg = *((uint8_t*)a);
+
+	app_regs.REG_PROTOCOL_STATE = reg;
+	
 	return true;
 }
