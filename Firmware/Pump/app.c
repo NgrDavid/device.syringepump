@@ -189,7 +189,20 @@ void core_callback_1st_config_hw_after_boot(void)
 	_delay_ms(10);
 	clr_RESET;
 	
-	clr_EN_DRIVER;
+	if(!(read_EN_DRIVER_UC))
+	{
+		set_BUF_EN;
+
+		// change STEP, DIR and MSx as tristate
+		io_pin2out(&PORTA, 0, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);			// STEP
+		io_pin2out(&PORTA, 1, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // DIR
+		io_pin2out(&PORTA, 2, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS1
+		io_pin2out(&PORTA, 3, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS2
+		io_pin2out(&PORTA, 4, PULL_IO_TRISTATE, SENSE_IO_NO_INT_USED);          // MS3
+	}
+	
+	if(read_EN_DRIVER_UC)
+		clr_EN_DRIVER;
 }
 
 void core_callback_reset_registers(void)
@@ -197,6 +210,7 @@ void core_callback_reset_registers(void)
 	/* Initialize registers */
 	app_regs.REG_ENABLE_MOTOR_DRIVER = B_MOTOR_ENABLE;
 	app_regs.REG_START_PROTOCOL = B_START_PROTOCOL;
+	app_regs.REG_PROTOCOL_STATE = B_PROTOCOL_STATE;
 	app_regs.REG_SET_DOS |= (B_SET_DO0 | B_SET_DO1);
 	app_regs.REG_CLEAR_DOS |= (B_CLR_DO0 | B_CLR_DO1);
 	app_regs.REG_DO0_CONFIG = GM_OUT0_SOFTWARE;
@@ -211,7 +225,7 @@ void core_callback_reset_registers(void)
 	app_regs.REG_PROTOCOL_TYPE = 0;
 	// TODO: missing calibration values
 	
-	app_regs.REG_EVT_ENABLE = (B_EVT_STEP_STATE | B_EVT_DIR_STATE | B_EVT_SW_FORWARD_STATE | B_EVT_SW_REVERSE_STATE | B_EVT_INPUT_STATE);
+	app_regs.REG_EVT_ENABLE = (B_EVT_STEP_STATE | B_EVT_DIR_STATE | B_EVT_SW_FORWARD_STATE | B_EVT_SW_REVERSE_STATE | B_EVT_INPUT_STATE | B_EVT_PROTOCOL_STATE);
 	
 	// update switches initial state
 	if(read_SW_F)
@@ -274,8 +288,8 @@ void core_callback_device_to_speed(void) {}
 /* Callbacks: 1 ms timer                                                */
 /************************************************************************/
 
-#define STEP_PERIOD_HALF_MILLISECONDS 8
-#define STEP_UPTIME_HALF_MILLISECONDS 4
+#define STEP_PERIOD_HALF_MILLISECONDS 2
+#define STEP_UPTIME_HALF_MILLISECONDS 1
 #define INACTIVITY_TIME 30000
 
 void core_callback_t_before_exec(void) 
@@ -285,6 +299,13 @@ void core_callback_t_before_exec(void)
 		clear_but_push();
 	if(read_BUT_PULL)
 		clear_but_pull();
+		
+	// update switches initial state
+	if(read_SW_F)
+		switch_pressed(DIR_FORWARD);
+	
+	if(read_SW_R)
+		switch_pressed(DIR_REVERSE);
 
 	if(running_protocol)
 	{
@@ -307,6 +328,8 @@ void core_callback_t_before_exec(void)
 			{
 				// we reached the end, lets stop everything and reset variables
 				stop_and_reset_protocol();
+				app_regs.REG_PROTOCOL_STATE = 0;
+				app_write_REG_PROTOCOL_STATE(&app_regs.REG_PROTOCOL_STATE);
 			}
 		}
 	}
@@ -341,7 +364,7 @@ void core_callback_t_before_exec(void)
 			// prevent steps on long press only if switch on the same direction is active
 			if(but_push_long_press && !switch_f_active)
 			{
-				app_regs.REG_DIR_STATE = 0;
+				app_regs.REG_DIR_STATE = DIR_FORWARD;
 				app_regs.REG_STEP_STATE = 1;
 				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
 				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
@@ -349,14 +372,14 @@ void core_callback_t_before_exec(void)
 			
 			if(but_pull_long_press && !switch_r_active)
 			{
-				app_regs.REG_DIR_STATE = 1;
+				app_regs.REG_DIR_STATE = DIR_REVERSE;
 				app_regs.REG_STEP_STATE = 1;
 				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
 				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 			}
 			
 			return;
-		}	
+		}
 	}
 }
 void core_callback_t_after_exec(void) {}

@@ -84,7 +84,8 @@
             <CheckBox IsChecked="{Binding DirectionStateEvent}">Direction state</CheckBox>
             <CheckBox IsChecked="{Binding SwitchForwardStateEvent}">Switch forward state</CheckBox>
             <CheckBox IsChecked="{Binding SwitchReverseStateEvent}">Switch reverse state</CheckBox>
-            <CheckBox IsChecked="{Binding InputStateEvent}">Input state</CheckBox>  
+            <CheckBox IsChecked="{Binding InputStateEvent}">Input state</CheckBox>
+            <CheckBox IsChecked="{Binding ProtocolStateEvent}">Protocol state</CheckBox>
           </StackPanel>
           <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5" Margin="0,20,30,0">
             <TextBlock Text="Protocol type" FontWeight="SemiBold"/>

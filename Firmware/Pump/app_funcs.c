@@ -32,7 +32,9 @@ void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_PROTOCOL_TYPE,
 	&app_read_REG_CALIBRATION_VALUE_1,
 	&app_read_REG_CALIBRATION_VALUE_2,
-	&app_read_REG_EVT_ENABLE
+	&app_read_REG_EVT_ENABLE,
+	&app_read_REG_SET_BOARD_TYPE,
+	&app_read_REG_PROTOCOL_STATE
 };
 
 bool (*app_func_wr_pointer[])(void*) = {
@@ -56,7 +58,9 @@ bool (*app_func_wr_pointer[])(void*) = {
 	&app_write_REG_PROTOCOL_TYPE,
 	&app_write_REG_CALIBRATION_VALUE_1,
 	&app_write_REG_CALIBRATION_VALUE_2,
-	&app_write_REG_EVT_ENABLE
+	&app_write_REG_EVT_ENABLE,
+	&app_write_REG_SET_BOARD_TYPE,
+	&app_write_REG_PROTOCOL_STATE
 };
 
 
@@ -95,9 +99,11 @@ bool app_write_REG_START_PROTOCOL(void *a)
 	//		will only be updated after stopping and starting the protocol again
 	stop_and_reset_protocol();
 	
-	running_protocol = reg > 0;	
+	running_protocol = reg > 0;
 
 	app_regs.REG_START_PROTOCOL = reg;
+	app_regs.REG_PROTOCOL_STATE = reg;
+	app_write_REG_PROTOCOL_STATE(&app_regs.REG_PROTOCOL_STATE);
 
 	return true;
 }
@@ -401,7 +407,7 @@ bool app_write_REG_PROTOCOL_NUMBER_STEPS(void *a)
 	uint16_t reg = *((uint16_t*)a);
 	
 	/* Check range */
-	if (reg < 1)
+	if (reg <= 0)
 		return false;
 
 	app_regs.REG_PROTOCOL_NUMBER_STEPS = reg;
@@ -423,7 +429,7 @@ bool app_write_REG_PROTOCOL_FLOWRATE(void *a)
 	float reg = *((float*)a);
 	
 	/* Check range */
-	if (reg < 0.5 || reg > 2000.0)
+	if (reg <= 0)
 		return false;
 
 	app_regs.REG_PROTOCOL_FLOWRATE = reg;
@@ -465,7 +471,7 @@ bool app_write_REG_PROTOCOL_VOLUME(void *a)
 	float reg = *((float*)a);
 	
 	/* Check range */
-	if (reg < 0.5 || reg > 2000.0)
+	if (reg <= 0)
 		return false;
 
 	app_regs.REG_PROTOCOL_VOLUME = reg;
@@ -541,5 +547,41 @@ bool app_write_REG_EVT_ENABLE(void *a)
 	uint8_t reg = *((uint8_t*)a);
 
 	app_regs.REG_EVT_ENABLE = reg;
+	return true;
+}
+
+/************************************************************************/
+/* REG_SET_BOARD_TYPE                                                   */
+/************************************************************************/
+void app_read_REG_SET_BOARD_TYPE(void)
+{
+	//app_regs.REG_SET_BOARD_TYPE = 0;
+}
+
+bool app_write_REG_SET_BOARD_TYPE(void *a)
+{
+	uint8_t reg = *((uint8_t*)a);
+
+	app_regs.REG_SET_BOARD_TYPE = reg;
+	return true;
+}
+
+/************************************************************************/
+/* REG_PROTOCOL_STATE                                                   */
+/************************************************************************/
+void app_read_REG_PROTOCOL_STATE(void)
+{
+	//app_regs.REG_PROTOCOL_STATE = 0;
+}
+
+bool app_write_REG_PROTOCOL_STATE(void *a)
+{
+	uint8_t reg = *((uint8_t*)a);
+
+	app_regs.REG_PROTOCOL_STATE = reg;
+	
+	if(app_regs.REG_EVT_ENABLE & B_EVT_PROTOCOL_STATE)
+		core_func_send_event(ADD_REG_PROTOCOL_STATE, true);
+	
 	return true;
 }

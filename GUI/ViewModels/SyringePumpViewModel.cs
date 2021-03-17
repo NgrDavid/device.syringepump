@@ -40,6 +40,7 @@ namespace Device.Pump.GUI.ViewModels
         [Reactive] public bool SwitchForwardStateEvent { get; set; } = true;
         [Reactive] public bool SwitchReverseStateEvent { get; set; } = true;
         [Reactive] public bool InputStateEvent { get; set; } = true;
+        [Reactive] public bool ProtocolStateEvent { get; set; } = true;
 
         [Reactive] public int ProtocolType { get; set; }
 
@@ -154,7 +155,8 @@ namespace Device.Pump.GUI.ViewModels
                                       (Convert.ToByte(DirectionStateEvent) << 1) |
                                       (Convert.ToByte(SwitchForwardStateEvent) << 2) |
                                       (Convert.ToByte(SwitchReverseStateEvent) << 3) |
-                                      (Convert.ToByte(InputStateEvent) << 4));
+                                      (Convert.ToByte(InputStateEvent) << 4) |
+                                      (Convert.ToByte(ProtocolStateEvent) << 5));
                 var eventsMessage = HarpCommand.WriteByte((int) PumpRegisters.EventsEnable, events);
                 msgs.Add(eventsMessage);
 
@@ -405,7 +407,12 @@ namespace Device.Pump.GUI.ViewModels
                     SwitchForwardStateEvent = GetBit(all, 2);
                     SwitchReverseStateEvent = GetBit(all, 3);
                     InputStateEvent = GetBit(all, 4);
+                    ProtocolStateEvent = GetBit(all, 5);
 
+                    break;
+                case PumpRegisters.SetBoardType:
+                    break;
+                case PumpRegisters.ProtocolState:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

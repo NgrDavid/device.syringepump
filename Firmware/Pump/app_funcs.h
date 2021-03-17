@@ -41,6 +41,8 @@ void app_read_REG_PROTOCOL_TYPE(void);
 void app_read_REG_CALIBRATION_VALUE_1(void);
 void app_read_REG_CALIBRATION_VALUE_2(void);
 void app_read_REG_EVT_ENABLE(void);
+void app_read_REG_SET_BOARD_TYPE(void);
+void app_read_REG_PROTOCOL_STATE(void);
 
 bool app_write_REG_ENABLE_MOTOR_DRIVER(void *a);
 bool app_write_REG_START_PROTOCOL(void *a);
@@ -63,6 +65,8 @@ bool app_write_REG_PROTOCOL_TYPE(void *a);
 bool app_write_REG_CALIBRATION_VALUE_1(void *a);
 bool app_write_REG_CALIBRATION_VALUE_2(void *a);
 bool app_write_REG_EVT_ENABLE(void *a);
+bool app_write_REG_SET_BOARD_TYPE(void *a);
+bool app_write_REG_PROTOCOL_STATE(void *a);
 
 
 #endif /* _APP_FUNCTIONS_H_ */
