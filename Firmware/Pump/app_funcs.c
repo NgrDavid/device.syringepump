@@ -99,9 +99,11 @@ bool app_write_REG_START_PROTOCOL(void *a)
 	//		will only be updated after stopping and starting the protocol again
 	stop_and_reset_protocol();
 	
-	running_protocol = reg > 0;	
+	running_protocol = reg > 0;
 
 	app_regs.REG_START_PROTOCOL = reg;
+	app_regs.REG_PROTOCOL_STATE = reg;
+	app_write_REG_PROTOCOL_STATE(&app_regs.REG_PROTOCOL_STATE);
 
 	return true;
 }
@@ -577,6 +579,9 @@ bool app_write_REG_PROTOCOL_STATE(void *a)
 	uint8_t reg = *((uint8_t*)a);
 
 	app_regs.REG_PROTOCOL_STATE = reg;
+	
+	if(app_regs.REG_EVT_ENABLE & B_EVT_PROTOCOL_STATE)
+		core_func_send_event(ADD_REG_PROTOCOL_STATE, true);
 	
 	return true;
 }

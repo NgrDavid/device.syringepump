@@ -328,6 +328,8 @@ void core_callback_t_before_exec(void)
 			{
 				// we reached the end, lets stop everything and reset variables
 				stop_and_reset_protocol();
+				app_regs.REG_PROTOCOL_STATE = 0;
+				app_write_REG_PROTOCOL_STATE(&app_regs.REG_PROTOCOL_STATE);
 			}
 		}
 	}
