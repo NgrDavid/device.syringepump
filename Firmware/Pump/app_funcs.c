@@ -407,7 +407,7 @@ bool app_write_REG_PROTOCOL_NUMBER_STEPS(void *a)
 	uint16_t reg = *((uint16_t*)a);
 	
 	/* Check range */
-	if (reg < 1)
+	if (reg <= 0)
 		return false;
 
 	app_regs.REG_PROTOCOL_NUMBER_STEPS = reg;
@@ -429,7 +429,7 @@ bool app_write_REG_PROTOCOL_FLOWRATE(void *a)
 	float reg = *((float*)a);
 	
 	/* Check range */
-	if (reg < 0.5 || reg > 2000.0)
+	if (reg <= 0)
 		return false;
 
 	app_regs.REG_PROTOCOL_FLOWRATE = reg;
@@ -471,7 +471,7 @@ bool app_write_REG_PROTOCOL_VOLUME(void *a)
 	float reg = *((float*)a);
 	
 	/* Check range */
-	if (reg < 0.5 || reg > 2000.0)
+	if (reg <= 0)
 		return false;
 
 	app_regs.REG_PROTOCOL_VOLUME = reg;

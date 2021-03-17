@@ -156,9 +156,9 @@ typedef struct
 #define ADD_REG_DI0_CONFIG                  43 // U8     Configuration of the digital input 0 (DI0)
 #define ADD_REG_MOTOR_MICROSTEP             44 // U8     Defines the motor microstep
 #define ADD_REG_PROTOCOL_NUMBER_STEPS       45 // U16    Number of steps [1;65535]
-#define ADD_REG_PROTOCOL_FLOWRATE           46 // FLOAT  Flowrate value [0.5;2000.0]
+#define ADD_REG_PROTOCOL_FLOWRATE           46 // FLOAT  Flowrate value in uL/s ]0;max_float[
 #define ADD_REG_PROTOCOL_PERIOD             47 // U16    Period for each step in ms [1;65535]
-#define ADD_REG_PROTOCOL_VOLUME             48 // FLOAT  Volume value in uL [0.5;2000.0]
+#define ADD_REG_PROTOCOL_VOLUME             48 // FLOAT  Volume value in uL ]0;max_float[
 #define ADD_REG_PROTOCOL_TYPE               49 // U8     Step-based (0) or Volume-based protocol (1)
 #define ADD_REG_CALIBRATION_VALUE_1         50 // U8     Calibration value 1
 #define ADD_REG_CALIBRATION_VALUE_2         51 // U8     Calibration value 2
