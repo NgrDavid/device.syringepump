@@ -301,13 +301,6 @@ void core_callback_t_before_exec(void)
 		clear_but_push();
 	if(read_BUT_PULL)
 		clear_but_pull();
-		
-	// update switches initial state
-	if(read_SW_F)
-		switch_pressed(DIR_FORWARD);
-	
-	if(read_SW_R)
-		switch_pressed(DIR_REVERSE);
 
 	if(running_protocol)
 	{
