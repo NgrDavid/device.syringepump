@@ -372,8 +372,6 @@ void core_callback_t_before_exec(void)
 				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
 				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 			}
-			
-			return;
 		}
 	}
 }
