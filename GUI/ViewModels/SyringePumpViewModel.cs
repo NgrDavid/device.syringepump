@@ -12,6 +12,7 @@ using System.Reactive.Subjects;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia;
 using Bonsai;
 using Bonsai.Harp;
 using Device.Pump.GUI.Models;
@@ -72,8 +73,12 @@ namespace Device.Pump.GUI.ViewModels
         [ObservableAsProperty]
         public bool IsSaving { get; }
 
+        [ObservableAsProperty]
+        public bool IsRunningProtocol { get; }
+
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<Unit, Unit> ConnectAndGetBaseInfoCommand{ get; }
+        public ReactiveCommand<Unit, Unit> StartProtocolCommand{ get; }
         public ReactiveCommand<bool, Unit> SaveConfigurationCommand{ get; }
         public ReactiveCommand<Unit, Unit> ResetConfigurationCommand{ get; }
 
@@ -98,6 +103,8 @@ namespace Device.Pump.GUI.ViewModels
             ConnectAndGetBaseInfoCommand.ThrownExceptions.Subscribe(ex => Console.WriteLine(ex.Message));
 
             var canChangeConfig = this.WhenAnyValue(x => x.Connected).Select(connected => connected);
+            StartProtocolCommand = ReactiveCommand.CreateFromObservable(StartProtocol, canChangeConfig);
+            StartProtocolCommand.IsExecuting.ToPropertyEx(this, x => x.IsRunningProtocol);
             SaveConfigurationCommand = ReactiveCommand.CreateFromObservable<bool, Unit>(SaveConfiguration, canChangeConfig);
             SaveConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsSaving);
 
@@ -136,6 +143,27 @@ namespace Device.Pump.GUI.ViewModels
                     Ports = devices?.Where(d => d.Contains("cu.")).ToList();
                 else
                     Ports = devices?.ToList();
+            });
+        }
+
+        private IObservable<Unit> StartProtocol()
+        {
+            return Observable.StartAsync(async () =>
+            {
+                var startProtocolMessage = HarpCommand.WriteByte((int) PumpRegisters.StartProtocol, 1);
+
+                var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
+                    (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
+                    () => HarpMessages.Add("Completed sending commands to device"));
+            
+                var observable = _dev.Generate(_msgsSubject)
+                    .Subscribe(observer);
+
+                _msgsSubject.OnNext(startProtocolMessage);
+
+                await Task.Delay(200);
+
+                observable.Dispose();
             });
         }
 
