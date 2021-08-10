@@ -110,17 +110,17 @@ namespace Device.Pump.GUI.ViewModels
             
             // Validation rules
             this.ValidationRule(viewModel => viewModel.NumberOfSteps,
-                steps => steps > 0 && steps < 65535,
-                "Number of steps only accepts integer values between 1 and 65535");
+                steps => steps > 0,
+                "Number of steps only accepts integer values greater than 0");
             this.ValidationRule(viewModel => viewModel.StepPeriod,
-                period => period > 0 && period < 65535,
-                "Step Period only accepts integer values between 1 and 65535");
+                period => period > 0,
+                "Step Period only accepts integer values greater than 0");
             this.ValidationRule(viewModel => viewModel.Flowrate,
-                flowRate => flowRate >= 0.5f && flowRate <= 2000f,
-                "Flowrate only accepts float values between 0.5 and 2000");
+                flowRate => flowRate >= 0,
+                "Flowrate only accepts float values greater than 0");
             this.ValidationRule(viewModel => viewModel.Volume,
-                volume => volume >= 0.5f && volume <= 2000f,
-                "Volume only accepts float values between 0.5 and 2000");
+                volume => volume >= 0,
+                "Volume only accepts float values greater than 0");
 
             // force initial population of currently connected ports
             LoadUSBInformation();
