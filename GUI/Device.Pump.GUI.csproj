@@ -18,6 +18,8 @@
     <NSPrincipalClass>NSApplication</NSPrincipalClass>
     <NSHighResolutionCapable>true</NSHighResolutionCapable>
     <Version>0.1.0-preview</Version>
+    <Copyright>Champalimaud Foundation</Copyright>
+    <ApplicationIcon>Assets\cf-logo.ico</ApplicationIcon>
   </PropertyGroup>
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
     <Copy SourceFiles="cf-logo.icns" DestinationFolder="$(OutDir)" />
