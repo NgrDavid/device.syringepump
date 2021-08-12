@@ -16,6 +16,7 @@ using Avalonia;
 using Bonsai;
 using Bonsai.Harp;
 using Device.Pump.GUI.Models;
+using MessageBox.Avalonia.Enums;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Extensions;
@@ -352,8 +353,11 @@ namespace Device.Pump.GUI.ViewModels
                     int id = Convert.ToInt32(info[1].Split(':')[1].Trim());
                     if (id != 1280)
                     {
-                        //TODO: Although it's a Harp device, it is not the right one, so we should present an error.
-
+                        var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager
+                            .GetMessageBoxStandardWindow("Unexpected HARP device found", $"Found a HARP device: {info[5].Split(':')[1].TrimEnd('\0')}.\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.", icon: Icon.Warning);
+                        await messageBoxStandardWindow.Show();
+                        observable.Dispose();
+                        return;
                     }
 
                     DeviceName = ((INamedElement) _dev).Name.TrimEnd('\0').ToUpper();
