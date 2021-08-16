@@ -135,24 +135,20 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 /************************************************************************/ 
 /* EN_DRIVER_UC & BUT_PUSH & BUT_PULL & BUT_RESET                       */
 /************************************************************************/
-extern uint8_t but_push_counter_ms;
-extern uint16_t but_long_push_counter_ms;
-extern uint8_t but_pull_counter_ms;
-extern uint16_t but_long_pull_counter_ms;
 extern uint8_t but_reset_counter_ms;
+extern void clear_but_push();
+extern void clear_but_pull();
 
 ISR(PORTD_INT0_vect, ISR_NAKED)
 {
 	if(!(read_BUT_PUSH))
 	{
-		but_push_counter_ms = 25;
-		but_long_push_counter_ms = 500;
+		clear_but_push();
 	}
 	
 	if(!(read_BUT_PULL))
 	{
-		but_pull_counter_ms = 25;
-		but_long_pull_counter_ms = 500;
+		clear_but_pull();
 	}
 	
 	if(!(read_BUT_RESET))

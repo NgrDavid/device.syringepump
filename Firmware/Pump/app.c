@@ -228,13 +228,6 @@ void core_callback_reset_registers(void)
 	// TODO: missing calibration values
 	
 	app_regs.REG_EVT_ENABLE = (B_EVT_STEP_STATE | B_EVT_DIR_STATE | B_EVT_SW_FORWARD_STATE | B_EVT_SW_REVERSE_STATE | B_EVT_INPUT_STATE | B_EVT_PROTOCOL_STATE);
-	
-	// update switches initial state
-	if(read_SW_F)
-		switch_pressed(DIR_FORWARD);
-	
-	if(read_SW_R)
-		switch_pressed(DIR_REVERSE);
 }
 
 void core_callback_registers_were_reinitialized(void)
@@ -261,6 +254,13 @@ void core_callback_registers_were_reinitialized(void)
 
 	app_write_REG_MOTOR_MICROSTEP(&app_regs.REG_MOTOR_MICROSTEP);
 	clr_EN_DRIVER;
+	
+	// update switches initial state
+	if(read_SW_F)
+		switch_pressed(DIR_FORWARD);
+	
+	if(read_SW_R)
+		switch_pressed(DIR_REVERSE);
 }
 
 /************************************************************************/
@@ -301,13 +301,6 @@ void core_callback_t_before_exec(void)
 		clear_but_push();
 	if(read_BUT_PULL)
 		clear_but_pull();
-		
-	// update switches initial state
-	if(read_SW_F)
-		switch_pressed(DIR_FORWARD);
-	
-	if(read_SW_R)
-		switch_pressed(DIR_REVERSE);
 
 	if(running_protocol)
 	{
@@ -379,8 +372,6 @@ void core_callback_t_before_exec(void)
 				app_write_REG_DIR_STATE(&app_regs.REG_DIR_STATE);
 				app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 			}
-			
-			return;
 		}
 	}
 }
