@@ -164,14 +164,13 @@ bool app_write_REG_DIR_STATE(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
+	app_regs.REG_DIR_STATE = reg;
+	
 	if(reg != curr_dir)
 	{
 		curr_dir = reg;
-		if(app_regs.REG_ENABLE_MOTOR_DRIVER == B_MOTOR_ENABLE)
-		{
-			if(app_regs.REG_EVT_ENABLE & B_EVT_DIR_STATE)
-				core_func_send_event(ADD_REG_DIR_STATE, true);
-		}
+		if(app_regs.REG_EVT_ENABLE & B_EVT_DIR_STATE)
+			core_func_send_event(ADD_REG_DIR_STATE, true);
 	}
 	
 	if(curr_dir)
@@ -179,7 +178,6 @@ bool app_write_REG_DIR_STATE(void *a)
 	else
 		clr_DIR;
 
-	app_regs.REG_DIR_STATE = reg;
 	return true;
 }
 
