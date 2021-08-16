@@ -164,6 +164,8 @@ bool app_write_REG_DIR_STATE(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
+	app_regs.REG_DIR_STATE = reg;
+	
 	if(reg != curr_dir)
 	{
 		curr_dir = reg;
@@ -176,7 +178,6 @@ bool app_write_REG_DIR_STATE(void *a)
 	else
 		clr_DIR;
 
-	app_regs.REG_DIR_STATE = reg;
 	return true;
 }
 
