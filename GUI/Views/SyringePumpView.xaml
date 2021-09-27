@@ -6,7 +6,8 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:svg="clr-namespace:Svg.Skia.Avalonia;assembly=Svg.Skia.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="730" d:DesignHeight="650"
+             xmlns:views="clr-namespace:Device.Pump.GUI.Views"
+             mc:Ignorable="d"
              x:Class="Device.Pump.GUI.Views.SyringePumpView"
              FontFamily="resm:?assembly=Syringe Pump#Open Sans">
   
@@ -53,6 +54,7 @@
                       </DrawingPresenter>
                   </Button>
                   <Button Content="Connect" Command="{Binding ConnectAndGetBaseInfoCommand}" />
+                  <ComboBox Name="direction" Items="{Binding Directions}" SelectedItem="{Binding SelectedDirection}" IsEnabled="{Binding Connected}" MinWidth="70"/>
                   <Button Command="{Binding StartProtocolCommand}" ToolTip.Tip="Start Protocol" Background="#009CDF">
                       <DrawingPresenter Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
                           <DrawingPresenter.Drawing>

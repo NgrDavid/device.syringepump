@@ -12,7 +12,6 @@ using System.Reactive.Subjects;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Avalonia;
 using Bonsai;
 using Bonsai.Harp;
 using Device.Pump.GUI.Models;
@@ -61,6 +60,9 @@ namespace Device.Pump.GUI.ViewModels
         [Reactive] public int DigitalOutput1Config { get; set; }
         [Reactive] public int CalibrationValue1 { get; set; }
         [Reactive] public int CalibrationValue2 { get; set; }
+        [Reactive] public Direction SelectedDirection { get; set; }
+
+        [Reactive] public List<Direction> Directions { get; set; }
 
         [ObservableAsProperty]
         public bool IsLoadingPorts { get; }
@@ -92,6 +94,8 @@ namespace Device.Pump.GUI.ViewModels
             var informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
             AppVersion = "v" + informationVersion;
 
+            HarpMessages = new ObservableCollection<string>();
+            Directions = Enum.GetValues<Direction>().ToList();
             LoadDeviceInformation = ReactiveCommand.CreateFromObservable(LoadUSBInformation);
             LoadDeviceInformation.IsExecuting.ToPropertyEx(this, x => x.IsLoadingPorts);
 
@@ -151,6 +155,7 @@ namespace Device.Pump.GUI.ViewModels
         {
             return Observable.StartAsync(async () =>
             {
+                var selectedDirection = HarpCommand.WriteByte((int)PumpRegisters.DirState, (byte)SelectedDirection);
                 var startProtocolMessage = HarpCommand.WriteByte((int) PumpRegisters.StartProtocol, 1);
 
                 var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
@@ -160,6 +165,7 @@ namespace Device.Pump.GUI.ViewModels
                 var observable = _dev.Generate(_msgsSubject)
                     .Subscribe(observer);
 
+                _msgsSubject.OnNext(selectedDirection);
                 _msgsSubject.OnNext(startProtocolMessage);
 
                 await Task.Delay(200);
