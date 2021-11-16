@@ -60,7 +60,7 @@ namespace Device.Pump.GUI.ViewModels
         [Reactive] public int DigitalOutput1Config { get; set; }
         [Reactive] public int CalibrationValue1 { get; set; }
         [Reactive] public int CalibrationValue2 { get; set; }
-        [Reactive] public Direction SelectedDirection { get; set; }
+        [Reactive] public Direction ProtocolDirection { get; set; }
 
         [Reactive] public List<Direction> Directions { get; set; }
 
@@ -218,6 +218,12 @@ namespace Device.Pump.GUI.ViewModels
                 byte protocolType = Convert.ToByte(ProtocolType);
                 var protocolTypeMessage = HarpCommand.WriteByte((int) PumpRegisters.ProtocolType, protocolType);
                 msgs.Add(protocolTypeMessage);
+
+                // protocol direction
+                byte protocolDirection = Convert.ToByte(ProtocolDirection);
+                var protocolDirectionMessage = HarpCommand.WriteByte((int)PumpRegisters.ProtocolDirection, protocolDirection);
+                msgs.Add(protocolDirectionMessage);
+
                 // if step:
                 if (protocolType == 0)
                 {
@@ -436,6 +442,9 @@ namespace Device.Pump.GUI.ViewModels
                     break;
                 case PumpRegisters.CalibrationValue2:
                     CalibrationValue2 = item.GetPayloadByte();
+                    break;
+                case PumpRegisters.ProtocolDirection:
+                    ProtocolDirection = (Direction)item.GetPayloadByte();
                     break;
                 case PumpRegisters.EventsEnable:
                     byte all = item.GetPayloadByte();

@@ -97,7 +97,9 @@
             <CheckBox IsChecked="{Binding ProtocolStateEvent}">Protocol state</CheckBox>
           </StackPanel>
           <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5" Margin="0,20,30,0">
-            <TextBlock Text="Protocol type" FontWeight="SemiBold"/>
+              <TextBlock Text="Protocol direction" FontWeight="SemiBold"/>
+              <ComboBox Name="protocolDirection" Items="{Binding Directions}" SelectedItem="{Binding ProtocolDirection}" MinWidth="70"/>
+              <TextBlock Text="Protocol type" FontWeight="SemiBold"/>
             <ComboBox SelectedIndex="{Binding Path=ProtocolType}" Name="protocolType">
               <i:Interaction.Behaviors>
                 <ia:DataTriggerBehavior Binding="{Binding #protocolType.SelectedIndex}" ComparisonCondition="Equal" Value="0">
