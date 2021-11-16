@@ -155,7 +155,6 @@ namespace Device.Pump.GUI.ViewModels
         {
             return Observable.StartAsync(async () =>
             {
-                var selectedDirection = HarpCommand.WriteByte((int)PumpRegisters.DirState, (byte)SelectedDirection);
                 var startProtocolMessage = HarpCommand.WriteByte((int) PumpRegisters.StartProtocol, 1);
 
                 var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
@@ -165,7 +164,6 @@ namespace Device.Pump.GUI.ViewModels
                 var observable = _dev.Generate(_msgsSubject)
                     .Subscribe(observer);
 
-                _msgsSubject.OnNext(selectedDirection);
                 _msgsSubject.OnNext(startProtocolMessage);
 
                 await Task.Delay(200);
@@ -259,10 +257,6 @@ namespace Device.Pump.GUI.ViewModels
                     var calValue2Message = HarpCommand.WriteByte((int) PumpRegisters.CalibrationValue2, calValue2);
                     msgs.Add(calValue2Message);
                 }
-
-                // FIXME: remove this, for testing purposes only
-                //HarpMessage startProtocolMessage = HarpCommand.WriteByte(address: (int) PumpRegisters.StartProtocol, 1);
-                //msgs.Add(startProtocolMessage);
 
                 if (savePermanently)
                 {
