@@ -57,18 +57,20 @@ ISR(PORTB_INT0_vect, ISR_NAKED)
 			app_regs.REG_STEP_STATE = aux;
 			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 		}
-		
-		previous_in0 = aux;
 	}
 	
 	if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_RISE_START_PROTOCOL)
 	{
 		// transition from low to high
 		if(previous_in0 == 0 && aux == 1)
-			running_protocol = true;
+			app_regs.REG_START_PROTOCOL = 1;
 		else
-			running_protocol = false;
+			app_regs.REG_START_PROTOCOL = 0;
+			
+		app_write_REG_START_PROTOCOL(&app_regs.REG_START_PROTOCOL);
 	}
+	
+	previous_in0 = aux;
 	
 	reti();
 }
