@@ -102,6 +102,22 @@ bool app_write_REG_START_PROTOCOL(void *a)
 	//		will only be updated after stopping and starting the protocol again
 	stop_and_reset_protocol();
 	
+	// prevent activating protocol if the switch for the same direction is active
+	if( reg > 0 )
+	{
+		// forward switch and forward direction
+		if(read_SW_F && app_regs.REG_PROTOCOL_DIRECTION)
+		{
+			return true;
+		}
+		
+		// reverse switch and reverse direction
+		if(read_SW_R && !app_regs.REG_PROTOCOL_DIRECTION)
+		{
+			return true;
+		}
+	}
+	
 	running_protocol = reg > 0;
 	
 	// set current direction to the one defined in the protocol_direction reg
