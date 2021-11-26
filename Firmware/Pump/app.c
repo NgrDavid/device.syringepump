@@ -30,7 +30,7 @@ void hwbp_app_initialize(void)
     uint8_t hwH = 1;
     uint8_t hwL = 1;
     uint8_t fwH = 0;
-    uint8_t fwL = 2;
+    uint8_t fwL = 3;
     uint8_t ass = 0;
     
    	/* Start core */
@@ -68,6 +68,9 @@ void core_callback_catastrophic_error_detected(void)
 /************************************************************************/
 /* User functions                                                       */
 /************************************************************************/
+#define DIR_FORWARD 1
+#define DIR_REVERSE 0
+
 uint16_t inactivity_counter = 0;
 
 uint8_t but_push_counter_ms = 0;
@@ -84,15 +87,13 @@ bool but_reset_dir_change = false;
 bool switch_f_active = false;
 bool switch_r_active = false;
 
-uint8_t curr_dir = 0;
+uint8_t curr_dir = DIR_FORWARD;
+uint8_t prev_dir = DIR_FORWARD;
 uint16_t step_period_counter = 0;
 
 bool running_protocol = false;
 uint16_t prot_remaining_steps = 0;
 uint16_t prot_step_period = 0;
-
-#define DIR_FORWARD 1
-#define DIR_REVERSE 0
 
 
 void stop_and_reset_protocol()
@@ -102,6 +103,9 @@ void stop_and_reset_protocol()
 	prot_remaining_steps = app_regs.REG_PROTOCOL_NUMBER_STEPS + 1;
 	prot_step_period = app_regs.REG_PROTOCOL_PERIOD * 2;
 	app_regs.REG_START_PROTOCOL = 0;
+	
+	// revert direction
+	app_write_REG_DIR_STATE(&prev_dir);
 }
 
 void switch_pressed(uint8_t direction)
@@ -220,6 +224,7 @@ void core_callback_reset_registers(void)
 	app_regs.REG_DI0_CONFIG = GM_DI0_SYNC;
 	app_regs.REG_MOTOR_MICROSTEP = GM_STEP_FULL;
 	
+	app_regs.REG_PROTOCOL_DIRECTION = DIR_FORWARD;
 	app_regs.REG_PROTOCOL_NUMBER_STEPS = 15;
 	app_regs.REG_PROTOCOL_FLOWRATE = 0.5;
 	app_regs.REG_PROTOCOL_PERIOD = 10;
