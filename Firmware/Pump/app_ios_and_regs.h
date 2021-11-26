@@ -136,6 +136,7 @@ typedef struct
 	uint8_t REG_EVT_ENABLE;
 	uint8_t REG_SET_BOARD_TYPE;
 	uint8_t REG_PROTOCOL_STATE;
+	uint8_t REG_PROTOCOL_DIRECTION;
 } AppRegs;
 
 /************************************************************************/
@@ -165,6 +166,7 @@ typedef struct
 #define ADD_REG_EVT_ENABLE                  52 // U8     Enable the Events
 #define ADD_REG_SET_BOARD_TYPE              53 // U8     Type of the board
 #define ADD_REG_PROTOCOL_STATE              54 // U8     State of the protocol (running or stopped)
+#define ADD_REG_PROTOCOL_DIRECTION          55 // U8     Protocol direction
 
 /************************************************************************/
 /* PWM Generator registers' memory limits                               */
@@ -174,8 +176,8 @@ typedef struct
 /************************************************************************/
 /* Memory limits */
 #define APP_REGS_ADD_MIN                    0x20
-#define APP_REGS_ADD_MAX                    0x36
-#define APP_NBYTES_OF_REG_BANK              31
+#define APP_REGS_ADD_MAX                    0x37
+#define APP_NBYTES_OF_REG_BANK              32
 
 /************************************************************************/
 /* Registers' bits                                                      */

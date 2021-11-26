@@ -34,7 +34,8 @@ void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_CALIBRATION_VALUE_2,
 	&app_read_REG_EVT_ENABLE,
 	&app_read_REG_SET_BOARD_TYPE,
-	&app_read_REG_PROTOCOL_STATE
+	&app_read_REG_PROTOCOL_STATE,
+	&app_read_REG_PROTOCOL_DIRECTION
 };
 
 bool (*app_func_wr_pointer[])(void*) = {
@@ -60,7 +61,8 @@ bool (*app_func_wr_pointer[])(void*) = {
 	&app_write_REG_CALIBRATION_VALUE_2,
 	&app_write_REG_EVT_ENABLE,
 	&app_write_REG_SET_BOARD_TYPE,
-	&app_write_REG_PROTOCOL_STATE
+	&app_write_REG_PROTOCOL_STATE,
+	&app_write_REG_PROTOCOL_DIRECTION
 };
 
 
@@ -581,5 +583,22 @@ bool app_write_REG_PROTOCOL_STATE(void *a)
 	if(app_regs.REG_EVT_ENABLE & B_EVT_PROTOCOL_STATE)
 		core_func_send_event(ADD_REG_PROTOCOL_STATE, true);
 	
+	return true;
+}
+
+/************************************************************************/
+/* REG_PROTOCOL_DIRECTION                                               */
+/************************************************************************/
+void app_read_REG_PROTOCOL_DIRECTION(void)
+{
+	//app_regs.REG_PROTOCOL_DIRECTION = 0;
+
+}
+
+bool app_write_REG_PROTOCOL_DIRECTION(void *a)
+{
+	uint8_t reg = *((uint8_t*)a);
+
+	app_regs.REG_PROTOCOL_DIRECTION = reg;
 	return true;
 }
