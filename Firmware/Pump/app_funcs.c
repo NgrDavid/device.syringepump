@@ -149,7 +149,7 @@ bool app_write_REG_STEP_STATE(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
-	if(reg)
+	if( reg > 0 )
 	{
 		// force starting counting from the start
 		step_period_counter = 0;
@@ -160,10 +160,22 @@ bool app_write_REG_STEP_STATE(void *a)
 			app_write_REG_ENABLE_MOTOR_DRIVER(&app_regs.REG_ENABLE_MOTOR_DRIVER);
 		}
 		
-		set_STEP;
-		if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
+		// only allow steps if the switch on the same direction is not active
+		if(!read_SW_F && curr_dir == 1)
 		{
-			set_OUT01;
+			set_STEP;
+			if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
+			{
+				set_OUT01;
+			}
+		}
+		if(!read_SW_R && curr_dir == 0)
+		{
+			set_STEP;
+			if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
+			{
+				set_OUT01;
+			}
 		}
 	}
 	
