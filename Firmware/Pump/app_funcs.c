@@ -7,6 +7,7 @@
 /************************************************************************/
 extern AppRegs app_regs;
 extern uint8_t curr_dir;
+extern uint8_t prev_dir;
 extern uint8_t step_period_counter;
 extern bool running_protocol;
 extern void stop_and_reset_protocol();
@@ -102,6 +103,14 @@ bool app_write_REG_START_PROTOCOL(void *a)
 	stop_and_reset_protocol();
 	
 	running_protocol = reg > 0;
+	
+	// set current direction to the one defined in the protocol_direction reg
+	if( running_protocol )
+	{
+		prev_dir = curr_dir;
+		//FIXME: seems that the first event is not triggered
+		app_write_REG_DIR_STATE(&app_regs.REG_PROTOCOL_DIRECTION);
+	}
 
 	app_regs.REG_START_PROTOCOL = reg;
 	app_regs.REG_PROTOCOL_STATE = reg;
@@ -173,6 +182,11 @@ bool app_write_REG_DIR_STATE(void *a)
 		curr_dir = reg;
 		if(app_regs.REG_EVT_ENABLE & B_EVT_DIR_STATE)
 			core_func_send_event(ADD_REG_DIR_STATE, true);
+	}
+	
+	if(!running_protocol)
+	{
+		prev_dir = curr_dir;
 	}
 	
 	if(curr_dir)

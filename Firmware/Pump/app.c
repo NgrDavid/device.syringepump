@@ -88,6 +88,7 @@ bool switch_f_active = false;
 bool switch_r_active = false;
 
 uint8_t curr_dir = DIR_FORWARD;
+uint8_t prev_dir = DIR_FORWARD;
 uint16_t step_period_counter = 0;
 
 bool running_protocol = false;
@@ -102,6 +103,9 @@ void stop_and_reset_protocol()
 	prot_remaining_steps = app_regs.REG_PROTOCOL_NUMBER_STEPS + 1;
 	prot_step_period = app_regs.REG_PROTOCOL_PERIOD * 2;
 	app_regs.REG_START_PROTOCOL = 0;
+	
+	// revert direction
+	app_write_REG_DIR_STATE(&prev_dir);
 }
 
 void switch_pressed(uint8_t direction)
@@ -220,6 +224,7 @@ void core_callback_reset_registers(void)
 	app_regs.REG_DI0_CONFIG = GM_DI0_SYNC;
 	app_regs.REG_MOTOR_MICROSTEP = GM_STEP_FULL;
 	
+	app_regs.REG_PROTOCOL_DIRECTION = DIR_FORWARD;
 	app_regs.REG_PROTOCOL_NUMBER_STEPS = 15;
 	app_regs.REG_PROTOCOL_FLOWRATE = 0.5;
 	app_regs.REG_PROTOCOL_PERIOD = 10;
