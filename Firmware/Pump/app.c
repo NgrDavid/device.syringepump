@@ -68,6 +68,9 @@ void core_callback_catastrophic_error_detected(void)
 /************************************************************************/
 /* User functions                                                       */
 /************************************************************************/
+#define DIR_FORWARD 1
+#define DIR_REVERSE 0
+
 uint16_t inactivity_counter = 0;
 
 uint8_t but_push_counter_ms = 0;
@@ -84,15 +87,12 @@ bool but_reset_dir_change = false;
 bool switch_f_active = false;
 bool switch_r_active = false;
 
-uint8_t curr_dir = 0;
+uint8_t curr_dir = DIR_FORWARD;
 uint16_t step_period_counter = 0;
 
 bool running_protocol = false;
 uint16_t prot_remaining_steps = 0;
 uint16_t prot_step_period = 0;
-
-#define DIR_FORWARD 1
-#define DIR_REVERSE 0
 
 
 void stop_and_reset_protocol()
