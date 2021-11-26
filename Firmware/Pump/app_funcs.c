@@ -7,6 +7,7 @@
 /************************************************************************/
 extern AppRegs app_regs;
 extern uint8_t curr_dir;
+extern uint8_t prev_dir;
 extern uint8_t step_period_counter;
 extern bool running_protocol;
 extern void stop_and_reset_protocol();
@@ -34,7 +35,8 @@ void (*app_func_rd_pointer[])(void) = {
 	&app_read_REG_CALIBRATION_VALUE_2,
 	&app_read_REG_EVT_ENABLE,
 	&app_read_REG_SET_BOARD_TYPE,
-	&app_read_REG_PROTOCOL_STATE
+	&app_read_REG_PROTOCOL_STATE,
+	&app_read_REG_PROTOCOL_DIRECTION
 };
 
 bool (*app_func_wr_pointer[])(void*) = {
@@ -60,7 +62,8 @@ bool (*app_func_wr_pointer[])(void*) = {
 	&app_write_REG_CALIBRATION_VALUE_2,
 	&app_write_REG_EVT_ENABLE,
 	&app_write_REG_SET_BOARD_TYPE,
-	&app_write_REG_PROTOCOL_STATE
+	&app_write_REG_PROTOCOL_STATE,
+	&app_write_REG_PROTOCOL_DIRECTION
 };
 
 
@@ -99,7 +102,31 @@ bool app_write_REG_START_PROTOCOL(void *a)
 	//		will only be updated after stopping and starting the protocol again
 	stop_and_reset_protocol();
 	
+	// prevent activating protocol if the switch for the same direction is active
+	if( reg > 0 )
+	{
+		// forward switch and forward direction
+		if(read_SW_F && app_regs.REG_PROTOCOL_DIRECTION)
+		{
+			return true;
+		}
+		
+		// reverse switch and reverse direction
+		if(read_SW_R && !app_regs.REG_PROTOCOL_DIRECTION)
+		{
+			return true;
+		}
+	}
+	
 	running_protocol = reg > 0;
+	
+	// set current direction to the one defined in the protocol_direction reg
+	if( running_protocol )
+	{
+		prev_dir = curr_dir;
+		//FIXME: seems that the first event is not triggered
+		app_write_REG_DIR_STATE(&app_regs.REG_PROTOCOL_DIRECTION);
+	}
 
 	app_regs.REG_START_PROTOCOL = reg;
 	app_regs.REG_PROTOCOL_STATE = reg;
@@ -122,7 +149,7 @@ bool app_write_REG_STEP_STATE(void *a)
 {
 	uint8_t reg = *((uint8_t*)a);
 	
-	if(reg)
+	if( reg > 0 )
 	{
 		// force starting counting from the start
 		step_period_counter = 0;
@@ -133,10 +160,22 @@ bool app_write_REG_STEP_STATE(void *a)
 			app_write_REG_ENABLE_MOTOR_DRIVER(&app_regs.REG_ENABLE_MOTOR_DRIVER);
 		}
 		
-		set_STEP;
-		if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
+		// only allow steps if the switch on the same direction is not active
+		if(!read_SW_F && curr_dir == 1)
 		{
-			set_OUT01;
+			set_STEP;
+			if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
+			{
+				set_OUT01;
+			}
+		}
+		if(!read_SW_R && curr_dir == 0)
+		{
+			set_STEP;
+			if((app_regs.REG_DO1_CONFIG & MSK_OUT1_CONF) == GM_OUT1_STEP_STATE)
+			{
+				set_OUT01;
+			}
 		}
 	}
 	
@@ -171,6 +210,11 @@ bool app_write_REG_DIR_STATE(void *a)
 		curr_dir = reg;
 		if(app_regs.REG_EVT_ENABLE & B_EVT_DIR_STATE)
 			core_func_send_event(ADD_REG_DIR_STATE, true);
+	}
+	
+	if(!running_protocol)
+	{
+		prev_dir = curr_dir;
 	}
 	
 	if(curr_dir)
@@ -581,5 +625,22 @@ bool app_write_REG_PROTOCOL_STATE(void *a)
 	if(app_regs.REG_EVT_ENABLE & B_EVT_PROTOCOL_STATE)
 		core_func_send_event(ADD_REG_PROTOCOL_STATE, true);
 	
+	return true;
+}
+
+/************************************************************************/
+/* REG_PROTOCOL_DIRECTION                                               */
+/************************************************************************/
+void app_read_REG_PROTOCOL_DIRECTION(void)
+{
+	//app_regs.REG_PROTOCOL_DIRECTION = 0;
+
+}
+
+bool app_write_REG_PROTOCOL_DIRECTION(void *a)
+{
+	uint8_t reg = *((uint8_t*)a);
+
+	app_regs.REG_PROTOCOL_DIRECTION = reg;
 	return true;
 }
