@@ -30,7 +30,7 @@ void hwbp_app_initialize(void)
     uint8_t hwH = 1;
     uint8_t hwL = 1;
     uint8_t fwH = 0;
-    uint8_t fwL = 3;
+    uint8_t fwL = 4;
     uint8_t ass = 0;
     
    	/* Start core */
@@ -122,10 +122,13 @@ void switch_pressed(uint8_t direction)
 		app_regs.REG_SW_REVERSE_STATE = 1;
 	}
 	
-	stop_and_reset_protocol();
-	but_reset_pressed = false;
-	but_reset_dir_change = false;
-	step_period_counter = 0;
+	if(curr_dir == direction)
+	{
+		stop_and_reset_protocol();
+		step_period_counter = 0;
+		but_reset_pressed = false;
+		but_reset_dir_change = false;
+	}
 }
 
 void take_step(uint8_t direction)
