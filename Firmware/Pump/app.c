@@ -122,10 +122,13 @@ void switch_pressed(uint8_t direction)
 		app_regs.REG_SW_REVERSE_STATE = 1;
 	}
 	
-	stop_and_reset_protocol();
-	but_reset_pressed = false;
-	but_reset_dir_change = false;
-	step_period_counter = 0;
+	if(curr_dir == direction)
+	{
+		stop_and_reset_protocol();
+		step_period_counter = 0;
+		but_reset_pressed = false;
+		but_reset_dir_change = false;
+	}
 }
 
 void take_step(uint8_t direction)
