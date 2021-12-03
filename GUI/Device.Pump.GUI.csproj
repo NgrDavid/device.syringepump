@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
     <AssemblyName>Syringe Pump</AssemblyName>
   </PropertyGroup>
   <PropertyGroup>
-    <CFBundleName>Syringe Pump</CFBundleName> <!-- Also defines .app file name -->
+    <CFBundleName>Syringe Pump</CFBundleName>
     <CFBundleDisplayName>Syringe Pump</CFBundleDisplayName>
     <CFBundleIdentifier>org.fchampalimaud</CFBundleIdentifier>
     <CFBundleVersion>0.1.0-preview</CFBundleVersion>
@@ -14,7 +14,7 @@
     <CFBundlePackageType>AAPL</CFBundlePackageType>
     <CFBundleSignature>.</CFBundleSignature>
     <CFBundleExecutable>Syringe Pump</CFBundleExecutable>
-    <CFBundleIconFile>fc-logo.icns</CFBundleIconFile> <!-- Will be copied from output directory -->
+    <CFBundleIconFile>fc-logo.icns</CFBundleIconFile>
     <NSPrincipalClass>NSApplication</NSPrincipalClass>
     <NSHighResolutionCapable>true</NSHighResolutionCapable>
     <Version>0.1.0-preview</Version>
