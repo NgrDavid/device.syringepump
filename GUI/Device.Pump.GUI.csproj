@@ -28,7 +28,6 @@
     <Copy SourceFiles="Assets\cf-logo.ico" DestinationFolder="$(OutDir)\publish" />
   </Target>
   <ItemGroup>
-    <Folder Include="Models\" />
     <Compile Update="**\*.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
@@ -83,5 +82,10 @@
     <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
     <PackageReference Include="System.IO.Ports" Version="6.0.0" />
     <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\LogsWindow.axaml.cs">
+      <DependentUpon>LogsWindow.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

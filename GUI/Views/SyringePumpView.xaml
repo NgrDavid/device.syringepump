@@ -76,6 +76,15 @@
                           </DrawingImage>
                       </Image>
                   </Button>
+                  <Button Command="{Binding ShowLogsCommand}" ToolTip.Tip="Show logs window">
+                      <Image Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+                          <DrawingImage>
+                              <DrawingImage.Drawing>
+                                  <GeometryDrawing Brush="#FF000000" Geometry="M575.4 0H0V1000H750V174.5L575.4 0ZM562.4 75.4L674.6 187.5H562.4V75.4ZM62.5 937.5V62.4H500V250H687.5V937.5H62.5ZM625 500L625 562.5L125 562.5L125 562.5L125 500ZM625 375L625 437.5L125 437.5L125 437.5L125 375ZM500 625L500 687.5L125 687.5L125 687.5L125 625Z"   />
+                              </DrawingImage.Drawing>
+                          </DrawingImage>
+                      </Image>
+                  </Button>
               </StackPanel>
           </Grid>
       
@@ -163,6 +172,10 @@
         </Grid>
       </StackPanel>
     </ScrollViewer>
+
+      <StackPanel DockPanel.Dock="Right" IsVisible="{Binding ShowLogs}" MinWidth="100" x:Name="LogsPanel">
+          <views:LogsWindow />
+      </StackPanel>
     
   </DockPanel>
 </UserControl>

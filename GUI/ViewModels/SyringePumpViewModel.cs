@@ -64,6 +64,8 @@ namespace Device.Pump.GUI.ViewModels
 
         [Reactive] public List<Direction> Directions { get; set; }
 
+        [Reactive] public bool ShowLogs { get; set; } = false;
+
         [ObservableAsProperty]
         public bool IsLoadingPorts { get; }
 
@@ -82,6 +84,7 @@ namespace Device.Pump.GUI.ViewModels
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<Unit, Unit> ConnectAndGetBaseInfoCommand{ get; }
         public ReactiveCommand<Unit, Unit> StartProtocolCommand{ get; }
+        public ReactiveCommand<Unit, Unit> ShowLogsCommand{ get; }
         public ReactiveCommand<bool, Unit> SaveConfigurationCommand{ get; }
         public ReactiveCommand<Unit, Unit> ResetConfigurationCommand{ get; }
 
@@ -110,13 +113,15 @@ namespace Device.Pump.GUI.ViewModels
             var canChangeConfig = this.WhenAnyValue(x => x.Connected).Select(connected => connected);
             StartProtocolCommand = ReactiveCommand.CreateFromObservable(StartProtocol, canChangeConfig);
             StartProtocolCommand.IsExecuting.ToPropertyEx(this, x => x.IsRunningProtocol);
+
+            ShowLogsCommand = ReactiveCommand.Create(() => { ShowLogs = !ShowLogs; }, canChangeConfig);
+
             SaveConfigurationCommand = ReactiveCommand.CreateFromObservable<bool, Unit>(SaveConfiguration, canChangeConfig);
             SaveConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsSaving);
 
             ResetConfigurationCommand = ReactiveCommand.CreateFromObservable(ResetConfiguration, canChangeConfig);
             ResetConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsResetting);
 
-            HarpMessages = new ObservableCollection<string>();
             // TODO: missing properly dispose of this
             _msgsSubject = new Subject<HarpMessage>();
             
