@@ -24,6 +24,9 @@
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
     <Copy SourceFiles="cf-logo.icns" DestinationFolder="$(OutDir)" />
   </Target>
+  <Target Name="CopyCustomContent2" AfterTargets="Publish">
+    <Copy SourceFiles="Assets\cf-logo.ico" DestinationFolder="$(OutDir)\publish" />
+  </Target>
   <ItemGroup>
     <Folder Include="Models\" />
     <Compile Update="**\*.xaml.cs">
