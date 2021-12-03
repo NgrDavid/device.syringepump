@@ -39,19 +39,21 @@
     
     <ScrollViewer HorizontalScrollBarVisibility="Auto" Padding="0">
       <StackPanel Spacing="12" Margin="0,20,0,0">
-        <Panel Height="50">
-          <TextBlock Text="Device information" Foreground="#465f6b" VerticalAlignment="Center" FontSize="22" FontWeight="SemiBold" Margin="10,0"/>
+        <Panel Height="36">
+          <TextBlock Text="Device connection" Foreground="#465f6b" VerticalAlignment="Center" FontSize="22" FontWeight="SemiBold" Margin="10,0"/>
         </Panel>
-          <Grid ColumnDefinitions="*,*,20,30,20,30" RowDefinitions="*,*" Margin="0,0,10,0">
+          <Grid ColumnDefinitions="*,*,20,30,20,30" RowDefinitions="*,*" Margin="0,0,10,0" MinHeight="60">
               <StackPanel Grid.RowSpan="2" VerticalAlignment="Bottom" Margin="10" Orientation="Horizontal" Spacing="20">
                   <TextBlock Text="Select a device" VerticalAlignment="Center"/>
                   <ComboBox Name="ports" Items="{Binding Ports}" SelectedItem="{Binding SelectedPort}" MinWidth="70"/>
                   <Button Command="{Binding LoadDeviceInformation}">
-                      <DrawingPresenter Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <DrawingPresenter.Drawing>
-                              <GeometryDrawing  Brush="#ff000000" Geometry="M256 388c-72.597 0-132-59.405-132-132 0-72.601 59.403-132 132-132 36.3 0 69.299 15.4 92.406 39.601L278 234h154V80l-51.698 51.702C348.406 99.798 304.406 80 256 80c-96.797 0-176 79.203-176 176s78.094 176 176 176c81.045 0 148.287-54.134 169.401-128H378.85c-18.745 49.561-67.138 84-122.85 84z"   />
-                          </DrawingPresenter.Drawing>
-                      </DrawingPresenter>
+                      <Image Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+                          <DrawingImage>
+                              <DrawingImage.Drawing>
+                                  <GeometryDrawing  Brush="#ff000000" Geometry="M256 388c-72.597 0-132-59.405-132-132 0-72.601 59.403-132 132-132 36.3 0 69.299 15.4 92.406 39.601L278 234h154V80l-51.698 51.702C348.406 99.798 304.406 80 256 80c-96.797 0-176 79.203-176 176s78.094 176 176 176c81.045 0 148.287-54.134 169.401-128H378.85c-18.745 49.561-67.138 84-122.85 84z"   />
+                              </DrawingImage.Drawing>
+                          </DrawingImage>
+                      </Image>
                   </Button>
                   <Button Content="Connect" Command="{Binding ConnectAndGetBaseInfoCommand}" />
               </StackPanel>
@@ -71,7 +73,7 @@
                       <Image Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
                           <DrawingImage>
                               <DrawingImage.Drawing>
-                                  <GeometryDrawing Brush="#FFFFFF00" Geometry="M4 2.00005V13.82L13 7.88006L4 2.00005ZM5.5 4.82L10.3101 7.88006L5.5 11.0001V4.82Z"   />
+                                  <GeometryDrawing Brush="#FFF" Geometry="M4 2.00005V13.82L13 7.88006L4 2.00005ZM5.5 4.82L10.3101 7.88006L5.5 11.0001V4.82Z"   />
                               </DrawingImage.Drawing>
                           </DrawingImage>
                       </Image>
@@ -80,7 +82,7 @@
                       <Image Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
                           <DrawingImage>
                               <DrawingImage.Drawing>
-                                  <GeometryDrawing Brush="#FF000000" Geometry="M575.4 0H0V1000H750V174.5L575.4 0ZM562.4 75.4L674.6 187.5H562.4V75.4ZM62.5 937.5V62.4H500V250H687.5V937.5H62.5ZM625 500L625 562.5L125 562.5L125 562.5L125 500ZM625 375L625 437.5L125 437.5L125 437.5L125 375ZM500 625L500 687.5L125 687.5L125 687.5L125 625Z"   />
+                                  <GeometryDrawing Brush="#F000" Geometry="M575.4 0H0V1000H750V174.5L575.4 0ZM562.4 75.4L674.6 187.5H562.4V75.4ZM62.5 937.5V62.4H500V250H687.5V937.5H62.5ZM625 500L625 562.5L125 562.5L125 562.5L125 500ZM625 375L625 437.5L125 437.5L125 437.5L125 375ZM500 625L500 687.5L125 687.5L125 687.5L125 625Z"   />
                               </DrawingImage.Drawing>
                           </DrawingImage>
                       </Image>
