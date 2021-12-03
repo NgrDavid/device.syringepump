@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Device.Pump.GUI.ViewModels;
@@ -10,6 +11,7 @@ namespace Device.Pump.GUI.Views
         public MainWindow()
         {
             InitializeComponent();
+            SizeToContent = SizeToContent.WidthAndHeight;
 
     #if DEBUG
             this.AttachDevTools();
