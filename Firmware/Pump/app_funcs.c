@@ -124,14 +124,18 @@ bool app_write_REG_START_PROTOCOL(void *a)
 	if( running_protocol )
 	{
 		prev_dir = curr_dir;
-		//FIXME: seems that the first event is not triggered
 		app_write_REG_DIR_STATE(&app_regs.REG_PROTOCOL_DIRECTION);
 	}
 
 	app_regs.REG_START_PROTOCOL = reg;
-	app_regs.REG_PROTOCOL_STATE = reg;
-	app_write_REG_PROTOCOL_STATE(&app_regs.REG_PROTOCOL_STATE);
-
+	
+	if(app_regs.REG_PROTOCOL_STATE != reg)
+	{
+		app_regs.REG_PROTOCOL_STATE = reg;
+		app_write_REG_PROTOCOL_STATE(&app_regs.REG_PROTOCOL_STATE);				
+	}
+	
+	
 	return true;
 }
 
