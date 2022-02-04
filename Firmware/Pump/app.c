@@ -73,6 +73,7 @@ void core_callback_catastrophic_error_detected(void)
 
 uint16_t inactivity_counter = 0;
 
+/* Buttons */
 uint8_t but_push_counter_ms = 0;
 uint16_t but_long_push_counter_ms = 0;
 bool but_push_long_press = false;
@@ -84,8 +85,12 @@ bool but_pull_long_press = false;
 uint8_t but_reset_counter_ms = 0;
 bool but_reset_pressed = false;
 bool but_reset_dir_change = false;
+
+/* Switches */
 bool switch_f_active = false;
 bool switch_r_active = false;
+uint8_t sw_f_counter_ms = 0;
+uint8_t sw_r_counter_ms = 0;
 
 uint8_t curr_dir = DIR_FORWARD;
 uint8_t prev_dir = DIR_FORWARD;
@@ -172,6 +177,18 @@ void clear_but_pull()
 	but_pull_long_press = false;
 }
 
+/* Switches */ 
+extern void clear_sw_f()
+{			
+	switch_f_active = false;
+	sw_f_counter_ms = 50;	
+}
+
+extern void clear_sw_r()
+{
+	switch_r_active = false;
+	sw_r_counter_ms = 50;
+}
 
 /************************************************************************/
 /* Initialization Callbacks                                             */
@@ -330,9 +347,8 @@ void core_callback_t_before_exec(void)
 			else
 			{
 				// we reached the end, lets stop everything and reset variables
-				stop_and_reset_protocol();
-				app_regs.REG_PROTOCOL_STATE = 0;
-				app_write_REG_PROTOCOL_STATE(&app_regs.REG_PROTOCOL_STATE);
+				app_regs.REG_START_PROTOCOL = 0;
+				app_write_REG_START_PROTOCOL(&app_regs.REG_START_PROTOCOL);
 			}
 		}
 	}
@@ -401,6 +417,53 @@ void core_callback_t_1ms(void)
 	{
 		app_write_REG_ENABLE_MOTOR_DRIVER(0);
 		inactivity_counter = 0;
+	}
+	
+	/* handle switches */
+	/* De-bounce Switch FORWARD */
+	if(sw_f_counter_ms)
+	{
+		if(read_SW_F)
+		{
+			if(!--sw_f_counter_ms)
+			{
+				switch_pressed(DIR_FORWARD);
+						
+				if(app_regs.REG_EVT_ENABLE & B_EVT_SW_FORWARD_STATE)
+					core_func_send_event(ADD_REG_SW_FORWARD_STATE, true);
+	
+				if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
+				{
+					if(read_SW_F)
+						set_OUT00;
+					else
+						clr_OUT00;
+				}
+			}
+		}
+	}
+	
+	/* De-bounce Switch REVERSE */
+	if(sw_r_counter_ms)
+	{
+		if(read_SW_R)
+		{
+			if(!--sw_r_counter_ms)
+			{
+				switch_pressed(DIR_REVERSE);
+
+				if(app_regs.REG_EVT_ENABLE & B_EVT_SW_REVERSE_STATE)
+					core_func_send_event(ADD_REG_SW_REVERSE_STATE, true);
+					
+				if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
+				{
+					if(read_SW_R)
+						set_OUT00;
+					else
+						clr_OUT00;
+				}
+			}
+		}
 	}
 	
 	/* handle buttons */
