@@ -73,6 +73,7 @@ void core_callback_catastrophic_error_detected(void)
 
 uint16_t inactivity_counter = 0;
 
+/* Buttons */
 uint8_t but_push_counter_ms = 0;
 uint16_t but_long_push_counter_ms = 0;
 bool but_push_long_press = false;
@@ -84,8 +85,12 @@ bool but_pull_long_press = false;
 uint8_t but_reset_counter_ms = 0;
 bool but_reset_pressed = false;
 bool but_reset_dir_change = false;
+
+/* Switches */
 bool switch_f_active = false;
 bool switch_r_active = false;
+uint8_t sw_f_counter_ms = 0;
+uint8_t sw_r_counter_ms = 0;
 
 uint8_t curr_dir = DIR_FORWARD;
 uint8_t prev_dir = DIR_FORWARD;
@@ -172,6 +177,18 @@ void clear_but_pull()
 	but_pull_long_press = false;
 }
 
+/* Switches */ 
+extern void clear_sw_f()
+{			
+	switch_f_active = false;
+	sw_f_counter_ms = 50;	
+}
+
+extern void clear_sw_r()
+{
+	switch_r_active = false;
+	sw_r_counter_ms = 50;
+}
 
 /************************************************************************/
 /* Initialization Callbacks                                             */
