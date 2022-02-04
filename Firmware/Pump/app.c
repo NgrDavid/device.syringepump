@@ -420,6 +420,53 @@ void core_callback_t_1ms(void)
 		inactivity_counter = 0;
 	}
 	
+	/* handle switches */
+	/* De-bounce Switch FORWARD */
+	if(sw_f_counter_ms)
+	{
+		if(read_SW_F)
+		{
+			if(!--sw_f_counter_ms)
+			{
+				switch_pressed(DIR_FORWARD);
+						
+				if(app_regs.REG_EVT_ENABLE & B_EVT_SW_FORWARD_STATE)
+					core_func_send_event(ADD_REG_SW_FORWARD_STATE, true);
+	
+				if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
+				{
+					if(read_SW_F)
+						set_OUT00;
+					else
+						clr_OUT00;
+				}
+			}
+		}
+	}
+	
+	/* De-bounce Switch REVERSE */
+	if(sw_r_counter_ms)
+	{
+		if(read_SW_R)
+		{
+			if(!--sw_r_counter_ms)
+			{
+				switch_pressed(DIR_REVERSE);
+
+				if(app_regs.REG_EVT_ENABLE & B_EVT_SW_REVERSE_STATE)
+					core_func_send_event(ADD_REG_SW_REVERSE_STATE, true);
+					
+				if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
+				{
+					if(read_SW_R)
+						set_OUT00;
+					else
+						clr_OUT00;
+				}
+			}
+		}
+	}
+	
 	/* handle buttons */
 	/* De-bounce PUSH button */
 	if(but_push_counter_ms)
