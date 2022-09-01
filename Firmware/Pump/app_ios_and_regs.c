@@ -83,10 +83,12 @@ uint8_t app_regs_type[] = {
 	TYPE_U8,
 	TYPE_U8,
 	TYPE_U8,
+	TYPE_U8,
 	TYPE_U8
 };
 
 uint16_t app_regs_n_elements[] = {
+	1,
 	1,
 	1,
 	1,
@@ -135,5 +137,6 @@ uint8_t *app_regs_pointer[] = {
 	(uint8_t*)(&app_regs.REG_CALIBRATION_VALUE_2),
 	(uint8_t*)(&app_regs.REG_EVT_ENABLE),
 	(uint8_t*)(&app_regs.REG_SET_BOARD_TYPE),
-	(uint8_t*)(&app_regs.REG_PROTOCOL_STATE)
+	(uint8_t*)(&app_regs.REG_PROTOCOL_STATE),
+	(uint8_t*)(&app_regs.REG_PROTOCOL_DIRECTION)
 };

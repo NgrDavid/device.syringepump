@@ -30,7 +30,7 @@ void hwbp_app_initialize(void)
     uint8_t hwH = 1;
     uint8_t hwL = 1;
     uint8_t fwH = 0;
-    uint8_t fwL = 2;
+    uint8_t fwL = 5;
     uint8_t ass = 0;
     
    	/* Start core */
@@ -68,8 +68,12 @@ void core_callback_catastrophic_error_detected(void)
 /************************************************************************/
 /* User functions                                                       */
 /************************************************************************/
+#define DIR_FORWARD 1
+#define DIR_REVERSE 0
+
 uint16_t inactivity_counter = 0;
 
+/* Buttons */
 uint8_t but_push_counter_ms = 0;
 uint16_t but_long_push_counter_ms = 0;
 bool but_push_long_press = false;
@@ -81,18 +85,20 @@ bool but_pull_long_press = false;
 uint8_t but_reset_counter_ms = 0;
 bool but_reset_pressed = false;
 bool but_reset_dir_change = false;
+
+/* Switches */
 bool switch_f_active = false;
 bool switch_r_active = false;
+uint8_t sw_f_counter_ms = 0;
+uint8_t sw_r_counter_ms = 0;
 
-uint8_t curr_dir = 0;
+uint8_t curr_dir = DIR_FORWARD;
+uint8_t prev_dir = DIR_FORWARD;
 uint16_t step_period_counter = 0;
 
 bool running_protocol = false;
 uint16_t prot_remaining_steps = 0;
 uint16_t prot_step_period = 0;
-
-#define DIR_FORWARD 1
-#define DIR_REVERSE 0
 
 
 void stop_and_reset_protocol()
@@ -102,6 +108,9 @@ void stop_and_reset_protocol()
 	prot_remaining_steps = app_regs.REG_PROTOCOL_NUMBER_STEPS + 1;
 	prot_step_period = app_regs.REG_PROTOCOL_PERIOD * 2;
 	app_regs.REG_START_PROTOCOL = 0;
+	
+	// revert direction
+	app_write_REG_DIR_STATE(&prev_dir);
 }
 
 void switch_pressed(uint8_t direction)
@@ -118,10 +127,13 @@ void switch_pressed(uint8_t direction)
 		app_regs.REG_SW_REVERSE_STATE = 1;
 	}
 	
-	stop_and_reset_protocol();
-	but_reset_pressed = false;
-	but_reset_dir_change = false;
-	step_period_counter = 0;
+	if(curr_dir == direction)
+	{
+		stop_and_reset_protocol();
+		step_period_counter = 0;
+		but_reset_pressed = false;
+		but_reset_dir_change = false;
+	}
 }
 
 void take_step(uint8_t direction)
@@ -165,6 +177,18 @@ void clear_but_pull()
 	but_pull_long_press = false;
 }
 
+/* Switches */ 
+extern void clear_sw_f()
+{			
+	switch_f_active = false;
+	sw_f_counter_ms = 50;	
+}
+
+extern void clear_sw_r()
+{
+	switch_r_active = false;
+	sw_r_counter_ms = 50;
+}
 
 /************************************************************************/
 /* Initialization Callbacks                                             */
@@ -220,6 +244,7 @@ void core_callback_reset_registers(void)
 	app_regs.REG_DI0_CONFIG = GM_DI0_SYNC;
 	app_regs.REG_MOTOR_MICROSTEP = GM_STEP_FULL;
 	
+	app_regs.REG_PROTOCOL_DIRECTION = DIR_FORWARD;
 	app_regs.REG_PROTOCOL_NUMBER_STEPS = 15;
 	app_regs.REG_PROTOCOL_FLOWRATE = 0.5;
 	app_regs.REG_PROTOCOL_PERIOD = 10;
@@ -322,9 +347,8 @@ void core_callback_t_before_exec(void)
 			else
 			{
 				// we reached the end, lets stop everything and reset variables
-				stop_and_reset_protocol();
-				app_regs.REG_PROTOCOL_STATE = 0;
-				app_write_REG_PROTOCOL_STATE(&app_regs.REG_PROTOCOL_STATE);
+				app_regs.REG_START_PROTOCOL = 0;
+				app_write_REG_START_PROTOCOL(&app_regs.REG_START_PROTOCOL);
 			}
 		}
 	}
@@ -393,6 +417,53 @@ void core_callback_t_1ms(void)
 	{
 		app_write_REG_ENABLE_MOTOR_DRIVER(0);
 		inactivity_counter = 0;
+	}
+	
+	/* handle switches */
+	/* De-bounce Switch FORWARD */
+	if(sw_f_counter_ms)
+	{
+		if(read_SW_F)
+		{
+			if(!--sw_f_counter_ms)
+			{
+				switch_pressed(DIR_FORWARD);
+						
+				if(app_regs.REG_EVT_ENABLE & B_EVT_SW_FORWARD_STATE)
+					core_func_send_event(ADD_REG_SW_FORWARD_STATE, true);
+	
+				if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
+				{
+					if(read_SW_F)
+						set_OUT00;
+					else
+						clr_OUT00;
+				}
+			}
+		}
+	}
+	
+	/* De-bounce Switch REVERSE */
+	if(sw_r_counter_ms)
+	{
+		if(read_SW_R)
+		{
+			if(!--sw_r_counter_ms)
+			{
+				switch_pressed(DIR_REVERSE);
+
+				if(app_regs.REG_EVT_ENABLE & B_EVT_SW_REVERSE_STATE)
+					core_func_send_event(ADD_REG_SW_REVERSE_STATE, true);
+					
+				if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
+				{
+					if(read_SW_R)
+						set_OUT00;
+					else
+						clr_OUT00;
+				}
+			}
+		}
 	}
 	
 	/* handle buttons */

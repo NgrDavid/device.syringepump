@@ -57,18 +57,20 @@ ISR(PORTB_INT0_vect, ISR_NAKED)
 			app_regs.REG_STEP_STATE = aux;
 			app_write_REG_STEP_STATE(&app_regs.REG_STEP_STATE);
 		}
-		
-		previous_in0 = aux;
 	}
 	
 	if((app_regs.REG_DI0_CONFIG & MSK_DI0_CONF) == GM_DI0_RISE_START_PROTOCOL)
 	{
 		// transition from low to high
 		if(previous_in0 == 0 && aux == 1)
-			running_protocol = true;
+			app_regs.REG_START_PROTOCOL = 1;
 		else
-			running_protocol = false;
+			app_regs.REG_START_PROTOCOL = 0;
+			
+		app_write_REG_START_PROTOCOL(&app_regs.REG_START_PROTOCOL);
 	}
+	
+	previous_in0 = aux;
 	
 	reti();
 }
@@ -77,58 +79,33 @@ ISR(PORTB_INT0_vect, ISR_NAKED)
 /************************************************************************/ 
 /* SW_F, SW_R, TYPE0 & TYPE1                                            */
 /************************************************************************/
+extern void clear_sw_f();
+extern void clear_sw_r();
+
 ISR(PORTC_INT0_vect, ISR_NAKED)
 {
-	if(read_SW_F)
+	if(!(read_SW_F))
 	{
-		// TODO: change this to use DIR_FORWARD
-		switch_pressed(1);
-		
-		if(app_regs.REG_EVT_ENABLE & B_EVT_SW_FORWARD_STATE)
-			core_func_send_event(ADD_REG_SW_FORWARD_STATE, true);
-	}
-	else
-	{
-		// should send event when down (only if previously was up)
 		if(switch_f_active)
 		{
 			app_regs.REG_SW_FORWARD_STATE = 0;
 			if(app_regs.REG_EVT_ENABLE & B_EVT_SW_FORWARD_STATE)
 				core_func_send_event(ADD_REG_SW_FORWARD_STATE, true);
 		}
-			
-		switch_f_active = false;
+		clear_sw_f();
 	}
-
-	if(read_SW_R)
+	
+	if(!(read_SW_R))
 	{
-		// TODO: change this to use DIR_REVERSE
-		switch_pressed(0);
-
-		if(app_regs.REG_EVT_ENABLE & B_EVT_SW_REVERSE_STATE)
-			core_func_send_event(ADD_REG_SW_REVERSE_STATE, true);
-	}
-	else
-	{		
-		// should send event when down (only if previously was up)
 		if(switch_r_active)
 		{
 			app_regs.REG_SW_REVERSE_STATE = 0;
 			if(app_regs.REG_EVT_ENABLE & B_EVT_SW_REVERSE_STATE)
 				core_func_send_event(ADD_REG_SW_REVERSE_STATE, true);
 		}
-		
-		switch_r_active = false;
+		clear_sw_r();
 	}
-		
-	if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
-	{
-		if(read_SW_F || read_SW_R)
-			set_OUT00;
-		else
-			clr_OUT00;
-	}
-	
+
 	reti();
 }
 
