@@ -41,7 +41,7 @@ Usage information is available in the [Wiki](https://bitbucket.org/fchampalimaud
   ```
 - Run makesis to generate the installer
     ```
-     makensis.exe /DVERSION_MAJOR=0 /DVERSION_MINOR=10 /DVERSION_BUILD=0 .\SyringePump.nsi
+     makensis.exe /DVERSION_MAJOR=0 /DVERSION_MINOR=1 /DVERSION_BUILD=0 .\SyringePump.nsi
     ```
 - The installer will be available at `.\bin\Release\net6.0\win-x64\SyringePump.vx.x.x-win-x64.self-contained.exe`
 
