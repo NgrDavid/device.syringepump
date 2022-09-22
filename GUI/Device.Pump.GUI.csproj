@@ -4,22 +4,24 @@
     <TargetFramework>net6.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
     <AssemblyName>Syringe Pump</AssemblyName>
+    <Version>0.2</Version>
   </PropertyGroup>
   <PropertyGroup>
     <CFBundleName>Syringe Pump</CFBundleName>
     <CFBundleDisplayName>Syringe Pump</CFBundleDisplayName>
     <CFBundleIdentifier>org.fchampalimaud</CFBundleIdentifier>
-    <CFBundleVersion>0.1.0-preview</CFBundleVersion>
-    <CFBundleShortVersionString>0.1.0-preview</CFBundleShortVersionString>
+    <CFBundleVersion>$(Version)</CFBundleVersion>
+    <CFBundleShortVersionString>$(Version)</CFBundleShortVersionString>
     <CFBundlePackageType>AAPL</CFBundlePackageType>
     <CFBundleSignature>.</CFBundleSignature>
     <CFBundleExecutable>Syringe Pump</CFBundleExecutable>
     <CFBundleIconFile>fc-logo.icns</CFBundleIconFile>
     <NSPrincipalClass>NSApplication</NSPrincipalClass>
     <NSHighResolutionCapable>true</NSHighResolutionCapable>
-    <Version>0.1.0-preview</Version>
     <Copyright>Champalimaud Foundation</Copyright>
     <ApplicationIcon>Assets\cf-logo.ico</ApplicationIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
     <Copy SourceFiles="cf-logo.icns" DestinationFolder="$(OutDir)" />
@@ -47,6 +49,19 @@
     <AvaloniaResource Remove="Assets\Fonts\OpenSans-Regular.ttf" />
     <AvaloniaResource Remove="Assets\Fonts\OpenSans-SemiBold.ttf" />
     <AvaloniaResource Remove="Assets\Fonts\OpenSans-SemiBoldItalic.ttf" />
+    <AvaloniaResource Remove="Views\About.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Views\About.xaml" />
+    <None Include="Assets\cf-logo.n.ico">
+      <Pack>True</Pack>
+      <PackagePath />
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaXaml Include="Views\About.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Fonts\OpenSans-Bold.ttf" />
@@ -84,8 +99,17 @@
     <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Views\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\LogsWindow.axaml.cs">
       <DependentUpon>LogsWindow.axaml</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 </Project>
