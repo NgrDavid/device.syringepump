@@ -22,6 +22,7 @@
     <ApplicationIcon>Assets\cf-logo.ico</ApplicationIcon>
     <PackageReadmeFile>..\README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
+    <BaseOutputPath>..\bin</BaseOutputPath>
   </PropertyGroup>
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
     <Copy SourceFiles="cf-logo.icns" DestinationFolder="$(OutDir)" />
