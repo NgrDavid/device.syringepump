@@ -8,7 +8,32 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AssemblyName>Syringe Pump</AssemblyName>
     <BaseOutputPath>..\bin</BaseOutputPath>
+    <Version>0.2</Version>
   </PropertyGroup>
+  <PropertyGroup>
+    <CFBundleName>Syringe Pump</CFBundleName>
+    <CFBundleDisplayName>Syringe Pump</CFBundleDisplayName>
+    <CFBundleIdentifier>org.fchampalimaud</CFBundleIdentifier>
+    <CFBundleVersion>$(Version)</CFBundleVersion>
+    <CFBundleShortVersionString>$(Version)</CFBundleShortVersionString>
+    <CFBundlePackageType>AAPL</CFBundlePackageType>
+    <CFBundleSignature>.</CFBundleSignature>
+    <CFBundleExecutable>Syringe Pump</CFBundleExecutable>
+    <CFBundleIconFile>fc-logo.icns</CFBundleIconFile>
+    <NSPrincipalClass>NSApplication</NSPrincipalClass>
+    <NSHighResolutionCapable>true</NSHighResolutionCapable>
+    <Copyright>Champalimaud Foundation</Copyright>
+    <ApplicationIcon>..\Assets\cf-logo.ico</ApplicationIcon>
+    <PackageReadmeFile>..\README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
+    <BaseOutputPath>..\bin</BaseOutputPath>
+  </PropertyGroup>
+  <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
+    <Copy SourceFiles="..\Assets\cf-logo.icns" DestinationFolder="$(OutDir)" />
+  </Target>
+  <Target Name="CopyCustomContent2" AfterTargets="Publish">
+    <Copy SourceFiles="..\Assets\cf-logo.ico" DestinationFolder="$(OutDir)\publish" />
+  </Target>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
     <None Remove=".gitignore" />

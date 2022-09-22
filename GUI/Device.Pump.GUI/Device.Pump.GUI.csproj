@@ -6,30 +6,6 @@
     <AssemblyName>Device.Pump.GUI</AssemblyName>
     <Version>0.2</Version>
   </PropertyGroup>
-  <PropertyGroup>
-    <CFBundleName>Syringe Pump</CFBundleName>
-    <CFBundleDisplayName>Syringe Pump</CFBundleDisplayName>
-    <CFBundleIdentifier>org.fchampalimaud</CFBundleIdentifier>
-    <CFBundleVersion>$(Version)</CFBundleVersion>
-    <CFBundleShortVersionString>$(Version)</CFBundleShortVersionString>
-    <CFBundlePackageType>AAPL</CFBundlePackageType>
-    <CFBundleSignature>.</CFBundleSignature>
-    <CFBundleExecutable>Syringe Pump</CFBundleExecutable>
-    <CFBundleIconFile>fc-logo.icns</CFBundleIconFile>
-    <NSPrincipalClass>NSApplication</NSPrincipalClass>
-    <NSHighResolutionCapable>true</NSHighResolutionCapable>
-    <Copyright>Champalimaud Foundation</Copyright>
-    <ApplicationIcon>Assets\cf-logo.ico</ApplicationIcon>
-    <PackageReadmeFile>..\README.md</PackageReadmeFile>
-    <RepositoryType>git</RepositoryType>
-    <BaseOutputPath>..\bin</BaseOutputPath>
-  </PropertyGroup>
-  <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
-    <Copy SourceFiles="cf-logo.icns" DestinationFolder="$(OutDir)" />
-  </Target>
-  <Target Name="CopyCustomContent2" AfterTargets="Publish">
-    <Copy SourceFiles="Assets\cf-logo.ico" DestinationFolder="$(OutDir)\publish" />
-  </Target>
   <ItemGroup>
     <Compile Update="**\*.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
@@ -40,29 +16,11 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Remove="Assets\Fonts\OpenSans-Bold.ttf" />
-    <AvaloniaResource Remove="Assets\Fonts\OpenSans-BoldItalic.ttf" />
-    <AvaloniaResource Remove="Assets\Fonts\OpenSans-ExtraBold.ttf" />
-    <AvaloniaResource Remove="Assets\Fonts\OpenSans-ExtraBoldItalic.ttf" />
-    <AvaloniaResource Remove="Assets\Fonts\OpenSans-Italic.ttf" />
-    <AvaloniaResource Remove="Assets\Fonts\OpenSans-Light.ttf" />
-    <AvaloniaResource Remove="Assets\Fonts\OpenSans-LightItalic.ttf" />
-    <AvaloniaResource Remove="Assets\Fonts\OpenSans-Regular.ttf" />
-    <AvaloniaResource Remove="Assets\Fonts\OpenSans-SemiBold.ttf" />
-    <AvaloniaResource Remove="Assets\Fonts\OpenSans-SemiBoldItalic.ttf" />
-    <AvaloniaResource Remove="Views\About.xaml" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove="Views\About.xaml" />
     <None Include="Assets\cf-logo.n.ico">
       <Pack>True</Pack>
       <PackagePath />
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <AvaloniaXaml Include="Views\About.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </AvaloniaXaml>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Fonts\OpenSans-Bold.ttf" />
