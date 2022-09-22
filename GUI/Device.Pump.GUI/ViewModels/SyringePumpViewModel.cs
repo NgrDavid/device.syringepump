@@ -270,7 +270,7 @@ namespace Device.Pump.GUI.ViewModels
 
                 if (savePermanently)
                 {
-                    var resetMessage = HarpCommand.Reset(ResetMode.Save);
+                    var resetMessage = HarpCommand.ResetDevice(ResetMode.Save);
                     msgs.Add(resetMessage);
                 }
 
@@ -299,7 +299,7 @@ namespace Device.Pump.GUI.ViewModels
         {
             return Observable.StartAsync(async () =>
             {
-                var resetMessage = HarpCommand.Reset(ResetMode.RestoreDefault);
+                var resetMessage = HarpCommand.ResetDevice(ResetMode.RestoreDefault);
 
                 var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
                     (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
