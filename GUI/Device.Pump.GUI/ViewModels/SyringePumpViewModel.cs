@@ -96,9 +96,14 @@ namespace Device.Pump.GUI.ViewModels
             var assembly = typeof(SyringePumpViewModel).Assembly;
             var informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
             AppVersion = "v" + informationVersion;
+            
+            Console.WriteLine($"Dotnet version: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
 
             HarpMessages = new ObservableCollection<string>();
             Directions = Enum.GetValues<Direction>().ToList();
+
+            //this.LogsWindow.ViewModel.HarpMessages = HarpMessages;
+            
             LoadDeviceInformation = ReactiveCommand.CreateFromObservable(LoadUSBInformation);
             LoadDeviceInformation.IsExecuting.ToPropertyEx(this, x => x.IsLoadingPorts);
 
@@ -329,11 +334,12 @@ namespace Device.Pump.GUI.ViewModels
                 var writer = new StringWriter(sb);
                 Console.SetOut(writer);
 
-                if (_dev == null || string.Compare(_dev.PortName, SelectedPort, StringComparison.Ordinal) != 0)
+                if (_dev == null ) //|| string.Compare(_dev.PortName, SelectedPort, StringComparison.Ordinal) != 0)
                 {
                     _dev = new Bonsai.Harp.Device();
-                    _dev.PortName = SelectedPort;
                 }
+
+                _dev.PortName = SelectedPort;
 
                 // to guarantee that we give enough time to get the data from the device
                 await Task.Delay(250);

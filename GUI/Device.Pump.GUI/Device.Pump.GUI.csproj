@@ -20,7 +20,7 @@
     <NSHighResolutionCapable>true</NSHighResolutionCapable>
     <Copyright>Champalimaud Foundation</Copyright>
     <ApplicationIcon>Assets\cf-logo.ico</ApplicationIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>..\README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="$([MSBuild]::IsOsPlatform('OSX'))">

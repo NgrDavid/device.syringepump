@@ -45,7 +45,7 @@
           <Grid ColumnDefinitions="*,*,20,30,20,30" RowDefinitions="*,*" Margin="0,0,10,0" MinHeight="60">
               <StackPanel Grid.RowSpan="2" VerticalAlignment="Bottom" Margin="10" Orientation="Horizontal" Spacing="20">
                   <TextBlock Text="Select a device" VerticalAlignment="Center"/>
-                  <ComboBox Name="ports" Items="{Binding Ports}" SelectedItem="{Binding SelectedPort}" MinWidth="70"/>
+                  <ComboBox Name="Ports" Items="{Binding Ports}" SelectedItem="{Binding SelectedPort}" MinWidth="70"/>
                   <Button Command="{Binding LoadDeviceInformation}">
                       <Image Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
                           <DrawingImage>
