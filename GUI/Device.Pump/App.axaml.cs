@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 using Device.Pump.GUI.ViewModels;
 using Device.Pump.GUI.Views;
 
-namespace Device.Pump.GUI
+namespace Device.Pump
 {
-    public class App : Application
+    public partial class App : Application
     {
         public override void Initialize()
         {
