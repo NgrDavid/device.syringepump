@@ -9,7 +9,7 @@
              xmlns:views="clr-namespace:Device.Pump.GUI.Views"
              mc:Ignorable="d"
              x:Class="Device.Pump.GUI.Views.SyringePumpView"
-             FontFamily="resm:?assembly=Syringe Pump#Open Sans">
+             FontFamily="resm:?assembly=Device.Pump.GUI#Open Sans">
   
   <DockPanel>
     <Grid Margin="10" DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,*,100,200" RowDefinitions="30,25,*,*">

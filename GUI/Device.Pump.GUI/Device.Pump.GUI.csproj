@@ -3,7 +3,7 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
-    <AssemblyName>Syringe Pump</AssemblyName>
+    <AssemblyName>Device.Pump.GUI</AssemblyName>
     <Version>0.2</Version>
   </PropertyGroup>
   <PropertyGroup>
