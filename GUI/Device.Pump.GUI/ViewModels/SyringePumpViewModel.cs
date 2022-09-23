@@ -20,6 +20,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
+using Serilog;
 
 #endregion
 
@@ -158,6 +159,8 @@ namespace Device.Pump.GUI.ViewModels
                     Ports = devices?.Where(d => d.Contains("cu.")).ToList();
                 else
                     Ports = devices?.ToList();
+
+                Log.Information("Loaded USB information");
             });
         }
 
@@ -179,6 +182,8 @@ namespace Device.Pump.GUI.ViewModels
                 await Task.Delay(200);
 
                 observable.Dispose();
+
+                Log.Information("Started protocol");
             });
         }
 
@@ -341,6 +346,8 @@ namespace Device.Pump.GUI.ViewModels
 
                 _dev.PortName = SelectedPort;
 
+                Log.Information($"Attempting connection to port '{SelectedPort}'");
+
                 // to guarantee that we give enough time to get the data from the device
                 await Task.Delay(250);
 
@@ -355,6 +362,8 @@ namespace Device.Pump.GUI.ViewModels
                     .Subscribe(observer);
 
                 await Task.Delay(300);
+
+                Log.Information("Connection established with the following return information: {@info}", sb.ToString());
 
                 var info = sb.ToString().Split(Environment.NewLine);
                 // [1] = WhoAmI: 1280
