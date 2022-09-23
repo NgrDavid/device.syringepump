@@ -13,9 +13,9 @@ namespace Device.Pump.GUI.Views
             InitializeComponent();
             SizeToContent = SizeToContent.WidthAndHeight;
 
-    #if DEBUG
+#if DEBUG
             this.AttachDevTools();
-    #endif
+#endif
         }
 
         private void InitializeComponent()

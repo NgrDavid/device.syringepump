@@ -4,7 +4,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Device.Pump.GUI.ViewModels
 {
-    public class LogsWindowViewModel :  ReactiveObject
+    public class LogsWindowViewModel : ReactiveObject
     {
         [Reactive] public ObservableCollection<string> HarpMessages { get; set; }
     }

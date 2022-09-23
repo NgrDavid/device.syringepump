@@ -14,7 +14,7 @@ namespace Device.Pump.GUI
 
             Log.Information(value, "{@Type} - {@Message}", value.GetType().ToString(), value.Message);
 
-            RxApp.MainThreadScheduler.Schedule(() => { throw value; }) ;
+            RxApp.MainThreadScheduler.Schedule(() => { throw value; });
         }
 
         public void OnError(Exception error)
