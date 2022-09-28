@@ -21,6 +21,7 @@ using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 using Serilog;
+using OperatingSystem = System.OperatingSystem;
 
 #endregion
 
@@ -67,20 +68,16 @@ namespace Device.Pump.GUI.ViewModels
 
         [Reactive] public bool ShowLogs { get; set; } = false;
 
-        [ObservableAsProperty]
-        public bool IsLoadingPorts { get; }
+        [ObservableAsProperty] public bool IsLoadingPorts { get; }
 
-        [ObservableAsProperty]
-        public bool IsConnecting { get; }
+        [ObservableAsProperty] public bool IsConnecting { get; }
 
-        [ObservableAsProperty]
-        public bool IsResetting { get; }
+        [ObservableAsProperty] public bool IsResetting { get; }
 
-        [ObservableAsProperty]
-        public bool IsSaving { get; }
+        [ObservableAsProperty] public bool IsSaving { get; }
 
-        [ObservableAsProperty]
-        public bool IsRunningProtocol { get; }
+        [ObservableAsProperty] public bool IsRunningProtocol { get; }
+
 
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<Unit, Unit> ConnectAndGetBaseInfoCommand { get; }
@@ -95,10 +92,12 @@ namespace Device.Pump.GUI.ViewModels
         public SyringePumpViewModel()
         {
             var assembly = typeof(SyringePumpViewModel).Assembly;
-            var informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+            var informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion;
             AppVersion = "v" + informationVersion;
 
-            Console.WriteLine($"Dotnet version: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
+            Console.WriteLine(
+                $"Dotnet version: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
 
             HarpMessages = new ObservableCollection<string>();
             Directions = Enum.GetValues<Direction>().ToList();
@@ -122,7 +121,8 @@ namespace Device.Pump.GUI.ViewModels
 
             ShowLogsCommand = ReactiveCommand.Create(() => { ShowLogs = !ShowLogs; }, canChangeConfig);
 
-            SaveConfigurationCommand = ReactiveCommand.CreateFromObservable<bool, Unit>(SaveConfiguration, canChangeConfig);
+            SaveConfigurationCommand =
+                ReactiveCommand.CreateFromObservable<bool, Unit>(SaveConfiguration, canChangeConfig);
             SaveConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsSaving);
 
             ResetConfigurationCommand = ReactiveCommand.CreateFromObservable(ResetConfiguration, canChangeConfig);
@@ -200,11 +200,11 @@ namespace Device.Pump.GUI.ViewModels
 
                 // events
                 byte events = (byte)((Convert.ToByte(StepStateEvent) << 0) |
-                                      (Convert.ToByte(DirectionStateEvent) << 1) |
-                                      (Convert.ToByte(SwitchForwardStateEvent) << 2) |
-                                      (Convert.ToByte(SwitchReverseStateEvent) << 3) |
-                                      (Convert.ToByte(InputStateEvent) << 4) |
-                                      (Convert.ToByte(ProtocolStateEvent) << 5));
+                                     (Convert.ToByte(DirectionStateEvent) << 1) |
+                                     (Convert.ToByte(SwitchForwardStateEvent) << 2) |
+                                     (Convert.ToByte(SwitchReverseStateEvent) << 3) |
+                                     (Convert.ToByte(InputStateEvent) << 4) |
+                                     (Convert.ToByte(ProtocolStateEvent) << 5));
                 var eventsMessage = HarpCommand.WriteByte((int)PumpRegisters.EventsEnable, events);
                 msgs.Add(eventsMessage);
 
@@ -234,7 +234,8 @@ namespace Device.Pump.GUI.ViewModels
 
                 // protocol direction
                 byte protocolDirection = Convert.ToByte(ProtocolDirection);
-                var protocolDirectionMessage = HarpCommand.WriteByte((int)PumpRegisters.ProtocolDirection, protocolDirection);
+                var protocolDirectionMessage =
+                    HarpCommand.WriteByte((int)PumpRegisters.ProtocolDirection, protocolDirection);
                 msgs.Add(protocolDirectionMessage);
 
                 // if step:
@@ -346,7 +347,7 @@ namespace Device.Pump.GUI.ViewModels
 
                 _dev.PortName = SelectedPort;
 
-                Log.Information($"Attempting connection to port '{SelectedPort}'");
+                Log.Information("Attempting connection to port \'{SelectedPort}\'", SelectedPort);
 
                 // to guarantee that we give enough time to get the data from the device
                 await Task.Delay(250);
@@ -363,7 +364,7 @@ namespace Device.Pump.GUI.ViewModels
 
                 await Task.Delay(300);
 
-                Log.Information("Connection established with the following return information: {@info}", sb.ToString());
+                Log.Information("Connection established with the following return information: {Info}", sb.ToString());
 
                 var info = sb.ToString().Split(Environment.NewLine);
                 // [1] = WhoAmI: 1280
@@ -380,7 +381,9 @@ namespace Device.Pump.GUI.ViewModels
                     if (id != 1280)
                     {
                         var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager
-                            .GetMessageBoxStandardWindow("Unexpected HARP device found", $"Found a HARP device: {info[5].Split(':')[1].TrimEnd('\0')}.\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.", icon: Icon.Warning);
+                            .GetMessageBoxStandardWindow("Unexpected HARP device found",
+                                $"Found a HARP device: {info[5].Split(':')[1].TrimEnd('\0')}.\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.",
+                                icon: Icon.Warning);
                         await messageBoxStandardWindow.Show();
                         observable.Dispose();
                         return;

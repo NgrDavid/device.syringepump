@@ -110,24 +110,24 @@
             <ComboBox SelectedIndex="{Binding Path=ProtocolType}" Name="protocolType">
               <i:Interaction.Behaviors>
                 <ia:DataTriggerBehavior Binding="{Binding #protocolType.SelectedIndex}" ComparisonCondition="Equal" Value="0">
-                    <ia:ChangePropertyAction TargetObject="{Binding #stepsOptions}" PropertyName="IsVisible" Value="true"/>
-                    <ia:ChangePropertyAction TargetObject="{Binding #volumeOptions}" PropertyName="IsVisible" Value="false"/>
+                    <ia:ChangePropertyAction TargetObject="{Binding #StepsOptions}" PropertyName="IsVisible" Value="true"/>
+                    <ia:ChangePropertyAction TargetObject="{Binding #VolumeOptions}" PropertyName="IsVisible" Value="false"/>
                 </ia:DataTriggerBehavior>
                 <ia:DataTriggerBehavior Binding="{Binding #protocolType.SelectedIndex}" ComparisonCondition="Equal" Value="1">
-                    <ia:ChangePropertyAction TargetObject="{Binding #stepsOptions}" PropertyName="IsVisible" Value="false"/>
-                    <ia:ChangePropertyAction TargetObject="{Binding #volumeOptions}" PropertyName="IsVisible" Value="true"/>
+                    <ia:ChangePropertyAction TargetObject="{Binding #StepsOptions}" PropertyName="IsVisible" Value="false"/>
+                    <ia:ChangePropertyAction TargetObject="{Binding #VolumeOptions}" PropertyName="IsVisible" Value="true"/>
                 </ia:DataTriggerBehavior>
               </i:Interaction.Behaviors>
               <ComboBoxItem Tag="Step">Step</ComboBoxItem>
               <ComboBoxItem Tag="Volume">Volume</ComboBoxItem>
             </ComboBox>
-            <StackPanel Name="stepsOptions" Spacing="5">
+            <StackPanel Name="StepsOptions" Spacing="5">
               <TextBlock Text="Number of steps" FontWeight="SemiBold" />
               <TextBox Width="110" HorizontalAlignment="Left" Text="{Binding NumberOfSteps, Mode=TwoWay}"/>
               <TextBlock Text="Step period [ms]" FontWeight="SemiBold" />
               <TextBox Width="110" HorizontalAlignment="Left" Text="{Binding StepPeriod, Mode=TwoWay}"/>
             </StackPanel>
-            <StackPanel Name="volumeOptions" IsVisible="False" Spacing="5">
+            <StackPanel Name="VolumeOptions" IsVisible="False" Spacing="5">
               <TextBlock Text="Flowrate" FontWeight="SemiBold" />
               <TextBox Width="110" HorizontalAlignment="Left" Text="{Binding Flowrate, Mode=TwoWay}"/>
               <TextBlock Text="Volume" FontWeight="SemiBold" />
