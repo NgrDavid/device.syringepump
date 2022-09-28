@@ -4,7 +4,7 @@ using System.Reactive.Concurrency;
 using ReactiveUI;
 using Serilog;
 
-namespace Device.Pump.GUI
+namespace Device.Pump
 {
     public class MyCustomObservableExceptionHandler : IObserver<Exception>
     {
