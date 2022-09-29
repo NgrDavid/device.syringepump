@@ -139,10 +139,10 @@ namespace Device.Pump.GUI.ViewModels
                 period => period > 0,
                 "Step Period only accepts integer values greater than 0");
             this.ValidationRule(viewModel => viewModel.Flowrate,
-                flowRate => flowRate >= 0,
+                flowRate => flowRate > 0,
                 "Flowrate only accepts float values greater than 0");
             this.ValidationRule(viewModel => viewModel.Volume,
-                volume => volume >= 0,
+                volume => volume > 0,
                 "Volume only accepts float values greater than 0");
 
             // force initial population of currently connected ports
