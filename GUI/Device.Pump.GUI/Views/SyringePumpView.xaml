@@ -98,7 +98,7 @@
         <Grid Margin="10,0,0,0" ColumnDefinitions="Auto,Auto,Auto,Auto" RowDefinitions="*,*,*,*">
           <TextBlock Grid.Row="0" Grid.Column="0" Text="Events" Foreground="#465f6b" FontSize="16" FontWeight="SemiBold" />
           <TextBlock Grid.Row="0" Grid.Column="1" Text="Protocol" Foreground="#465f6b" FontSize="16" FontWeight="SemiBold" />
-          <TextBlock Grid.Row="0" Grid.Column="2" Text="Input/Ouput" Foreground="#465f6b" FontSize="16" FontWeight="SemiBold"/>
+          <TextBlock Grid.Row="0" Grid.Column="2" Text="Input/Output" Foreground="#465f6b" FontSize="16" FontWeight="SemiBold"/>
           <TextBlock Grid.Row="0" Grid.Column="3" Text="Other" Foreground="#465f6b" FontSize="16" FontWeight="SemiBold"/>
           <StackPanel Grid.Row="1" Grid.Column="0" Spacing="5" Margin="0,20,30,0">
             <CheckBox IsChecked="{Binding StepStateEvent}">Step state</CheckBox>
