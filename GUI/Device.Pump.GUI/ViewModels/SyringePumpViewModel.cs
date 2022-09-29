@@ -342,16 +342,16 @@ namespace Device.Pump.GUI.ViewModels
 
                 if (_dev == null) //|| string.Compare(_dev.PortName, SelectedPort, StringComparison.Ordinal) != 0)
                 {
-                    _dev = new Bonsai.Harp.Device();
+                    _dev = new Bonsai.Harp.Device
+                    {
+                        PortName = SelectedPort,
+                        Heartbeat = EnableType.Disable,
+                        IgnoreErrors = true
+                    };
                 }
-
-                _dev.PortName = SelectedPort;
-
+                
                 Log.Information("Attempting connection to port \'{SelectedPort}\'", SelectedPort);
-
-                // to guarantee that we give enough time to get the data from the device
-                await Task.Delay(250);
-
+                
                 HarpMessages.Clear();
 
                 var observer = Observer.Create<HarpMessage>(UpdateUI,
@@ -360,6 +360,7 @@ namespace Device.Pump.GUI.ViewModels
 
                 var observable = _dev.Generate().Where(item =>
                         item.MessageType == MessageType.Read && item.Address >= (int)(PumpRegisters.EnableMotorDriver))
+                    .Throttle(TimeSpan.FromSeconds(0.2))
                     .Subscribe(observer);
 
                 await Task.Delay(300);
