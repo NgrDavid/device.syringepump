@@ -88,6 +88,7 @@ namespace Device.Pump.GUI.ViewModels
 
         private Bonsai.Harp.Device _dev;
         private Subject<HarpMessage> _msgsSubject;
+        private DeviceConfiguration configuration;
 
         public SyringePumpViewModel()
         {
@@ -336,78 +337,105 @@ namespace Device.Pump.GUI.ViewModels
                 if (string.IsNullOrEmpty(SelectedPort))
                     throw new Exception("invalid parameter");
 
-                StringBuilder sb = new StringBuilder();
-                var writer = new StringWriter(sb);
-                Console.SetOut(writer);
+                configuration = new DeviceConfiguration();
 
                 if (_dev == null) //|| string.Compare(_dev.PortName, SelectedPort, StringComparison.Ordinal) != 0)
                 {
                     _dev = new Bonsai.Harp.Device
                     {
-                        PortName = SelectedPort,
-                        Heartbeat = EnableType.Disable,
-                        IgnoreErrors = true
+                        PortName = SelectedPort, Heartbeat = EnableType.Disable, IgnoreErrors = true
                     };
                 }
-                
+
                 Log.Information("Attempting connection to port \'{SelectedPort}\'", SelectedPort);
-                
+
                 HarpMessages.Clear();
 
-                var observer = Observer.Create<HarpMessage>(UpdateUI,
-                    (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
-                    () => HarpMessages.Add("Completed sending commands to device"));
-
-                var observable = _dev.Generate().Where(item =>
-                        item.MessageType == MessageType.Read && item.Address >= (int)(PumpRegisters.EnableMotorDriver))
+                var observable = _dev.Generate()
+                    .Where(MessageType.Read)
+                    .Do(ReadRegister)
                     .Throttle(TimeSpan.FromSeconds(0.2))
-                    .Subscribe(observer);
+                    .Subscribe();
 
                 await Task.Delay(300);
 
-                Log.Information("Connection established with the following return information: {Info}", sb.ToString());
+                Log.Information("Connection established with the following return information: {Info}", configuration);
 
-                var info = sb.ToString().Split(Environment.NewLine);
-                // [1] = WhoAmI: 1280
-                // [2] = Hw: 1.0
-                // [3] = Fw: 1.0
-                // [5] = DeviceName: Pump \0\0\0\0\0\0
-                if (info.Length < 6)
+                // present messagebox if we are not handling a Pump device
+                if (configuration.WhoAmI != 1280)
                 {
-                    // TODO: something went wrong, handle this
-                }
-                else
-                {
-                    int id = Convert.ToInt32(info[1].Split(':')[1].Trim());
-                    if (id != 1280)
-                    {
-                        var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager
-                            .GetMessageBoxStandardWindow("Unexpected HARP device found",
-                                $"Found a HARP device: {info[5].Split(':')[1].TrimEnd('\0')}.\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.",
-                                icon: Icon.Warning);
-                        await messageBoxStandardWindow.Show();
-                        observable.Dispose();
-                        return;
-                    }
-
-                    DeviceName = ((INamedElement)_dev).Name.TrimEnd('\0').ToUpper();
-                    DeviceID = id;
-
-                    // convert Hw and Fw version
-                    HardwareVersion = HarpVersion.Parse(info[2].Split(':')[1].Trim());
-                    FirmwareVersion = HarpVersion.Parse(info[3].Split(':')[1].Trim());
+                    var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager
+                        .GetMessageBoxStandardWindow("Unexpected HARP device found",
+                            $"Found a HARP device: {configuration.DeviceName} ({configuration.WhoAmI}).\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.",
+                            icon: Icon.Warning);
+                    await messageBoxStandardWindow.Show();
+                    observable.Dispose();
+                    return;
                 }
 
-                writer.Close();
+                DeviceName = configuration.DeviceName;
+                DeviceID = configuration.WhoAmI;
 
-                // return Console output to default
-                Console.SetOut(new StreamWriter(Console.OpenStandardOutput()));
-                await writer.DisposeAsync();
+                // convert Hw and Fw version
+                HardwareVersion = configuration.HardwareVersion;
+                FirmwareVersion = configuration.FirmwareVersion;
 
                 Connected = true;
 
                 observable.Dispose();
             });
+        }
+
+        private void ReadRegister(HarpMessage message)
+        {
+            switch (message.Address)
+            {
+                case DeviceRegisters.WhoAmI:
+                    configuration.WhoAmI = message.GetPayloadUInt16();
+                    break;
+                case DeviceRegisters.HardwareVersionHigh:
+                    configuration.HardwareVersionHigh = message.GetPayloadByte();
+                    break;
+                case DeviceRegisters.HardwareVersionLow:
+                    configuration.HardwareVersionLow = message.GetPayloadByte();
+                    break;
+                case DeviceRegisters.FirmwareVersionHigh:
+                    configuration.FirmwareVersionHigh = message.GetPayloadByte();
+                    break;
+                case DeviceRegisters.FirmwareVersionLow:
+                    configuration.FirmwareVersionLow = message.GetPayloadByte();
+                    break;
+                case DeviceRegisters.CoreVersionHigh:
+                    configuration.CoreVersionHigh = message.GetPayloadByte();
+                    break;
+                case DeviceRegisters.CoreVersionLow:
+                    configuration.CoreVersionLow = message.GetPayloadByte();
+                    break;
+                case DeviceRegisters.AssemblyVersion:
+                    configuration.AssemblyVersion = message.GetPayloadByte();
+                    break;
+                case DeviceRegisters.TimestampSecond:
+                    configuration.Timestamp = message.GetPayloadUInt32();
+                    break;
+                case DeviceRegisters.DeviceName:
+                    var deviceName = nameof(Device);
+                    if (!message.Error)
+                    {
+                        var namePayload = message.GetPayload();
+                        deviceName = Encoding.ASCII.GetString(namePayload.Array, namePayload.Offset, namePayload.Count)
+                            .Trim('\0');
+                    }
+
+                    configuration.DeviceName = deviceName;
+                    break;
+                case DeviceRegisters.SerialNumber:
+                    configuration.SerialNumber = message.GetPayloadUInt16();
+                    break;
+            }
+
+            // Update UI with the remaining registers
+            if (message.Address >= (int)(PumpRegisters.EnableMotorDriver))
+                UpdateUI(message);
         }
 
         private void UpdateUI(HarpMessage item)
