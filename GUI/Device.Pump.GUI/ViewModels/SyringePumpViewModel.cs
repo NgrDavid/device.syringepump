@@ -163,9 +163,9 @@ namespace Device.Pump.GUI.ViewModels
                 var devices = SerialPort.GetPortNames();
 
                 if (OperatingSystem.IsMacOS())
-                    Ports = devices?.Where(d => d.Contains("cu.")).ToList();
+                    Ports = devices.Where(d => d.Contains("cu.")).ToList();
                 else
-                    Ports = devices?.ToList();
+                    Ports = devices.ToList();
 
                 Log.Information("Loaded USB information");
             });
