@@ -109,6 +109,8 @@ namespace Device.Pump.GUI.ViewModels
 
             LoadDeviceInformation = ReactiveCommand.CreateFromObservable(LoadUSBInformation);
             LoadDeviceInformation.IsExecuting.ToPropertyEx(this, x => x.IsLoadingPorts);
+            LoadDeviceInformation.ThrownExceptions.Subscribe(ex =>
+                Log.Error(ex, "Error loading device information with exception: {Exception}", ex));
 
             // can connect if there is a selection and also if the new selection is different than the old one
             var canConnect = this.WhenAnyValue(x => x.SelectedPort)
@@ -116,20 +118,27 @@ namespace Device.Pump.GUI.ViewModels
 
             ConnectAndGetBaseInfoCommand = ReactiveCommand.CreateFromObservable(ConnectAndGetBaseInfo, canConnect);
             ConnectAndGetBaseInfoCommand.IsExecuting.ToPropertyEx(this, x => x.IsConnecting);
-            ConnectAndGetBaseInfoCommand.ThrownExceptions.Subscribe(ex => Console.WriteLine(ex.Message));
+            ConnectAndGetBaseInfoCommand.ThrownExceptions.Subscribe(ex =>
+                Log.Error(ex, "Error connecting to device with error: {Exception}", ex));
 
             var canChangeConfig = this.WhenAnyValue(x => x.Connected).Select(connected => connected);
             StartProtocolCommand = ReactiveCommand.CreateFromObservable(StartProtocol, canChangeConfig);
             StartProtocolCommand.IsExecuting.ToPropertyEx(this, x => x.IsRunningProtocol);
+            StartProtocolCommand.ThrownExceptions.Subscribe(ex =>
+                Log.Error(ex, "Error starting protocol with error: {Exception}", ex));
 
             ShowLogsCommand = ReactiveCommand.Create(() => { ShowLogs = !ShowLogs; }, canChangeConfig);
 
             SaveConfigurationCommand =
                 ReactiveCommand.CreateFromObservable<bool, Unit>(SaveConfiguration, canChangeConfig);
             SaveConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsSaving);
+            SaveConfigurationCommand.ThrownExceptions.Subscribe(ex =>
+                Log.Error(ex, "Error saving configuration with error: {Exception}", ex));
 
             ResetConfigurationCommand = ReactiveCommand.CreateFromObservable(ResetConfiguration, canChangeConfig);
             ResetConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsResetting);
+            ResetConfigurationCommand.ThrownExceptions.Subscribe(ex =>
+                Log.Error(ex, "Error resetting device configuration with error: {Exception}", ex));
 
             // TODO: missing properly dispose of this
             _msgsSubject = new Subject<HarpMessage>();
