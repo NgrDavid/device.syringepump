@@ -179,6 +179,6 @@
       <StackPanel DockPanel.Dock="Right" IsVisible="{Binding ShowLogs}" MinWidth="100" x:Name="LogsPanel">
           <views:LogsWindow />
       </StackPanel>
-    
+      
   </DockPanel>
 </UserControl>

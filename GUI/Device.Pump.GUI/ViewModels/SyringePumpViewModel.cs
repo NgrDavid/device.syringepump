@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Reactive;
@@ -97,7 +96,7 @@ namespace Device.Pump.GUI.ViewModels
             var assembly = typeof(SyringePumpViewModel).Assembly;
             var informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion;
-            AppVersion = "v" + informationVersion;
+            AppVersion = $"v{informationVersion}";
 
             Console.WriteLine(
                 $"Dotnet version: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
@@ -105,9 +104,7 @@ namespace Device.Pump.GUI.ViewModels
             HarpMessages = new ObservableCollection<string>();
             Directions = Enum.GetValues<Direction>().ToList();
 
-            //this.LogsWindow.ViewModel.HarpMessages = HarpMessages;
-
-            LoadDeviceInformation = ReactiveCommand.CreateFromObservable(LoadUSBInformation);
+            LoadDeviceInformation = ReactiveCommand.CreateFromObservable(LoadUsbInformation);
             LoadDeviceInformation.IsExecuting.ToPropertyEx(this, x => x.IsLoadingPorts);
             LoadDeviceInformation.ThrownExceptions.Subscribe(ex =>
                 Log.Error(ex, "Error loading device information with exception: {Exception}", ex));
@@ -162,10 +159,10 @@ namespace Device.Pump.GUI.ViewModels
                 "Volume only accepts float values greater than 0");
 
             // force initial population of currently connected ports
-            LoadUSBInformation();
+            LoadUsbInformation();
         }
 
-        public IObservable<Unit> LoadUSBInformation()
+        private IObservable<Unit> LoadUsbInformation()
         {
             return Observable.Start(() =>
             {
