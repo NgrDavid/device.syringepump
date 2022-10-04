@@ -87,7 +87,9 @@ namespace Device.Pump.GUI.ViewModels
         public ReactiveCommand<Unit, Unit> ResetConfigurationCommand { get; }
 
         private Bonsai.Harp.Device _dev;
-        private Subject<HarpMessage> _msgsSubject;
+        private readonly IObserver<HarpMessage> _observer;
+        private IDisposable _observable;
+        private readonly Subject<HarpMessage> _msgsSubject;
         private DeviceConfiguration configuration;
 
         public SyringePumpViewModel()
@@ -132,6 +134,10 @@ namespace Device.Pump.GUI.ViewModels
             // TODO: missing properly dispose of this
             _msgsSubject = new Subject<HarpMessage>();
 
+            _observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
+                (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
+                () => HarpMessages.Add("Completed sending commands to device"));
+
             // Validation rules
             this.ValidationRule(viewModel => viewModel.NumberOfSteps,
                 steps => steps > 0,
@@ -171,18 +177,9 @@ namespace Device.Pump.GUI.ViewModels
             {
                 var startProtocolMessage = HarpCommand.WriteByte((int)PumpRegisters.StartProtocol, 1);
 
-                var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
-                    (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
-                    () => HarpMessages.Add("Completed sending commands to device"));
-
-                var observable = _dev.Generate(_msgsSubject)
-                    .Subscribe(observer);
-
                 _msgsSubject.OnNext(startProtocolMessage);
 
                 await Task.Delay(200);
-
-                observable.Dispose();
 
                 Log.Information("Started protocol");
             });
@@ -284,21 +281,12 @@ namespace Device.Pump.GUI.ViewModels
                 // send all messages independently of the save type
                 HarpMessages.Clear();
 
-                var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
-                    (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
-                    () => HarpMessages.Add("Completed sending commands to device"));
-
-                // TODO: missing properly dispose of this observable
-                var observable = _dev.Generate(_msgsSubject)
-                    .Subscribe(observer);
-
                 foreach (var harpMessage in msgs)
                 {
                     _msgsSubject.OnNext(harpMessage);
                 }
 
                 await Task.Delay(500);
-                observable.Dispose();
             });
         }
 
@@ -308,18 +296,7 @@ namespace Device.Pump.GUI.ViewModels
             {
                 var resetMessage = HarpCommand.ResetDevice(ResetMode.RestoreDefault);
 
-                var observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
-                    (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
-                    () => HarpMessages.Add("Completed sending commands to device"));
-
-                var observable = _dev.Generate(_msgsSubject)
-                    .Subscribe(observer);
-
                 _msgsSubject.OnNext(resetMessage);
-
-                await Task.Delay(200);
-
-                observable.Dispose();
 
                 await Task.Delay(2000);
 
@@ -338,28 +315,40 @@ namespace Device.Pump.GUI.ViewModels
                     throw new Exception("invalid parameter");
 
                 configuration = new DeviceConfiguration();
-
-                if (_dev == null) //|| string.Compare(_dev.PortName, SelectedPort, StringComparison.Ordinal) != 0)
+                if (_dev != null)
                 {
-                    _dev = new Bonsai.Harp.Device
-                    {
-                        PortName = SelectedPort, Heartbeat = EnableType.Disable, IgnoreErrors = true
-                    };
+                    // cleanup variables
+                    _observable?.Dispose();
+                    _observable = null;
                 }
+
+                _dev = new Bonsai.Harp.Device
+                {
+                    PortName = SelectedPort,
+                    Heartbeat = EnableType.Disable,
+                    IgnoreErrors = false
+                };
 
                 Log.Information("Attempting connection to port \'{SelectedPort}\'", SelectedPort);
 
                 HarpMessages.Clear();
 
+                await Task.Delay(300);
+
                 var observable = _dev.Generate()
                     .Where(MessageType.Read)
                     .Do(ReadRegister)
                     .Throttle(TimeSpan.FromSeconds(0.2))
-                    .Subscribe();
+                    .Timeout(TimeSpan.FromSeconds(5))
+                    .Subscribe(_ => { },
+                                // FIXME: ignore here the connection and perhaps simply return?
+                                (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); });
 
                 await Task.Delay(300);
 
                 Log.Information("Connection established with the following return information: {Info}", configuration);
+
+                // TODO: missing handling connection to non-HARP devices
 
                 // present messagebox if we are not handling a Pump device
                 if (configuration.WhoAmI != 1280)
@@ -383,6 +372,10 @@ namespace Device.Pump.GUI.ViewModels
                 Connected = true;
 
                 observable.Dispose();
+
+                // generate observable for remaining operations
+                _observable = _dev.Generate(_msgsSubject)
+                    .Subscribe(_observer);
             });
         }
 
