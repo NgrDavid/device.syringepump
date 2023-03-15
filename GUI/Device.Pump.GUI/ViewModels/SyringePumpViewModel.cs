@@ -354,15 +354,23 @@ namespace Device.Pump.GUI.ViewModels
 
                 Log.Information("Connection established with the following return information: {Info}", configuration);
 
-                // TODO: missing handling connection to non-HARP devices
-
                 // present messagebox if we are not handling a Pump device
                 if (configuration.WhoAmI != 1280)
                 {
+                    // when the configuration.WhoAmI is zero, we are dealing with a non-HARP device, so change message accordingly
+                    var message = $"Found a HARP device: {configuration.DeviceName} ({configuration.WhoAmI}).\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.";
+                    var icon = Icon.Info;
+                    if (configuration.WhoAmI == 0)
+                    {
+                        message =
+                            $"Found a non-HARP device.\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.";
+                        icon = Icon.Error;
+                    }
+
                     var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager
-                        .GetMessageBoxStandardWindow("Unexpected HARP device found",
-                            $"Found a HARP device: {configuration.DeviceName} ({configuration.WhoAmI}).\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.",
-                            icon: Icon.Warning);
+                        .GetMessageBoxStandardWindow("Unexpected device found",
+                            message,
+                            icon: icon);
                     await messageBoxStandardWindow.Show();
                     observable.Dispose();
                     return;
