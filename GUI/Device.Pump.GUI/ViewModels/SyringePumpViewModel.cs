@@ -11,7 +11,8 @@ using System.Reactive.Subjects;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Bonsai;
+using Avalonia;
+using Avalonia.Themes.Fluent;
 using Bonsai.Harp;
 using Device.Pump.GUI.Models;
 using MessageBox.Avalonia.Enums;
@@ -77,6 +78,7 @@ namespace Device.Pump.GUI.ViewModels
 
         [ObservableAsProperty] public bool IsRunningProtocol { get; }
 
+        [Reactive] public bool ShowDarkTheme { get; set; }
 
         public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
         public ReactiveCommand<Unit, Unit> ConnectAndGetBaseInfoCommand { get; }
@@ -84,6 +86,8 @@ namespace Device.Pump.GUI.ViewModels
         public ReactiveCommand<Unit, Unit> ShowLogsCommand { get; }
         public ReactiveCommand<bool, Unit> SaveConfigurationCommand { get; }
         public ReactiveCommand<Unit, Unit> ResetConfigurationCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> ChangeThemeCommand { get; }
 
         private Bonsai.Harp.Device _dev;
         private readonly IObserver<HarpMessage> _observer;
@@ -137,6 +141,8 @@ namespace Device.Pump.GUI.ViewModels
             ResetConfigurationCommand.ThrownExceptions.Subscribe(ex =>
                 Log.Error(ex, "Error resetting device configuration with error: {Exception}", ex));
 
+            ChangeThemeCommand = ReactiveCommand.Create(ChangeTheme);
+
             // TODO: missing properly dispose of this
             _msgsSubject = new Subject<HarpMessage>();
 
@@ -160,6 +166,14 @@ namespace Device.Pump.GUI.ViewModels
 
             // force initial population of currently connected ports
             LoadUsbInformation();
+        }
+
+        private void ChangeTheme()
+        {
+            Application.Current.Styles[0] = new FluentTheme(new Uri("avares://ControlCatalog/Styles"))
+            {
+                Mode = ShowDarkTheme ? FluentThemeMode.Dark : FluentThemeMode.Light
+            };
         }
 
         private IObservable<Unit> LoadUsbInformation()
