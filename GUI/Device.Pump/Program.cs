@@ -12,9 +12,14 @@ namespace Device.Pump
         [STAThread]
         public static void Main(string[] args)
         {
-            StartApp.BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
 
             StartApp.CloseLog();
+        }
+        
+        public static AppBuilder BuildAvaloniaApp()
+        {
+            return StartApp.BuildAvaloniaApp();
         }
     }
 }
