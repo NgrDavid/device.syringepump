@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550" Width="730" Height="700" MinWidth="730" MinHeight="700"
+        WindowStartupLocation="CenterScreen"
         x:Class="Device.Pump.GUI.Views.MainWindow"
         Icon="/Assets/cf-logo.ico"
         Title="Syringe Pump GUI"
