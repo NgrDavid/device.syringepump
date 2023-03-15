@@ -16,10 +16,23 @@
       <TextBlock Grid.Row="0" Text="Syringe Pump" Foreground="#465f6b"  HorizontalAlignment="Left" VerticalAlignment="Bottom" FontWeight="Bold" FontSize="26"/>
       <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding AppVersion}" Foreground="#465f6b" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontWeight="Bold" FontSize="18" Margin="5,0,0,0"/>      
       <TextBlock Grid.Row="1" Grid.Column="0" Text="Hardware Platform" HorizontalAlignment="Left" Foreground="#009CDF" VerticalAlignment="Bottom" FontWeight="Bold" FontSize="19"/>
-      <Image Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+      <Image Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Grid.ColumnSpan="2"
+             VerticalAlignment="Center"
+             HorizontalAlignment="Right"
+             Margin="0,5,5,0"
+             IsVisible="{Binding !ShowDarkTheme}">
         <Image.Source>
           <svg:SvgImage Source="/Assets/cf-logo.svg"/>
         </Image.Source>
+      </Image>
+      <Image Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Grid.ColumnSpan="2"
+             VerticalAlignment="Center"
+             HorizontalAlignment="Right"
+             Margin="0,5,5,0"
+             IsVisible="{Binding ShowDarkTheme}">
+          <Image.Source>
+              <svg:SvgImage Source="/Assets/cf-logo-white-lettering.svg"/>
+          </Image.Source>
       </Image>
       <ToggleSwitch Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" Margin="10,0,0,0" ToolTip.Tip="Change theme"
                     Content="Theme"
