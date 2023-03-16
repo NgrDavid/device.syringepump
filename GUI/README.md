@@ -45,6 +45,17 @@ Usage information is available in the [Wiki](https://bitbucket.org/fchampalimaud
     ```
 - The installer will be available at `.\bin\Release\net6.0\win-x64\SyringePump.vx.x.x-win-x64.self-contained.exe`
 
+### Build .app image for macOS
+
+The project uses dotnet-bundle (https://github.com/egramtel/dotnet-bundle) to generate a .app image for macOS.
+
+To build the .app image, run the following commands on the solution folder:
+
+```sh
+dotnet restore -r osx-x64 -p:TargetFramework=net6.0
+dotnet msbuild -t:BundleApp -p:RuntimeIdentifier=osx-x64 -property:Configuration=Release -p:UseAppHost=true -p:TargetFramework=net6.0
+```
+
 ## Roadmap
 
 See the [open issues](https://bitbucket.org/fchampalimaud/device.pump/issues) for a list of proposed features (and known issues).
