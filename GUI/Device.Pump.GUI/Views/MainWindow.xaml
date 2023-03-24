@@ -9,6 +9,9 @@
         x:Class="Device.Pump.GUI.Views.MainWindow"
         Icon="/Assets/cf-logo.ico"
         Title="Syringe Pump GUI"
-        Content="{Binding SyringePump}">
+        Content="{Binding SyringePump}"
+        
+        ExtendClientAreaToDecorationsHint="True"
+        Padding="0,30,0,0">
 
 </Window>
