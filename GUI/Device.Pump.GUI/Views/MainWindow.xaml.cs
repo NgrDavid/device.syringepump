@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -16,6 +17,12 @@ namespace Device.Pump.GUI.Views
 #if DEBUG
             this.AttachDevTools();
 #endif
+            // check current OS and change window presentation and padding
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                ExtendClientAreaToDecorationsHint = false;
+                Padding = new Thickness(0, 0, 0, 0);
+            }
         }
 
         private void InitializeComponent()
