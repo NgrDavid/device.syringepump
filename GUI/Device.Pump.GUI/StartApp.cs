@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
 using Serilog;
+using Serilog.Events;
 
 namespace Device.Pump.GUI
 {
