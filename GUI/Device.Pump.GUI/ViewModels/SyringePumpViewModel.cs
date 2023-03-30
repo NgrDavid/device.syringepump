@@ -91,7 +91,8 @@ namespace Device.Pump.GUI.ViewModels
 
         public ReactiveCommand<Unit, Unit> ChangeThemeCommand { get; }
         public ReactiveCommand<Unit, Unit> ShowAboutCommand { get; }
-
+        public ReactiveCommand<Unit,Unit> ClearHarpMessagesCommand { get; set; }
+        
         private Bonsai.Harp.Device _dev;
         private readonly IObserver<HarpMessage> _observer;
         private IDisposable _observable;
@@ -131,7 +132,7 @@ namespace Device.Pump.GUI.ViewModels
             StartProtocolCommand.ThrownExceptions.Subscribe(ex =>
                 Log.Error(ex, "Error starting protocol with error: {Exception}", ex));
 
-            ShowLogsCommand = ReactiveCommand.Create(() => { ShowLogs = !ShowLogs; }, canChangeConfig);
+            ShowLogsCommand = ReactiveCommand.Create(() => { ShowLogs = !ShowLogs; });
 
             SaveConfigurationCommand =
                 ReactiveCommand.CreateFromObservable<bool, Unit>(SaveConfiguration, canChangeConfig);
@@ -149,6 +150,8 @@ namespace Device.Pump.GUI.ViewModels
             ShowAboutCommand = ReactiveCommand.CreateFromTask(async () =>
                 await new About() { DataContext = new AboutViewModel() }.ShowDialog(
                     (Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).MainWindow));
+
+            ClearHarpMessagesCommand = ReactiveCommand.Create(() => HarpMessages.Clear(), canChangeConfig);
 
             // TODO: missing properly dispose of this
             _msgsSubject = new Subject<HarpMessage>();

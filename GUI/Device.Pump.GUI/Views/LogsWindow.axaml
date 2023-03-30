@@ -2,17 +2,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:viewModels="clr-namespace:Device.Pump.GUI.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="690"
         x:Class="Device.Pump.GUI.Views.LogsWindow"
-        Width="300" Height="400" MinWidth="300" MinHeight="400">
-    <StackPanel>
-        <TextBlock Text="Logs" Foreground="#465f6b" VerticalAlignment="Center" FontSize="22" FontWeight="SemiBold" Margin="10,0"/>
-        <ListBox Items="{Binding HarpMessages}" BorderThickness="0" MaxHeight="300">
+        MinWidth="400">
+    <DockPanel Margin="10">
+        <TextBlock DockPanel.Dock="Top" Text="Logs" VerticalAlignment="Center" FontSize="22" FontWeight="SemiBold"/>
+        <Button DockPanel.Dock="Bottom" Content="Clear" Command="{Binding ClearHarpMessagesCommand}"/>
+        <ListBox Items="{Binding HarpMessages}" BorderThickness="0" MinHeight="600" MaxHeight="600">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-    </StackPanel>
+    </DockPanel>
 </UserControl>

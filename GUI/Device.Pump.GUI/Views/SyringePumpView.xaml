@@ -12,6 +12,10 @@
              FontFamily="resm:?assembly=Device.Pump.GUI#Open Sans">
   
     <DockPanel>
+        <views:LogsWindow DockPanel.Dock="Right"
+                              IsVisible="{Binding ShowLogs}"
+                              x:Name="LogsPanel"/>
+        
     <Grid Margin="10" DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,*,Auto,Auto" RowDefinitions="30,25,*,*">
       <TextBlock Grid.Row="0" Text="Syringe Pump" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontWeight="Bold" FontSize="26"/>
       <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2">
@@ -208,10 +212,5 @@
         </Grid>
       </StackPanel>
     </ScrollViewer>
-
-      <StackPanel DockPanel.Dock="Right" IsVisible="{Binding ShowLogs}" MinWidth="100" x:Name="LogsPanel">
-          <views:LogsWindow />
-      </StackPanel>
-      
-  </DockPanel>
+    </DockPanel>
 </UserControl>
