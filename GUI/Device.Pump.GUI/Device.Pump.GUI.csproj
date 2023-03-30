@@ -67,9 +67,6 @@
     <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\About.xaml.cs">
-      <DependentUpon>About.xaml</DependentUpon>
-    </Compile>
     <Compile Update="Views\LogsWindow.axaml.cs">
       <DependentUpon>LogsWindow.axaml</DependentUpon>
     </Compile>

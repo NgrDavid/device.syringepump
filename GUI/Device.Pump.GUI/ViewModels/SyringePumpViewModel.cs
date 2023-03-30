@@ -12,9 +12,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Themes.Fluent;
 using Bonsai.Harp;
 using Device.Pump.GUI.Models;
+using Device.Pump.GUI.Views;
 using MessageBox.Avalonia.Enums;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -88,6 +90,7 @@ namespace Device.Pump.GUI.ViewModels
         public ReactiveCommand<Unit, Unit> ResetConfigurationCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ChangeThemeCommand { get; }
+        public ReactiveCommand<Unit, Unit> ShowAboutCommand { get; }
 
         private Bonsai.Harp.Device _dev;
         private readonly IObserver<HarpMessage> _observer;
@@ -142,6 +145,10 @@ namespace Device.Pump.GUI.ViewModels
                 Log.Error(ex, "Error resetting device configuration with error: {Exception}", ex));
 
             ChangeThemeCommand = ReactiveCommand.Create(ChangeTheme);
+
+            ShowAboutCommand = ReactiveCommand.CreateFromTask(async () =>
+                await new About() { DataContext = new AboutViewModel() }.ShowDialog(
+                    (Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).MainWindow));
 
             // TODO: missing properly dispose of this
             _msgsSubject = new Subject<HarpMessage>();
