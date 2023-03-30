@@ -12,6 +12,7 @@
         Content="{Binding SyringePump}"
         
         ExtendClientAreaToDecorationsHint="True"
-        Padding="0,30,0,0">
+        Padding="0,30,0,0"
+        CanResize="False">
 
 </Window>
