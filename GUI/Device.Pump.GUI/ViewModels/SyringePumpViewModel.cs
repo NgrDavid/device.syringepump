@@ -190,7 +190,9 @@ namespace Device.Pump.GUI.ViewModels
                 var devices = SerialPort.GetPortNames();
 
                 if (OperatingSystem.IsMacOS())
-                    Ports = devices.Where(d => d.Contains("cu.")).ToList();
+                    // except with Bluetooth in the name
+                    Ports = devices.Where(d => d.Contains("cu.")).Except(devices.Where(d => d.Contains("Bluetooth")))
+                        .ToList();
                 else
                     Ports = devices.ToList();
 
