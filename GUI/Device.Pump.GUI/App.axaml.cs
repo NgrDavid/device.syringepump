@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -24,6 +25,14 @@ namespace Device.Pump
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private void NativeMenuItem_OnClick(object sender, EventArgs e)
+        { 
+            // FIXME: This should be using a Command
+            var about = new About() { DataContext = new AboutViewModel() };
+            about.ShowDialog((Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)
+                .MainWindow);
         }
     }
 }

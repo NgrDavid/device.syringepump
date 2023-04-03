@@ -17,7 +17,7 @@
     
     <NativeMenu.Menu>
         <NativeMenu>
-            <NativeMenuItem Header="About Syringe Pump GUI" Command="{Binding AboutCommand}" />
+            <NativeMenuItem Header="About Syringe Pump GUI" Click="NativeMenuItem_OnClick" />
         </NativeMenu>
     </NativeMenu.Menu>
 </Application>
