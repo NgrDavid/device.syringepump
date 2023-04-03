@@ -1,12 +1,13 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Device.Pump.GUI.ViewModels;
 using Device.Pump.GUI.Views;
 
-namespace Device.Pump.GUI
+namespace Device.Pump
 {
-    public class App : Application
+    public partial class App : Application
     {
         public override void Initialize()
         {
@@ -24,6 +25,14 @@ namespace Device.Pump.GUI
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private void NativeMenuItem_OnClick(object sender, EventArgs e)
+        { 
+            // FIXME: This should be using a Command
+            var about = new About() { DataContext = new AboutViewModel() };
+            about.ShowDialog((Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)
+                .MainWindow);
         }
     }
 }

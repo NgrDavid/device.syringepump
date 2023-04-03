@@ -1,12 +1,12 @@
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Device.Pump.GUI.ViewModels;
 
 namespace Device.Pump.GUI.Views
 {
-    public class MainWindow : ReactiveWindow<MainWindowViewModel>
+    public partial class About : ReactiveWindow<AboutViewModel>
     {
-        public MainWindow()
+        public About()
         {
             InitializeComponent();
         }
@@ -17,3 +17,4 @@ namespace Device.Pump.GUI.Views
         }
     }
 }
+
