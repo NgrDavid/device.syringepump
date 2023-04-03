@@ -24,6 +24,7 @@
         CalibrationValue2 = 51,     // U8     Calibration value 2
         EventsEnable = 52,          // U8     Enable the Events
         SetBoardType = 53,          // U8     Type of the board
-        ProtocolState = 54          // U8     State of the protocol (running or stopped)
+        ProtocolState = 54,         // U8     State of the protocol (running or stopped)
+        ProtocolDirection = 55      // U8     Protocol direction
     }
 }

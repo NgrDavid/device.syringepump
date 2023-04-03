@@ -4,7 +4,7 @@ using System.Reactive.Concurrency;
 using ReactiveUI;
 using Serilog;
 
-namespace Device.Pump.GUI
+namespace Device.Pump
 {
     public class MyCustomObservableExceptionHandler : IObserver<Exception>
     {
@@ -14,7 +14,7 @@ namespace Device.Pump.GUI
 
             Log.Information(value, "{@Type} - {@Message}", value.GetType().ToString(), value.Message);
 
-            RxApp.MainThreadScheduler.Schedule(() => { throw value; }) ;
+            RxApp.MainThreadScheduler.Schedule(() => { throw value; });
         }
 
         public void OnError(Exception error)
