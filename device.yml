@@ -1,10 +1,10 @@
 %YAML 1.1
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/harp-tech/reflex-generator/main/schema/device.json
-device: Pump
+device: SyringePump
 whoAmI: 1280
 firmwareVersion: "1.0"
-hardwareTargets: "1.*"
+hardwareTargets: "1.0"
 registers:
   EnableMotorDriver: &enablefunctionreg
     address: 32
@@ -160,6 +160,11 @@ bitMasks:
       DigitalInput: 0x10
       Protocol: 0x20
 groupMasks:
+  EnableFlag:
+    description: The state of an abstract functionality
+    values:
+      Disabled: 0
+      Enabled: 1 
   StepState:
     description: The state of the STEP motor controller pin
     values:
@@ -231,3 +236,4 @@ groupMasks:
     values:
       Reverse: 0
       Forward: 1
+      
