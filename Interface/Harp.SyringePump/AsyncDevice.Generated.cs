@@ -345,187 +345,187 @@ namespace Harp.SyringePump
         }
 
         /// <summary>
-        /// Asynchronously reads the contents of the DO0Mimic register.
+        /// Asynchronously reads the contents of the DO0Sync register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the register payload.
         /// </returns>
-        public async Task<DO0MimicConfig> ReadDO0MimicAsync()
+        public async Task<DO0SyncConfig> ReadDO0SyncAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(DO0Mimic.Address));
-            return DO0Mimic.GetPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(DO0Sync.Address));
+            return DO0Sync.GetPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously reads the timestamped contents of the DO0Mimic register.
+        /// Asynchronously reads the timestamped contents of the DO0Sync register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the timestamped register payload.
         /// </returns>
-        public async Task<Timestamped<DO0MimicConfig>> ReadTimestampedDO0MimicAsync()
+        public async Task<Timestamped<DO0SyncConfig>> ReadTimestampedDO0SyncAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(DO0Mimic.Address));
-            return DO0Mimic.GetTimestampedPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(DO0Sync.Address));
+            return DO0Sync.GetTimestampedPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously writes a value to the DO0Mimic register.
+        /// Asynchronously writes a value to the DO0Sync register.
         /// </summary>
         /// <param name="value">The value to be stored in the register.</param>
         /// <returns>The task object representing the asynchronous write operation.</returns>
-        public async Task WriteDO0MimicAsync(DO0MimicConfig value)
+        public async Task WriteDO0SyncAsync(DO0SyncConfig value)
         {
-            var request = DO0Mimic.FromPayload(MessageType.Write, value);
+            var request = DO0Sync.FromPayload(MessageType.Write, value);
             await CommandAsync(request);
         }
 
         /// <summary>
-        /// Asynchronously reads the contents of the DO1Mimic register.
+        /// Asynchronously reads the contents of the DO1Sync register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the register payload.
         /// </returns>
-        public async Task<DO1MimicConfig> ReadDO1MimicAsync()
+        public async Task<DO1SyncConfig> ReadDO1SyncAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(DO1Mimic.Address));
-            return DO1Mimic.GetPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(DO1Sync.Address));
+            return DO1Sync.GetPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously reads the timestamped contents of the DO1Mimic register.
+        /// Asynchronously reads the timestamped contents of the DO1Sync register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the timestamped register payload.
         /// </returns>
-        public async Task<Timestamped<DO1MimicConfig>> ReadTimestampedDO1MimicAsync()
+        public async Task<Timestamped<DO1SyncConfig>> ReadTimestampedDO1SyncAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(DO1Mimic.Address));
-            return DO1Mimic.GetTimestampedPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(DO1Sync.Address));
+            return DO1Sync.GetTimestampedPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously writes a value to the DO1Mimic register.
+        /// Asynchronously writes a value to the DO1Sync register.
         /// </summary>
         /// <param name="value">The value to be stored in the register.</param>
         /// <returns>The task object representing the asynchronous write operation.</returns>
-        public async Task WriteDO1MimicAsync(DO1MimicConfig value)
+        public async Task WriteDO1SyncAsync(DO1SyncConfig value)
         {
-            var request = DO1Mimic.FromPayload(MessageType.Write, value);
+            var request = DO1Sync.FromPayload(MessageType.Write, value);
             await CommandAsync(request);
         }
 
         /// <summary>
-        /// Asynchronously reads the contents of the DI0Callback register.
+        /// Asynchronously reads the contents of the DI0Trigger register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the register payload.
         /// </returns>
-        public async Task<DI0Config> ReadDI0CallbackAsync()
+        public async Task<DI0TriggerConfig> ReadDI0TriggerAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(DI0Callback.Address));
-            return DI0Callback.GetPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(DI0Trigger.Address));
+            return DI0Trigger.GetPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously reads the timestamped contents of the DI0Callback register.
+        /// Asynchronously reads the timestamped contents of the DI0Trigger register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the timestamped register payload.
         /// </returns>
-        public async Task<Timestamped<DI0Config>> ReadTimestampedDI0CallbackAsync()
+        public async Task<Timestamped<DI0TriggerConfig>> ReadTimestampedDI0TriggerAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(DI0Callback.Address));
-            return DI0Callback.GetTimestampedPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(DI0Trigger.Address));
+            return DI0Trigger.GetTimestampedPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously writes a value to the DI0Callback register.
+        /// Asynchronously writes a value to the DI0Trigger register.
         /// </summary>
         /// <param name="value">The value to be stored in the register.</param>
         /// <returns>The task object representing the asynchronous write operation.</returns>
-        public async Task WriteDI0CallbackAsync(DI0Config value)
+        public async Task WriteDI0TriggerAsync(DI0TriggerConfig value)
         {
-            var request = DI0Callback.FromPayload(MessageType.Write, value);
+            var request = DI0Trigger.FromPayload(MessageType.Write, value);
             await CommandAsync(request);
         }
 
         /// <summary>
-        /// Asynchronously reads the contents of the MicrostepConfig register.
+        /// Asynchronously reads the contents of the Microstepping register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the register payload.
         /// </returns>
-        public async Task<MicrostepResolution> ReadMicrostepConfigAsync()
+        public async Task<MicrosteppingMode> ReadMicrosteppingAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(MicrostepConfig.Address));
-            return MicrostepConfig.GetPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(Microstepping.Address));
+            return Microstepping.GetPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously reads the timestamped contents of the MicrostepConfig register.
+        /// Asynchronously reads the timestamped contents of the Microstepping register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the timestamped register payload.
         /// </returns>
-        public async Task<Timestamped<MicrostepResolution>> ReadTimestampedMicrostepConfigAsync()
+        public async Task<Timestamped<MicrosteppingMode>> ReadTimestampedMicrosteppingAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(MicrostepConfig.Address));
-            return MicrostepConfig.GetTimestampedPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(Microstepping.Address));
+            return Microstepping.GetTimestampedPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously writes a value to the MicrostepConfig register.
+        /// Asynchronously writes a value to the Microstepping register.
         /// </summary>
         /// <param name="value">The value to be stored in the register.</param>
         /// <returns>The task object representing the asynchronous write operation.</returns>
-        public async Task WriteMicrostepConfigAsync(MicrostepResolution value)
+        public async Task WriteMicrosteppingAsync(MicrosteppingMode value)
         {
-            var request = MicrostepConfig.FromPayload(MessageType.Write, value);
+            var request = Microstepping.FromPayload(MessageType.Write, value);
             await CommandAsync(request);
         }
 
         /// <summary>
-        /// Asynchronously reads the contents of the ProtocolNumberSteps register.
+        /// Asynchronously reads the contents of the ProtocolStepCount register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the register payload.
         /// </returns>
-        public async Task<ushort> ReadProtocolNumberStepsAsync()
+        public async Task<ushort> ReadProtocolStepCountAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadUInt16(ProtocolNumberSteps.Address));
-            return ProtocolNumberSteps.GetPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadUInt16(ProtocolStepCount.Address));
+            return ProtocolStepCount.GetPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously reads the timestamped contents of the ProtocolNumberSteps register.
+        /// Asynchronously reads the timestamped contents of the ProtocolStepCount register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the timestamped register payload.
         /// </returns>
-        public async Task<Timestamped<ushort>> ReadTimestampedProtocolNumberStepsAsync()
+        public async Task<Timestamped<ushort>> ReadTimestampedProtocolStepCountAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadUInt16(ProtocolNumberSteps.Address));
-            return ProtocolNumberSteps.GetTimestampedPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadUInt16(ProtocolStepCount.Address));
+            return ProtocolStepCount.GetTimestampedPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously writes a value to the ProtocolNumberSteps register.
+        /// Asynchronously writes a value to the ProtocolStepCount register.
         /// </summary>
         /// <param name="value">The value to be stored in the register.</param>
         /// <returns>The task object representing the asynchronous write operation.</returns>
-        public async Task WriteProtocolNumberStepsAsync(ushort value)
+        public async Task WriteProtocolStepCountAsync(ushort value)
         {
-            var request = ProtocolNumberSteps.FromPayload(MessageType.Write, value);
+            var request = ProtocolStepCount.FromPayload(MessageType.Write, value);
             await CommandAsync(request);
         }
 

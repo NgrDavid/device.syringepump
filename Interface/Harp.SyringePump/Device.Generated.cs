@@ -46,11 +46,11 @@ namespace Harp.SyringePump
             { 38, typeof(DigitalInput) },
             { 39, typeof(DigitalOutputSet) },
             { 40, typeof(DigitalOutputClear) },
-            { 41, typeof(DO0Mimic) },
-            { 42, typeof(DO1Mimic) },
-            { 43, typeof(DI0Callback) },
-            { 44, typeof(MicrostepConfig) },
-            { 45, typeof(ProtocolNumberSteps) },
+            { 41, typeof(DO0Sync) },
+            { 42, typeof(DO1Sync) },
+            { 43, typeof(DI0Trigger) },
+            { 44, typeof(Microstepping) },
+            { 45, typeof(ProtocolStepCount) },
             { 47, typeof(ProtocolPeriod) },
             { 52, typeof(EnableEvents) },
             { 54, typeof(Protocol) },
@@ -92,11 +92,11 @@ namespace Harp.SyringePump
     /// <seealso cref="DigitalInput"/>
     /// <seealso cref="DigitalOutputSet"/>
     /// <seealso cref="DigitalOutputClear"/>
-    /// <seealso cref="DO0Mimic"/>
-    /// <seealso cref="DO1Mimic"/>
-    /// <seealso cref="DI0Callback"/>
-    /// <seealso cref="MicrostepConfig"/>
-    /// <seealso cref="ProtocolNumberSteps"/>
+    /// <seealso cref="DO0Sync"/>
+    /// <seealso cref="DO1Sync"/>
+    /// <seealso cref="DI0Trigger"/>
+    /// <seealso cref="Microstepping"/>
+    /// <seealso cref="ProtocolStepCount"/>
     /// <seealso cref="ProtocolPeriod"/>
     /// <seealso cref="EnableEvents"/>
     /// <seealso cref="Protocol"/>
@@ -110,11 +110,11 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(DigitalInput))]
     [XmlInclude(typeof(DigitalOutputSet))]
     [XmlInclude(typeof(DigitalOutputClear))]
-    [XmlInclude(typeof(DO0Mimic))]
-    [XmlInclude(typeof(DO1Mimic))]
-    [XmlInclude(typeof(DI0Callback))]
-    [XmlInclude(typeof(MicrostepConfig))]
-    [XmlInclude(typeof(ProtocolNumberSteps))]
+    [XmlInclude(typeof(DO0Sync))]
+    [XmlInclude(typeof(DO1Sync))]
+    [XmlInclude(typeof(DI0Trigger))]
+    [XmlInclude(typeof(Microstepping))]
+    [XmlInclude(typeof(ProtocolStepCount))]
     [XmlInclude(typeof(ProtocolPeriod))]
     [XmlInclude(typeof(EnableEvents))]
     [XmlInclude(typeof(Protocol))]
@@ -149,11 +149,11 @@ namespace Harp.SyringePump
     /// <seealso cref="DigitalInput"/>
     /// <seealso cref="DigitalOutputSet"/>
     /// <seealso cref="DigitalOutputClear"/>
-    /// <seealso cref="DO0Mimic"/>
-    /// <seealso cref="DO1Mimic"/>
-    /// <seealso cref="DI0Callback"/>
-    /// <seealso cref="MicrostepConfig"/>
-    /// <seealso cref="ProtocolNumberSteps"/>
+    /// <seealso cref="DO0Sync"/>
+    /// <seealso cref="DO1Sync"/>
+    /// <seealso cref="DI0Trigger"/>
+    /// <seealso cref="Microstepping"/>
+    /// <seealso cref="ProtocolStepCount"/>
     /// <seealso cref="ProtocolPeriod"/>
     /// <seealso cref="EnableEvents"/>
     /// <seealso cref="Protocol"/>
@@ -167,11 +167,11 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(DigitalInput))]
     [XmlInclude(typeof(DigitalOutputSet))]
     [XmlInclude(typeof(DigitalOutputClear))]
-    [XmlInclude(typeof(DO0Mimic))]
-    [XmlInclude(typeof(DO1Mimic))]
-    [XmlInclude(typeof(DI0Callback))]
-    [XmlInclude(typeof(MicrostepConfig))]
-    [XmlInclude(typeof(ProtocolNumberSteps))]
+    [XmlInclude(typeof(DO0Sync))]
+    [XmlInclude(typeof(DO1Sync))]
+    [XmlInclude(typeof(DI0Trigger))]
+    [XmlInclude(typeof(Microstepping))]
+    [XmlInclude(typeof(ProtocolStepCount))]
     [XmlInclude(typeof(ProtocolPeriod))]
     [XmlInclude(typeof(EnableEvents))]
     [XmlInclude(typeof(Protocol))]
@@ -185,11 +185,11 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(TimestampedDigitalInput))]
     [XmlInclude(typeof(TimestampedDigitalOutputSet))]
     [XmlInclude(typeof(TimestampedDigitalOutputClear))]
-    [XmlInclude(typeof(TimestampedDO0Mimic))]
-    [XmlInclude(typeof(TimestampedDO1Mimic))]
-    [XmlInclude(typeof(TimestampedDI0Callback))]
-    [XmlInclude(typeof(TimestampedMicrostepConfig))]
-    [XmlInclude(typeof(TimestampedProtocolNumberSteps))]
+    [XmlInclude(typeof(TimestampedDO0Sync))]
+    [XmlInclude(typeof(TimestampedDO1Sync))]
+    [XmlInclude(typeof(TimestampedDI0Trigger))]
+    [XmlInclude(typeof(TimestampedMicrostepping))]
+    [XmlInclude(typeof(TimestampedProtocolStepCount))]
     [XmlInclude(typeof(TimestampedProtocolPeriod))]
     [XmlInclude(typeof(TimestampedEnableEvents))]
     [XmlInclude(typeof(TimestampedProtocol))]
@@ -221,11 +221,11 @@ namespace Harp.SyringePump
     /// <seealso cref="DigitalInput"/>
     /// <seealso cref="DigitalOutputSet"/>
     /// <seealso cref="DigitalOutputClear"/>
-    /// <seealso cref="DO0Mimic"/>
-    /// <seealso cref="DO1Mimic"/>
-    /// <seealso cref="DI0Callback"/>
-    /// <seealso cref="MicrostepConfig"/>
-    /// <seealso cref="ProtocolNumberSteps"/>
+    /// <seealso cref="DO0Sync"/>
+    /// <seealso cref="DO1Sync"/>
+    /// <seealso cref="DI0Trigger"/>
+    /// <seealso cref="Microstepping"/>
+    /// <seealso cref="ProtocolStepCount"/>
     /// <seealso cref="ProtocolPeriod"/>
     /// <seealso cref="EnableEvents"/>
     /// <seealso cref="Protocol"/>
@@ -239,11 +239,11 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(DigitalInput))]
     [XmlInclude(typeof(DigitalOutputSet))]
     [XmlInclude(typeof(DigitalOutputClear))]
-    [XmlInclude(typeof(DO0Mimic))]
-    [XmlInclude(typeof(DO1Mimic))]
-    [XmlInclude(typeof(DI0Callback))]
-    [XmlInclude(typeof(MicrostepConfig))]
-    [XmlInclude(typeof(ProtocolNumberSteps))]
+    [XmlInclude(typeof(DO0Sync))]
+    [XmlInclude(typeof(DO1Sync))]
+    [XmlInclude(typeof(DI0Trigger))]
+    [XmlInclude(typeof(Microstepping))]
+    [XmlInclude(typeof(ProtocolStepCount))]
     [XmlInclude(typeof(ProtocolPeriod))]
     [XmlInclude(typeof(EnableEvents))]
     [XmlInclude(typeof(Protocol))]
@@ -265,7 +265,7 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that enables the motor driver.
     /// </summary>
-    [Description("Enables the motor driver")]
+    [Description("Enables the motor driver.")]
     public partial class EnableMotorDriver
     {
         /// <summary>
@@ -362,7 +362,7 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that enables the currently defined protocol.
     /// </summary>
-    [Description("Enables the currently defined protocol")]
+    [Description("Enables the currently defined protocol.")]
     public partial class EnableProtocol
     {
         /// <summary>
@@ -459,7 +459,7 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that status of the STEP motor controller pin.
     /// </summary>
-    [Description("Status of the STEP motor controller pin")]
+    [Description("Status of the STEP motor controller pin.")]
     public partial class Step
     {
         /// <summary>
@@ -556,7 +556,7 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that status of the DIR motor controller pin.
     /// </summary>
-    [Description("Status of the DIR motor controller pin")]
+    [Description("Status of the DIR motor controller pin.")]
     public partial class Direction
     {
         /// <summary>
@@ -653,7 +653,7 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that status of the forward limit switch.
     /// </summary>
-    [Description("Status of the forward limit switch")]
+    [Description("Status of the forward limit switch.")]
     public partial class ForwardSwitch
     {
         /// <summary>
@@ -750,7 +750,7 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that status of the reverse limit switch.
     /// </summary>
-    [Description("Status of the reverse limit switch")]
+    [Description("Status of the reverse limit switch.")]
     public partial class ReverseSwitch
     {
         /// <summary>
@@ -847,7 +847,7 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that status of the digital input pin.
     /// </summary>
-    [Description("Status of the digital input pin")]
+    [Description("Status of the digital input pin.")]
     public partial class DigitalInput
     {
         /// <summary>
@@ -1041,7 +1041,7 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that clear the specified digital output lines.
     /// </summary>
-    [Description("Clear the specified digital output lines")]
+    [Description("Clear the specified digital output lines.")]
     public partial class DigitalOutputClear
     {
         /// <summary>
@@ -1138,71 +1138,71 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that configures which signal is mimicked in the digital output 0.
     /// </summary>
-    [Description("Configures which signal is mimicked in the digital output 0")]
-    public partial class DO0Mimic
+    [Description("Configures which signal is mimicked in the digital output 0.")]
+    public partial class DO0Sync
     {
         /// <summary>
-        /// Represents the address of the <see cref="DO0Mimic"/> register. This field is constant.
+        /// Represents the address of the <see cref="DO0Sync"/> register. This field is constant.
         /// </summary>
         public const int Address = 41;
 
         /// <summary>
-        /// Represents the payload type of the <see cref="DO0Mimic"/> register. This field is constant.
+        /// Represents the payload type of the <see cref="DO0Sync"/> register. This field is constant.
         /// </summary>
         public const PayloadType RegisterType = PayloadType.U8;
 
         /// <summary>
-        /// Represents the length of the <see cref="DO0Mimic"/> register. This field is constant.
+        /// Represents the length of the <see cref="DO0Sync"/> register. This field is constant.
         /// </summary>
         public const int RegisterLength = 1;
 
         /// <summary>
-        /// Returns the payload data for <see cref="DO0Mimic"/> register messages.
+        /// Returns the payload data for <see cref="DO0Sync"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the message payload.</returns>
-        public static DO0MimicConfig GetPayload(HarpMessage message)
+        public static DO0SyncConfig GetPayload(HarpMessage message)
         {
-            return (DO0MimicConfig)message.GetPayloadByte();
+            return (DO0SyncConfig)message.GetPayloadByte();
         }
 
         /// <summary>
-        /// Returns the timestamped payload data for <see cref="DO0Mimic"/> register messages.
+        /// Returns the timestamped payload data for <see cref="DO0Sync"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DO0MimicConfig> GetTimestampedPayload(HarpMessage message)
+        public static Timestamped<DO0SyncConfig> GetTimestampedPayload(HarpMessage message)
         {
             var payload = message.GetTimestampedPayloadByte();
-            return Timestamped.Create((DO0MimicConfig)payload.Value, payload.Seconds);
+            return Timestamped.Create((DO0SyncConfig)payload.Value, payload.Seconds);
         }
 
         /// <summary>
-        /// Returns a Harp message for the <see cref="DO0Mimic"/> register.
+        /// Returns a Harp message for the <see cref="DO0Sync"/> register.
         /// </summary>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="DO0Mimic"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="DO0Sync"/> register
         /// with the specified message type and payload.
         /// </returns>
-        public static HarpMessage FromPayload(MessageType messageType, DO0MimicConfig value)
+        public static HarpMessage FromPayload(MessageType messageType, DO0SyncConfig value)
         {
             return HarpMessage.FromByte(Address, messageType, (byte)value);
         }
 
         /// <summary>
-        /// Returns a timestamped Harp message for the <see cref="DO0Mimic"/>
+        /// Returns a timestamped Harp message for the <see cref="DO0Sync"/>
         /// register.
         /// </summary>
         /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="DO0Mimic"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="DO0Sync"/> register
         /// with the specified message type, timestamp, and payload.
         /// </returns>
-        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DO0MimicConfig value)
+        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DO0SyncConfig value)
         {
             return HarpMessage.FromByte(Address, timestamp, messageType, (byte)value);
         }
@@ -1210,96 +1210,96 @@ namespace Harp.SyringePump
 
     /// <summary>
     /// Provides methods for manipulating timestamped messages from the
-    /// DO0Mimic register.
+    /// DO0Sync register.
     /// </summary>
-    /// <seealso cref="DO0Mimic"/>
-    [Description("Filters and selects timestamped messages from the DO0Mimic register.")]
-    public partial class TimestampedDO0Mimic
+    /// <seealso cref="DO0Sync"/>
+    [Description("Filters and selects timestamped messages from the DO0Sync register.")]
+    public partial class TimestampedDO0Sync
     {
         /// <summary>
-        /// Represents the address of the <see cref="DO0Mimic"/> register. This field is constant.
+        /// Represents the address of the <see cref="DO0Sync"/> register. This field is constant.
         /// </summary>
-        public const int Address = DO0Mimic.Address;
+        public const int Address = DO0Sync.Address;
 
         /// <summary>
-        /// Returns timestamped payload data for <see cref="DO0Mimic"/> register messages.
+        /// Returns timestamped payload data for <see cref="DO0Sync"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DO0MimicConfig> GetPayload(HarpMessage message)
+        public static Timestamped<DO0SyncConfig> GetPayload(HarpMessage message)
         {
-            return DO0Mimic.GetTimestampedPayload(message);
+            return DO0Sync.GetTimestampedPayload(message);
         }
     }
 
     /// <summary>
     /// Represents a register that configures which signal is mimicked in the digital output 1.
     /// </summary>
-    [Description("Configures which signal is mimicked in the digital output 1")]
-    public partial class DO1Mimic
+    [Description("Configures which signal is mimicked in the digital output 1.")]
+    public partial class DO1Sync
     {
         /// <summary>
-        /// Represents the address of the <see cref="DO1Mimic"/> register. This field is constant.
+        /// Represents the address of the <see cref="DO1Sync"/> register. This field is constant.
         /// </summary>
         public const int Address = 42;
 
         /// <summary>
-        /// Represents the payload type of the <see cref="DO1Mimic"/> register. This field is constant.
+        /// Represents the payload type of the <see cref="DO1Sync"/> register. This field is constant.
         /// </summary>
         public const PayloadType RegisterType = PayloadType.U8;
 
         /// <summary>
-        /// Represents the length of the <see cref="DO1Mimic"/> register. This field is constant.
+        /// Represents the length of the <see cref="DO1Sync"/> register. This field is constant.
         /// </summary>
         public const int RegisterLength = 1;
 
         /// <summary>
-        /// Returns the payload data for <see cref="DO1Mimic"/> register messages.
+        /// Returns the payload data for <see cref="DO1Sync"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the message payload.</returns>
-        public static DO1MimicConfig GetPayload(HarpMessage message)
+        public static DO1SyncConfig GetPayload(HarpMessage message)
         {
-            return (DO1MimicConfig)message.GetPayloadByte();
+            return (DO1SyncConfig)message.GetPayloadByte();
         }
 
         /// <summary>
-        /// Returns the timestamped payload data for <see cref="DO1Mimic"/> register messages.
+        /// Returns the timestamped payload data for <see cref="DO1Sync"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DO1MimicConfig> GetTimestampedPayload(HarpMessage message)
+        public static Timestamped<DO1SyncConfig> GetTimestampedPayload(HarpMessage message)
         {
             var payload = message.GetTimestampedPayloadByte();
-            return Timestamped.Create((DO1MimicConfig)payload.Value, payload.Seconds);
+            return Timestamped.Create((DO1SyncConfig)payload.Value, payload.Seconds);
         }
 
         /// <summary>
-        /// Returns a Harp message for the <see cref="DO1Mimic"/> register.
+        /// Returns a Harp message for the <see cref="DO1Sync"/> register.
         /// </summary>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="DO1Mimic"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="DO1Sync"/> register
         /// with the specified message type and payload.
         /// </returns>
-        public static HarpMessage FromPayload(MessageType messageType, DO1MimicConfig value)
+        public static HarpMessage FromPayload(MessageType messageType, DO1SyncConfig value)
         {
             return HarpMessage.FromByte(Address, messageType, (byte)value);
         }
 
         /// <summary>
-        /// Returns a timestamped Harp message for the <see cref="DO1Mimic"/>
+        /// Returns a timestamped Harp message for the <see cref="DO1Sync"/>
         /// register.
         /// </summary>
         /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="DO1Mimic"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="DO1Sync"/> register
         /// with the specified message type, timestamp, and payload.
         /// </returns>
-        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DO1MimicConfig value)
+        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DO1SyncConfig value)
         {
             return HarpMessage.FromByte(Address, timestamp, messageType, (byte)value);
         }
@@ -1307,96 +1307,96 @@ namespace Harp.SyringePump
 
     /// <summary>
     /// Provides methods for manipulating timestamped messages from the
-    /// DO1Mimic register.
+    /// DO1Sync register.
     /// </summary>
-    /// <seealso cref="DO1Mimic"/>
-    [Description("Filters and selects timestamped messages from the DO1Mimic register.")]
-    public partial class TimestampedDO1Mimic
+    /// <seealso cref="DO1Sync"/>
+    [Description("Filters and selects timestamped messages from the DO1Sync register.")]
+    public partial class TimestampedDO1Sync
     {
         /// <summary>
-        /// Represents the address of the <see cref="DO1Mimic"/> register. This field is constant.
+        /// Represents the address of the <see cref="DO1Sync"/> register. This field is constant.
         /// </summary>
-        public const int Address = DO1Mimic.Address;
+        public const int Address = DO1Sync.Address;
 
         /// <summary>
-        /// Returns timestamped payload data for <see cref="DO1Mimic"/> register messages.
+        /// Returns timestamped payload data for <see cref="DO1Sync"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DO1MimicConfig> GetPayload(HarpMessage message)
+        public static Timestamped<DO1SyncConfig> GetPayload(HarpMessage message)
         {
-            return DO1Mimic.GetTimestampedPayload(message);
+            return DO1Sync.GetTimestampedPayload(message);
         }
     }
 
     /// <summary>
     /// Represents a register that configures the callback function triggered when digital input is triggered.
     /// </summary>
-    [Description("Configures the callback function triggered when digital input is triggered")]
-    public partial class DI0Callback
+    [Description("Configures the callback function triggered when digital input is triggered.")]
+    public partial class DI0Trigger
     {
         /// <summary>
-        /// Represents the address of the <see cref="DI0Callback"/> register. This field is constant.
+        /// Represents the address of the <see cref="DI0Trigger"/> register. This field is constant.
         /// </summary>
         public const int Address = 43;
 
         /// <summary>
-        /// Represents the payload type of the <see cref="DI0Callback"/> register. This field is constant.
+        /// Represents the payload type of the <see cref="DI0Trigger"/> register. This field is constant.
         /// </summary>
         public const PayloadType RegisterType = PayloadType.U8;
 
         /// <summary>
-        /// Represents the length of the <see cref="DI0Callback"/> register. This field is constant.
+        /// Represents the length of the <see cref="DI0Trigger"/> register. This field is constant.
         /// </summary>
         public const int RegisterLength = 1;
 
         /// <summary>
-        /// Returns the payload data for <see cref="DI0Callback"/> register messages.
+        /// Returns the payload data for <see cref="DI0Trigger"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the message payload.</returns>
-        public static DI0Config GetPayload(HarpMessage message)
+        public static DI0TriggerConfig GetPayload(HarpMessage message)
         {
-            return (DI0Config)message.GetPayloadByte();
+            return (DI0TriggerConfig)message.GetPayloadByte();
         }
 
         /// <summary>
-        /// Returns the timestamped payload data for <see cref="DI0Callback"/> register messages.
+        /// Returns the timestamped payload data for <see cref="DI0Trigger"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DI0Config> GetTimestampedPayload(HarpMessage message)
+        public static Timestamped<DI0TriggerConfig> GetTimestampedPayload(HarpMessage message)
         {
             var payload = message.GetTimestampedPayloadByte();
-            return Timestamped.Create((DI0Config)payload.Value, payload.Seconds);
+            return Timestamped.Create((DI0TriggerConfig)payload.Value, payload.Seconds);
         }
 
         /// <summary>
-        /// Returns a Harp message for the <see cref="DI0Callback"/> register.
+        /// Returns a Harp message for the <see cref="DI0Trigger"/> register.
         /// </summary>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="DI0Callback"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="DI0Trigger"/> register
         /// with the specified message type and payload.
         /// </returns>
-        public static HarpMessage FromPayload(MessageType messageType, DI0Config value)
+        public static HarpMessage FromPayload(MessageType messageType, DI0TriggerConfig value)
         {
             return HarpMessage.FromByte(Address, messageType, (byte)value);
         }
 
         /// <summary>
-        /// Returns a timestamped Harp message for the <see cref="DI0Callback"/>
+        /// Returns a timestamped Harp message for the <see cref="DI0Trigger"/>
         /// register.
         /// </summary>
         /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="DI0Callback"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="DI0Trigger"/> register
         /// with the specified message type, timestamp, and payload.
         /// </returns>
-        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DI0Config value)
+        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DI0TriggerConfig value)
         {
             return HarpMessage.FromByte(Address, timestamp, messageType, (byte)value);
         }
@@ -1404,96 +1404,96 @@ namespace Harp.SyringePump
 
     /// <summary>
     /// Provides methods for manipulating timestamped messages from the
-    /// DI0Callback register.
+    /// DI0Trigger register.
     /// </summary>
-    /// <seealso cref="DI0Callback"/>
-    [Description("Filters and selects timestamped messages from the DI0Callback register.")]
-    public partial class TimestampedDI0Callback
+    /// <seealso cref="DI0Trigger"/>
+    [Description("Filters and selects timestamped messages from the DI0Trigger register.")]
+    public partial class TimestampedDI0Trigger
     {
         /// <summary>
-        /// Represents the address of the <see cref="DI0Callback"/> register. This field is constant.
+        /// Represents the address of the <see cref="DI0Trigger"/> register. This field is constant.
         /// </summary>
-        public const int Address = DI0Callback.Address;
+        public const int Address = DI0Trigger.Address;
 
         /// <summary>
-        /// Returns timestamped payload data for <see cref="DI0Callback"/> register messages.
+        /// Returns timestamped payload data for <see cref="DI0Trigger"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DI0Config> GetPayload(HarpMessage message)
+        public static Timestamped<DI0TriggerConfig> GetPayload(HarpMessage message)
         {
-            return DI0Callback.GetTimestampedPayload(message);
+            return DI0Trigger.GetTimestampedPayload(message);
         }
     }
 
     /// <summary>
-    /// Represents a register that sets the motor microstep resolution.
+    /// Represents a register that sets the motor microstepping resolution.
     /// </summary>
-    [Description("Sets the motor microstep resolution")]
-    public partial class MicrostepConfig
+    [Description("Sets the motor microstepping resolution.")]
+    public partial class Microstepping
     {
         /// <summary>
-        /// Represents the address of the <see cref="MicrostepConfig"/> register. This field is constant.
+        /// Represents the address of the <see cref="Microstepping"/> register. This field is constant.
         /// </summary>
         public const int Address = 44;
 
         /// <summary>
-        /// Represents the payload type of the <see cref="MicrostepConfig"/> register. This field is constant.
+        /// Represents the payload type of the <see cref="Microstepping"/> register. This field is constant.
         /// </summary>
         public const PayloadType RegisterType = PayloadType.U8;
 
         /// <summary>
-        /// Represents the length of the <see cref="MicrostepConfig"/> register. This field is constant.
+        /// Represents the length of the <see cref="Microstepping"/> register. This field is constant.
         /// </summary>
         public const int RegisterLength = 1;
 
         /// <summary>
-        /// Returns the payload data for <see cref="MicrostepConfig"/> register messages.
+        /// Returns the payload data for <see cref="Microstepping"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the message payload.</returns>
-        public static MicrostepResolution GetPayload(HarpMessage message)
+        public static MicrosteppingMode GetPayload(HarpMessage message)
         {
-            return (MicrostepResolution)message.GetPayloadByte();
+            return (MicrosteppingMode)message.GetPayloadByte();
         }
 
         /// <summary>
-        /// Returns the timestamped payload data for <see cref="MicrostepConfig"/> register messages.
+        /// Returns the timestamped payload data for <see cref="Microstepping"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<MicrostepResolution> GetTimestampedPayload(HarpMessage message)
+        public static Timestamped<MicrosteppingMode> GetTimestampedPayload(HarpMessage message)
         {
             var payload = message.GetTimestampedPayloadByte();
-            return Timestamped.Create((MicrostepResolution)payload.Value, payload.Seconds);
+            return Timestamped.Create((MicrosteppingMode)payload.Value, payload.Seconds);
         }
 
         /// <summary>
-        /// Returns a Harp message for the <see cref="MicrostepConfig"/> register.
+        /// Returns a Harp message for the <see cref="Microstepping"/> register.
         /// </summary>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="MicrostepConfig"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="Microstepping"/> register
         /// with the specified message type and payload.
         /// </returns>
-        public static HarpMessage FromPayload(MessageType messageType, MicrostepResolution value)
+        public static HarpMessage FromPayload(MessageType messageType, MicrosteppingMode value)
         {
             return HarpMessage.FromByte(Address, messageType, (byte)value);
         }
 
         /// <summary>
-        /// Returns a timestamped Harp message for the <see cref="MicrostepConfig"/>
+        /// Returns a timestamped Harp message for the <see cref="Microstepping"/>
         /// register.
         /// </summary>
         /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="MicrostepConfig"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="Microstepping"/> register
         /// with the specified message type, timestamp, and payload.
         /// </returns>
-        public static HarpMessage FromPayload(double timestamp, MessageType messageType, MicrostepResolution value)
+        public static HarpMessage FromPayload(double timestamp, MessageType messageType, MicrosteppingMode value)
         {
             return HarpMessage.FromByte(Address, timestamp, messageType, (byte)value);
         }
@@ -1501,51 +1501,51 @@ namespace Harp.SyringePump
 
     /// <summary>
     /// Provides methods for manipulating timestamped messages from the
-    /// MicrostepConfig register.
+    /// Microstepping register.
     /// </summary>
-    /// <seealso cref="MicrostepConfig"/>
-    [Description("Filters and selects timestamped messages from the MicrostepConfig register.")]
-    public partial class TimestampedMicrostepConfig
+    /// <seealso cref="Microstepping"/>
+    [Description("Filters and selects timestamped messages from the Microstepping register.")]
+    public partial class TimestampedMicrostepping
     {
         /// <summary>
-        /// Represents the address of the <see cref="MicrostepConfig"/> register. This field is constant.
+        /// Represents the address of the <see cref="Microstepping"/> register. This field is constant.
         /// </summary>
-        public const int Address = MicrostepConfig.Address;
+        public const int Address = Microstepping.Address;
 
         /// <summary>
-        /// Returns timestamped payload data for <see cref="MicrostepConfig"/> register messages.
+        /// Returns timestamped payload data for <see cref="Microstepping"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<MicrostepResolution> GetPayload(HarpMessage message)
+        public static Timestamped<MicrosteppingMode> GetPayload(HarpMessage message)
         {
-            return MicrostepConfig.GetTimestampedPayload(message);
+            return Microstepping.GetTimestampedPayload(message);
         }
     }
 
     /// <summary>
     /// Represents a register that sets the number of steps to be executed in the current protocol.
     /// </summary>
-    [Description("Sets the number of steps to be executed in the current protocol")]
-    public partial class ProtocolNumberSteps
+    [Description("Sets the number of steps to be executed in the current protocol.")]
+    public partial class ProtocolStepCount
     {
         /// <summary>
-        /// Represents the address of the <see cref="ProtocolNumberSteps"/> register. This field is constant.
+        /// Represents the address of the <see cref="ProtocolStepCount"/> register. This field is constant.
         /// </summary>
         public const int Address = 45;
 
         /// <summary>
-        /// Represents the payload type of the <see cref="ProtocolNumberSteps"/> register. This field is constant.
+        /// Represents the payload type of the <see cref="ProtocolStepCount"/> register. This field is constant.
         /// </summary>
         public const PayloadType RegisterType = PayloadType.U16;
 
         /// <summary>
-        /// Represents the length of the <see cref="ProtocolNumberSteps"/> register. This field is constant.
+        /// Represents the length of the <see cref="ProtocolStepCount"/> register. This field is constant.
         /// </summary>
         public const int RegisterLength = 1;
 
         /// <summary>
-        /// Returns the payload data for <see cref="ProtocolNumberSteps"/> register messages.
+        /// Returns the payload data for <see cref="ProtocolStepCount"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the message payload.</returns>
@@ -1555,7 +1555,7 @@ namespace Harp.SyringePump
         }
 
         /// <summary>
-        /// Returns the timestamped payload data for <see cref="ProtocolNumberSteps"/> register messages.
+        /// Returns the timestamped payload data for <see cref="ProtocolStepCount"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
@@ -1565,12 +1565,12 @@ namespace Harp.SyringePump
         }
 
         /// <summary>
-        /// Returns a Harp message for the <see cref="ProtocolNumberSteps"/> register.
+        /// Returns a Harp message for the <see cref="ProtocolStepCount"/> register.
         /// </summary>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="ProtocolNumberSteps"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="ProtocolStepCount"/> register
         /// with the specified message type and payload.
         /// </returns>
         public static HarpMessage FromPayload(MessageType messageType, ushort value)
@@ -1579,14 +1579,14 @@ namespace Harp.SyringePump
         }
 
         /// <summary>
-        /// Returns a timestamped Harp message for the <see cref="ProtocolNumberSteps"/>
+        /// Returns a timestamped Harp message for the <see cref="ProtocolStepCount"/>
         /// register.
         /// </summary>
         /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="ProtocolNumberSteps"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="ProtocolStepCount"/> register
         /// with the specified message type, timestamp, and payload.
         /// </returns>
         public static HarpMessage FromPayload(double timestamp, MessageType messageType, ushort value)
@@ -1597,32 +1597,32 @@ namespace Harp.SyringePump
 
     /// <summary>
     /// Provides methods for manipulating timestamped messages from the
-    /// ProtocolNumberSteps register.
+    /// ProtocolStepCount register.
     /// </summary>
-    /// <seealso cref="ProtocolNumberSteps"/>
-    [Description("Filters and selects timestamped messages from the ProtocolNumberSteps register.")]
-    public partial class TimestampedProtocolNumberSteps
+    /// <seealso cref="ProtocolStepCount"/>
+    [Description("Filters and selects timestamped messages from the ProtocolStepCount register.")]
+    public partial class TimestampedProtocolStepCount
     {
         /// <summary>
-        /// Represents the address of the <see cref="ProtocolNumberSteps"/> register. This field is constant.
+        /// Represents the address of the <see cref="ProtocolStepCount"/> register. This field is constant.
         /// </summary>
-        public const int Address = ProtocolNumberSteps.Address;
+        public const int Address = ProtocolStepCount.Address;
 
         /// <summary>
-        /// Returns timestamped payload data for <see cref="ProtocolNumberSteps"/> register messages.
+        /// Returns timestamped payload data for <see cref="ProtocolStepCount"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
         public static Timestamped<ushort> GetPayload(HarpMessage message)
         {
-            return ProtocolNumberSteps.GetTimestampedPayload(message);
+            return ProtocolStepCount.GetTimestampedPayload(message);
         }
     }
 
     /// <summary>
     /// Represents a register that sets the period, in ms, of of each step in the protocol.
     /// </summary>
-    [Description("Sets the period, in ms, of of each step in the protocol")]
+    [Description("Sets the period, in ms, of of each step in the protocol.")]
     public partial class ProtocolPeriod
     {
         /// <summary>
@@ -1716,9 +1716,9 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// Represents a register that specifies the active events in the device.
+    /// Represents a register that specifies all the active events in the device.
     /// </summary>
-    [Description("Specifies the active events in the device.")]
+    [Description("Specifies all the active events in the device.")]
     public partial class EnableEvents
     {
         /// <summary>
@@ -1815,7 +1815,7 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that status of the protocol execution.
     /// </summary>
-    [Description("Status of the protocol execution")]
+    [Description("Status of the protocol execution.")]
     public partial class Protocol
     {
         /// <summary>
@@ -1912,7 +1912,7 @@ namespace Harp.SyringePump
     /// <summary>
     /// Represents a register that sets the direction of the protocol execution.
     /// </summary>
-    [Description("Sets the direction of the protocol execution")]
+    [Description("Sets the direction of the protocol execution.")]
     public partial class ProtocolDirection
     {
         /// <summary>
@@ -2019,11 +2019,11 @@ namespace Harp.SyringePump
     /// <seealso cref="CreateDigitalInputPayload"/>
     /// <seealso cref="CreateDigitalOutputSetPayload"/>
     /// <seealso cref="CreateDigitalOutputClearPayload"/>
-    /// <seealso cref="CreateDO0MimicPayload"/>
-    /// <seealso cref="CreateDO1MimicPayload"/>
-    /// <seealso cref="CreateDI0CallbackPayload"/>
-    /// <seealso cref="CreateMicrostepConfigPayload"/>
-    /// <seealso cref="CreateProtocolNumberStepsPayload"/>
+    /// <seealso cref="CreateDO0SyncPayload"/>
+    /// <seealso cref="CreateDO1SyncPayload"/>
+    /// <seealso cref="CreateDI0TriggerPayload"/>
+    /// <seealso cref="CreateMicrosteppingPayload"/>
+    /// <seealso cref="CreateProtocolStepCountPayload"/>
     /// <seealso cref="CreateProtocolPeriodPayload"/>
     /// <seealso cref="CreateEnableEventsPayload"/>
     /// <seealso cref="CreateProtocolPayload"/>
@@ -2037,11 +2037,11 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(CreateDigitalInputPayload))]
     [XmlInclude(typeof(CreateDigitalOutputSetPayload))]
     [XmlInclude(typeof(CreateDigitalOutputClearPayload))]
-    [XmlInclude(typeof(CreateDO0MimicPayload))]
-    [XmlInclude(typeof(CreateDO1MimicPayload))]
-    [XmlInclude(typeof(CreateDI0CallbackPayload))]
-    [XmlInclude(typeof(CreateMicrostepConfigPayload))]
-    [XmlInclude(typeof(CreateProtocolNumberStepsPayload))]
+    [XmlInclude(typeof(CreateDO0SyncPayload))]
+    [XmlInclude(typeof(CreateDO1SyncPayload))]
+    [XmlInclude(typeof(CreateDI0TriggerPayload))]
+    [XmlInclude(typeof(CreateMicrosteppingPayload))]
+    [XmlInclude(typeof(CreateProtocolStepCountPayload))]
     [XmlInclude(typeof(CreateProtocolPeriodPayload))]
     [XmlInclude(typeof(CreateEnableEventsPayload))]
     [XmlInclude(typeof(CreateProtocolPayload))]
@@ -2496,16 +2496,16 @@ namespace Harp.SyringePump
     /// Represents an operator that creates a sequence of message payloads
     /// that configures which signal is mimicked in the digital output 0.
     /// </summary>
-    [DisplayName("DO0MimicPayload")]
+    [DisplayName("DO0SyncPayload")]
     [WorkflowElementCategory(ElementCategory.Transform)]
     [Description("Creates a sequence of message payloads that configures which signal is mimicked in the digital output 0.")]
-    public partial class CreateDO0MimicPayload : HarpCombinator
+    public partial class CreateDO0SyncPayload : HarpCombinator
     {
         /// <summary>
         /// Gets or sets the value that configures which signal is mimicked in the digital output 0.
         /// </summary>
         [Description("The value that configures which signal is mimicked in the digital output 0.")]
-        public DO0MimicConfig Value { get; set; }
+        public DO0SyncConfig Value { get; set; }
 
         /// <summary>
         /// Creates an observable sequence that contains a single message
@@ -2536,7 +2536,7 @@ namespace Harp.SyringePump
         /// </returns>
         public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
         {
-            return source.Select(_ => DO0Mimic.FromPayload(MessageType, Value));
+            return source.Select(_ => DO0Sync.FromPayload(MessageType, Value));
         }
     }
 
@@ -2544,16 +2544,16 @@ namespace Harp.SyringePump
     /// Represents an operator that creates a sequence of message payloads
     /// that configures which signal is mimicked in the digital output 1.
     /// </summary>
-    [DisplayName("DO1MimicPayload")]
+    [DisplayName("DO1SyncPayload")]
     [WorkflowElementCategory(ElementCategory.Transform)]
     [Description("Creates a sequence of message payloads that configures which signal is mimicked in the digital output 1.")]
-    public partial class CreateDO1MimicPayload : HarpCombinator
+    public partial class CreateDO1SyncPayload : HarpCombinator
     {
         /// <summary>
         /// Gets or sets the value that configures which signal is mimicked in the digital output 1.
         /// </summary>
         [Description("The value that configures which signal is mimicked in the digital output 1.")]
-        public DO1MimicConfig Value { get; set; }
+        public DO1SyncConfig Value { get; set; }
 
         /// <summary>
         /// Creates an observable sequence that contains a single message
@@ -2584,7 +2584,7 @@ namespace Harp.SyringePump
         /// </returns>
         public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
         {
-            return source.Select(_ => DO1Mimic.FromPayload(MessageType, Value));
+            return source.Select(_ => DO1Sync.FromPayload(MessageType, Value));
         }
     }
 
@@ -2592,16 +2592,16 @@ namespace Harp.SyringePump
     /// Represents an operator that creates a sequence of message payloads
     /// that configures the callback function triggered when digital input is triggered.
     /// </summary>
-    [DisplayName("DI0CallbackPayload")]
+    [DisplayName("DI0TriggerPayload")]
     [WorkflowElementCategory(ElementCategory.Transform)]
     [Description("Creates a sequence of message payloads that configures the callback function triggered when digital input is triggered.")]
-    public partial class CreateDI0CallbackPayload : HarpCombinator
+    public partial class CreateDI0TriggerPayload : HarpCombinator
     {
         /// <summary>
         /// Gets or sets the value that configures the callback function triggered when digital input is triggered.
         /// </summary>
         [Description("The value that configures the callback function triggered when digital input is triggered.")]
-        public DI0Config Value { get; set; }
+        public DI0TriggerConfig Value { get; set; }
 
         /// <summary>
         /// Creates an observable sequence that contains a single message
@@ -2632,28 +2632,28 @@ namespace Harp.SyringePump
         /// </returns>
         public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
         {
-            return source.Select(_ => DI0Callback.FromPayload(MessageType, Value));
+            return source.Select(_ => DI0Trigger.FromPayload(MessageType, Value));
         }
     }
 
     /// <summary>
     /// Represents an operator that creates a sequence of message payloads
-    /// that sets the motor microstep resolution.
+    /// that sets the motor microstepping resolution.
     /// </summary>
-    [DisplayName("MicrostepConfigPayload")]
+    [DisplayName("MicrosteppingPayload")]
     [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that sets the motor microstep resolution.")]
-    public partial class CreateMicrostepConfigPayload : HarpCombinator
+    [Description("Creates a sequence of message payloads that sets the motor microstepping resolution.")]
+    public partial class CreateMicrosteppingPayload : HarpCombinator
     {
         /// <summary>
-        /// Gets or sets the value that sets the motor microstep resolution.
+        /// Gets or sets the value that sets the motor microstepping resolution.
         /// </summary>
-        [Description("The value that sets the motor microstep resolution.")]
-        public MicrostepResolution Value { get; set; }
+        [Description("The value that sets the motor microstepping resolution.")]
+        public MicrosteppingMode Value { get; set; }
 
         /// <summary>
         /// Creates an observable sequence that contains a single message
-        /// that sets the motor microstep resolution.
+        /// that sets the motor microstepping resolution.
         /// </summary>
         /// <returns>
         /// A sequence containing a single <see cref="HarpMessage"/> object
@@ -2666,7 +2666,7 @@ namespace Harp.SyringePump
 
         /// <summary>
         /// Creates an observable sequence of message payloads
-        /// that sets the motor microstep resolution.
+        /// that sets the motor microstepping resolution.
         /// </summary>
         /// <typeparam name="TSource">
         /// The type of the elements in the <paramref name="source"/> sequence.
@@ -2680,7 +2680,7 @@ namespace Harp.SyringePump
         /// </returns>
         public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
         {
-            return source.Select(_ => MicrostepConfig.FromPayload(MessageType, Value));
+            return source.Select(_ => Microstepping.FromPayload(MessageType, Value));
         }
     }
 
@@ -2688,10 +2688,10 @@ namespace Harp.SyringePump
     /// Represents an operator that creates a sequence of message payloads
     /// that sets the number of steps to be executed in the current protocol.
     /// </summary>
-    [DisplayName("ProtocolNumberStepsPayload")]
+    [DisplayName("ProtocolStepCountPayload")]
     [WorkflowElementCategory(ElementCategory.Transform)]
     [Description("Creates a sequence of message payloads that sets the number of steps to be executed in the current protocol.")]
-    public partial class CreateProtocolNumberStepsPayload : HarpCombinator
+    public partial class CreateProtocolStepCountPayload : HarpCombinator
     {
         /// <summary>
         /// Gets or sets the value that sets the number of steps to be executed in the current protocol.
@@ -2730,7 +2730,7 @@ namespace Harp.SyringePump
         /// </returns>
         public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
         {
-            return source.Select(_ => ProtocolNumberSteps.FromPayload(MessageType, Value));
+            return source.Select(_ => ProtocolStepCount.FromPayload(MessageType, Value));
         }
     }
 
@@ -2786,22 +2786,22 @@ namespace Harp.SyringePump
 
     /// <summary>
     /// Represents an operator that creates a sequence of message payloads
-    /// that specifies the active events in the device.
+    /// that specifies all the active events in the device.
     /// </summary>
     [DisplayName("EnableEventsPayload")]
     [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that specifies the active events in the device.")]
+    [Description("Creates a sequence of message payloads that specifies all the active events in the device.")]
     public partial class CreateEnableEventsPayload : HarpCombinator
     {
         /// <summary>
-        /// Gets or sets the value that specifies the active events in the device.
+        /// Gets or sets the value that specifies all the active events in the device.
         /// </summary>
-        [Description("The value that specifies the active events in the device.")]
+        [Description("The value that specifies all the active events in the device.")]
         public PumpEvents Value { get; set; }
 
         /// <summary>
         /// Creates an observable sequence that contains a single message
-        /// that specifies the active events in the device.
+        /// that specifies all the active events in the device.
         /// </summary>
         /// <returns>
         /// A sequence containing a single <see cref="HarpMessage"/> object
@@ -2814,7 +2814,7 @@ namespace Harp.SyringePump
 
         /// <summary>
         /// Creates an observable sequence of message payloads
-        /// that specifies the active events in the device.
+        /// that specifies all the active events in the device.
         /// </summary>
         /// <typeparam name="TSource">
         /// The type of the elements in the <paramref name="source"/> sequence.
@@ -2929,23 +2929,34 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// The digital output lines
+    /// The digital output lines.
     /// </summary>
     [Flags]
     public enum DigitalOutputState : byte
     {
+        None = 0x0,
         DO0 = 0x1,
         DO1 = 0x2
     }
 
     /// <summary>
-    /// The events that can be enabled/disabled
+    /// The state of the digital input pin.
+    /// </summary>
+    [Flags]
+    public enum DigitalInputState : byte
+    {
+        None = 0x0,
+        DI0 = 0x1
+    }
+
+    /// <summary>
+    /// The events that can be enabled/disabled.
     /// </summary>
     [Flags]
     public enum PumpEvents : byte
     {
         Step = 0x1,
-        Dir = 0x2,
+        Direction = 0x2,
         ForwardSwitch = 0x4,
         ReverseSwitch = 0x8,
         DigitalInput = 0x10,
@@ -2953,16 +2964,7 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// The state of an abstract functionality
-    /// </summary>
-    public enum EnableFlag : byte
-    {
-        Disabled = 0,
-        Enabled = 1
-    }
-
-    /// <summary>
-    /// The state of the STEP motor controller pin
+    /// The state of the STEP motor controller pin.
     /// </summary>
     public enum StepState : byte
     {
@@ -2971,7 +2973,7 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// The state of the DIR motor controller pin
+    /// The state of the DIR motor controller pin.
     /// </summary>
     public enum DirectionState : byte
     {
@@ -2980,7 +2982,7 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// The state of the forward limit switch
+    /// The state of the forward limit switch.
     /// </summary>
     public enum ForwardSwitchState : byte
     {
@@ -2989,7 +2991,7 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// The state of the reverse limit switch
+    /// The state of the reverse limit switch.
     /// </summary>
     public enum ReverseSwitchState : byte
     {
@@ -2998,47 +3000,38 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// The state of the digital input pin
+    /// Configures which signal is mimicked in the digital output 0.
     /// </summary>
-    public enum DigitalInputState : byte
+    public enum DO0SyncConfig : byte
     {
-        Low = 0,
-        High = 1
-    }
-
-    /// <summary>
-    /// Configures which signal is mimicked in the digital output 0
-    /// </summary>
-    public enum DO0MimicConfig : byte
-    {
-        Software = 0,
+        None = 0,
         SwitchState = 1
     }
 
     /// <summary>
-    /// Configures which signal is mimicked in the digital output 1
+    /// Configures which signal is mimicked in the digital output 1.
     /// </summary>
-    public enum DO1MimicConfig : byte
+    public enum DO1SyncConfig : byte
     {
-        Software = 0,
+        None = 0,
         Heartbeat = 1,
         Step = 2
     }
 
     /// <summary>
-    /// Configures the function executed when digital input is triggered
+    /// Configures the function executed when digital input is triggered.
     /// </summary>
-    public enum DI0Config : byte
+    public enum DI0TriggerConfig : byte
     {
-        Event = 0,
+        None = 0,
         Step = 1,
         StartProtocol = 2
     }
 
     /// <summary>
-    /// Available microstep resolutions
+    /// Available microstepping resolutions.
     /// </summary>
-    public enum MicrostepResolution : byte
+    public enum MicrosteppingMode : byte
     {
         Full = 0,
         Half = 1,
@@ -3048,7 +3041,7 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// Available protocol types
+    /// Available protocol types.
     /// </summary>
     public enum PumpProtocolType : byte
     {
@@ -3057,7 +3050,7 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// Available board configurations
+    /// Available board configurations.
     /// </summary>
     public enum PumpBoardType : byte
     {
@@ -3067,7 +3060,7 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// The state of the protocol execution
+    /// The state of the protocol execution.
     /// </summary>
     public enum ProtocolState : byte
     {
@@ -3076,7 +3069,7 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// The state of the protocol execution
+    /// The state of the protocol execution.
     /// </summary>
     public enum ProtocolDirectionState : byte
     {

@@ -11,39 +11,39 @@ registers:
     access: Write
     type: U8
     maskType: EnableFlag
-    description: Enables the motor driver
+    description: Enables the motor driver.
   EnableProtocol:
     <<: *enablefunctionreg
     address: 33
-    description: Enables the currently defined protocol
+    description: Enables the currently defined protocol.
   Step:
     address: 34
     access: [Write, Event]
     type: U8
     maskType: StepState
-    description: Status of the STEP motor controller pin
+    description: Status of the STEP motor controller pin.
   Direction:
     address: 35
     access: [Write, Event]
     type: U8
     maskType: DirectionState
-    description: Status of the DIR motor controller pin
+    description: Status of the DIR motor controller pin.
   ForwardSwitch: &switchreg
     address: 36
     access: Event
     type: U8
     maskType: ForwardSwitchState
-    description: Status of the forward limit switch
+    description: Status of the forward limit switch.
   ReverseSwitch:
     <<: *switchreg
     address: 37
     maskType: ReverseSwitchState
-    description: Status of the reverse limit switch
+    description: Status of the reverse limit switch.
   DigitalInput:
     <<: *switchreg
     address: 38
     maskType: DigitalInputState
-    description: Status of the digital input pin
+    description: Status of the digital input pin.
   DigitalOutputSet: &output
     address: 39
     type: U8
@@ -53,162 +53,158 @@ registers:
   DigitalOutputClear:
     <<: *output
     address: 40
-    description: Clear the specified digital output lines
-  DO0Mimic: &ioconfig
+    description: Clear the specified digital output lines.
+  DO0Sync: &ioconfig
     address: 41
     type: U8
     access: Write
-    maskType: DO0MimicConfig
-    description: Configures which signal is mimicked in the digital output 0
-  DO1Mimic:
+    maskType: DO0SyncConfig
+    description: Configures which signal is mimicked in the digital output 0.
+  DO1Sync:
     << : *ioconfig
     address: 42
-    maskType: DO1MimicConfig
-    description: Configures which signal is mimicked in the digital output 1
-  DI0Callback:
+    maskType: DO1SyncConfig
+    description: Configures which signal is mimicked in the digital output 1.
+  DI0Trigger:
     << : *ioconfig
     address: 43
-    maskType: DI0Config
-    description: Configures the callback function triggered when digital input is triggered
-  MicrostepConfig:
+    maskType: DI0TriggerConfig
+    description: Configures the callback function triggered when digital input is triggered.
+  Microstepping:
     address: 44
     type: U8
     access: Write
-    maskType: MicrostepResolution
-    description: Sets the motor microstep resolution
-  ProtocolNumberSteps: &protocol
+    maskType: MicrosteppingMode
+    description: Sets the motor microstepping resolution.
+  ProtocolStepCount: &protocol
     address: 45
     type: U16
     access: Write
     minValue: 1
-    description: Sets the number of steps to be executed in the current protocol
+    description: Sets the number of steps to be executed in the current protocol.
   ProtocolFlowrate:
     address: 46
     type: Float
     access: Write
     visibility: private
     minValue: 1e-10
-    description: Sets the flowrate of the protocol in ul/s. Not implemented yet
+    description: Sets the flowrate of the protocol in ul/s.
   ProtocolPeriod:
     <<: *protocol
     address: 47
-    description: Sets the period, in ms, of of each step in the protocol
-  ProtocolVolume: #TODO: implement this
+    description: Sets the period, in ms, of of each step in the protocol.
+  ProtocolVolume:
     address: 48
     type: Float
     access: Write
     visibility: private
     minValue: 1e-10
-    description: Sets the volume to be delivered, in ul. Not implemented yet
+    description: Sets the volume to be delivered, in ul.
   ProtocolType:
     address: 49
     type: U8
     access: Write
     visibility: private
     maskType: PumpProtocolType
-    description: Sets the type of protocol to be executed
+    description: Sets the type of protocol to be executed.
   CalibrationOffset:
     address: 50
     type: Float
     access: Write
     visibility: private
-    description: Sets the offset value of the calibration curve. Not implemented yet
+    description: Sets the offset value of the calibration curve.
   CalibrationSlope:
     address: 51
     type: Float
     access: Write
     visibility: private
-    description: Sets the slope value of the calibration curve. Not implemented yet
+    description: Sets the slope value of the calibration curve.
   EnableEvents:
     address: 52
     type: U8
     access: Write
     maskType: PumpEvents
-    description: Specifies the active events in the device.
+    description: Specifies all the active events in the device.
   BoardType:
     address: 53
     type: U8
     access: Write
     maskType: PumpBoardType
-    description: Sets the board type
+    description: Sets the board type.
     visibility: private
   Protocol:
     address: 54
     access: Event
     type: U8
     maskType: ProtocolState
-    description: Status of the protocol execution
+    description: Status of the protocol execution.
   ProtocolDirection:
     address: 55
     type: U8
     access: Write
     maskType: ProtocolDirectionState
-    description: Sets the direction of the protocol execution
+    description: Sets the direction of the protocol execution.
 bitMasks:
   DigitalOutputState:
-    description: The digital output lines
+    description: The digital output lines.
     bits:
+      None: 0x0
       DO0: 0x1
       DO1: 0x2
+  DigitalInputState:
+    description: The state of the digital input pin.
+    bits:
+      None: 0x0
+      DI0: 0x1
   PumpEvents:
-    description: The events that can be enabled/disabled
+    description: The events that can be enabled/disabled.
     bits:
       Step: 0x1
-      Dir: 0x2
+      Direction: 0x2
       ForwardSwitch: 0x4
       ReverseSwitch: 0x8
       DigitalInput: 0x10
       Protocol: 0x20
 groupMasks:
-  EnableFlag:
-    description: The state of an abstract functionality
-    values:
-      Disabled: 0
-      Enabled: 1 
   StepState:
-    description: The state of the STEP motor controller pin
+    description: The state of the STEP motor controller pin.
     values:
       Low: 0
       High: 1
   DirectionState:
-    description: The state of the DIR motor controller pin
+    description: The state of the DIR motor controller pin.
     values:
       Reverse: 0
       Forward: 2
   ForwardSwitchState:
-    description: The state of the forward limit switch
+    description: The state of the forward limit switch.
     values:
       Low: 0
       High: 1
   ReverseSwitchState:
-    description: The state of the reverse limit switch
+    description: The state of the reverse limit switch.
     values:
       Low: 0
       High: 2
-  DigitalInputState:
-    description: The state of the digital input pin
+  DO0SyncConfig:
+    description: Configures which signal is mimicked in the digital output 0.
     values:
-      Low: 0
-      High: 1
-  DO0MimicConfig:
-    description: Configures which signal is mimicked in the digital output 0
-    values:
-      Software: 0
+      None: 0
       SwitchState: 1
-  DO1MimicConfig:
-    description: Configures which signal is mimicked in the digital output 1
+  DO1SyncConfig:
+    description: Configures which signal is mimicked in the digital output 1.
     values:
-      Software: 0
+      None: 0
       Heartbeat: 1
       Step: 2
-  DI0Config:
-    description: Configures the function executed when digital input is triggered
+  DI0TriggerConfig:
+    description: Configures the function executed when digital input is triggered.
     values:
-      Event: 0
+      None: 0
       Step: 1
       StartProtocol: 2
-  MicrostepResolution:
-    description: Available microstep resolutions
+  MicrosteppingMode:
+    description: Available microstepping resolutions.
     values:
       Full: 0
       Half: 1
@@ -216,24 +212,23 @@ groupMasks:
       Eighth: 3
       Sixteenth: 4
   PumpProtocolType:
-    description: Available protocol types
+    description: Available protocol types.
     values:
       Step: 0
       Volume: 1
   PumpBoardType:
-    description: Available board configurations
+    description: Available board configurations.
     values:
       Pump: 0
       FishFeeder: 1
       StepperMotor: 2
   ProtocolState:
-    description: The state of the protocol execution
+    description: The state of the protocol execution.
     values:
       Idle: 0
       Running: 1
   ProtocolDirectionState:
-    description: The state of the protocol execution
+    description: The state of the protocol execution.
     values:
       Reverse: 0
       Forward: 1
-      
