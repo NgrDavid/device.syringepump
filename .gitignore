@@ -1,25 +1,12 @@
-### AtmelStudio ###
-## Ignore Atmel Studio temporary files and build results
-# https://www.microchip.com/mplab/avr-support/atmel-studio-7
 
-# Atmel Studio is powered by an older version of Visual Studio,
-# so most of the project and solution files are the same as VS files,
-# only prefixed by an `at`.
+desktop.ini
 
-#Build Directories
-[Dd]ebug/
-[Rr]elease/
-
-#Build Results
-*.o
-*.d
-*.eep
-*.elf
-*.hex
-*.map
-*.srec
-
-#User Specific Files
-*.atsuo
-*.vscode
-*.vs
+# Visual studio files
+.vs
+.suo
+.nuget
+bin
+obj
+Debug
+packages
+*.componentinfo.xml
