@@ -3,7 +3,7 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
-    <AssemblyName>Device.Pump.GUI</AssemblyName>
+    <AssemblyName>SyringePump.Design</AssemblyName>
     <Version>1.0</Version>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

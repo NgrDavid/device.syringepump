@@ -2,7 +2,7 @@
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Device.Pump.GUI.ViewModels
+namespace SyringePump.Design.ViewModels
 {
     public class LogsWindowViewModel : ReactiveObject
     {

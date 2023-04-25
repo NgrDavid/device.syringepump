@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Device.Pump.GUI.ViewModels;
-using Device.Pump.GUI.Views;
+using SyringePump.Design.ViewModels;
+using SyringePump.Design.Views;
 
-namespace Device.Pump
+namespace SyringePump
 {
     public partial class App : Application
     {

@@ -9,7 +9,7 @@ using ReactiveUI;
 using Serilog;
 using Serilog.Events;
 
-namespace Device.Pump.GUI
+namespace SyringePump.Design
 {
     public class StartApp
     {

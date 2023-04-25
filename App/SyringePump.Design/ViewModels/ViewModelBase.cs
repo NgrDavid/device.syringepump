@@ -1,6 +1,6 @@
 ﻿using ReactiveUI;
 
-namespace Device.Pump.GUI.ViewModels
+namespace SyringePump.Design.ViewModels
 {
     public class ViewModelBase : ReactiveObject
     {
