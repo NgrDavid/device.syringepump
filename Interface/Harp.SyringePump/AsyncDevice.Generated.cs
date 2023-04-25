@@ -456,39 +456,39 @@ namespace Harp.SyringePump
         }
 
         /// <summary>
-        /// Asynchronously reads the contents of the Microstepping register.
+        /// Asynchronously reads the contents of the StepMode register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the register payload.
         /// </returns>
-        public async Task<MicrosteppingMode> ReadMicrosteppingAsync()
+        public async Task<StepModeType> ReadStepModeAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(Microstepping.Address));
-            return Microstepping.GetPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(StepMode.Address));
+            return StepMode.GetPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously reads the timestamped contents of the Microstepping register.
+        /// Asynchronously reads the timestamped contents of the StepMode register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the timestamped register payload.
         /// </returns>
-        public async Task<Timestamped<MicrosteppingMode>> ReadTimestampedMicrosteppingAsync()
+        public async Task<Timestamped<StepModeType>> ReadTimestampedStepModeAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(Microstepping.Address));
-            return Microstepping.GetTimestampedPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(StepMode.Address));
+            return StepMode.GetTimestampedPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously writes a value to the Microstepping register.
+        /// Asynchronously writes a value to the StepMode register.
         /// </summary>
         /// <param name="value">The value to be stored in the register.</param>
         /// <returns>The task object representing the asynchronous write operation.</returns>
-        public async Task WriteMicrosteppingAsync(MicrosteppingMode value)
+        public async Task WriteStepModeAsync(StepModeType value)
         {
-            var request = Microstepping.FromPayload(MessageType.Write, value);
+            var request = StepMode.FromPayload(MessageType.Write, value);
             await CommandAsync(request);
         }
 

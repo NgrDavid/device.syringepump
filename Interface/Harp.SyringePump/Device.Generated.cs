@@ -49,7 +49,7 @@ namespace Harp.SyringePump
             { 41, typeof(DO0Sync) },
             { 42, typeof(DO1Sync) },
             { 43, typeof(DI0Trigger) },
-            { 44, typeof(Microstepping) },
+            { 44, typeof(StepMode) },
             { 45, typeof(ProtocolStepCount) },
             { 47, typeof(ProtocolPeriod) },
             { 52, typeof(EnableEvents) },
@@ -95,7 +95,7 @@ namespace Harp.SyringePump
     /// <seealso cref="DO0Sync"/>
     /// <seealso cref="DO1Sync"/>
     /// <seealso cref="DI0Trigger"/>
-    /// <seealso cref="Microstepping"/>
+    /// <seealso cref="StepMode"/>
     /// <seealso cref="ProtocolStepCount"/>
     /// <seealso cref="ProtocolPeriod"/>
     /// <seealso cref="EnableEvents"/>
@@ -113,7 +113,7 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(DO0Sync))]
     [XmlInclude(typeof(DO1Sync))]
     [XmlInclude(typeof(DI0Trigger))]
-    [XmlInclude(typeof(Microstepping))]
+    [XmlInclude(typeof(StepMode))]
     [XmlInclude(typeof(ProtocolStepCount))]
     [XmlInclude(typeof(ProtocolPeriod))]
     [XmlInclude(typeof(EnableEvents))]
@@ -152,7 +152,7 @@ namespace Harp.SyringePump
     /// <seealso cref="DO0Sync"/>
     /// <seealso cref="DO1Sync"/>
     /// <seealso cref="DI0Trigger"/>
-    /// <seealso cref="Microstepping"/>
+    /// <seealso cref="StepMode"/>
     /// <seealso cref="ProtocolStepCount"/>
     /// <seealso cref="ProtocolPeriod"/>
     /// <seealso cref="EnableEvents"/>
@@ -170,7 +170,7 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(DO0Sync))]
     [XmlInclude(typeof(DO1Sync))]
     [XmlInclude(typeof(DI0Trigger))]
-    [XmlInclude(typeof(Microstepping))]
+    [XmlInclude(typeof(StepMode))]
     [XmlInclude(typeof(ProtocolStepCount))]
     [XmlInclude(typeof(ProtocolPeriod))]
     [XmlInclude(typeof(EnableEvents))]
@@ -188,7 +188,7 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(TimestampedDO0Sync))]
     [XmlInclude(typeof(TimestampedDO1Sync))]
     [XmlInclude(typeof(TimestampedDI0Trigger))]
-    [XmlInclude(typeof(TimestampedMicrostepping))]
+    [XmlInclude(typeof(TimestampedStepMode))]
     [XmlInclude(typeof(TimestampedProtocolStepCount))]
     [XmlInclude(typeof(TimestampedProtocolPeriod))]
     [XmlInclude(typeof(TimestampedEnableEvents))]
@@ -224,7 +224,7 @@ namespace Harp.SyringePump
     /// <seealso cref="DO0Sync"/>
     /// <seealso cref="DO1Sync"/>
     /// <seealso cref="DI0Trigger"/>
-    /// <seealso cref="Microstepping"/>
+    /// <seealso cref="StepMode"/>
     /// <seealso cref="ProtocolStepCount"/>
     /// <seealso cref="ProtocolPeriod"/>
     /// <seealso cref="EnableEvents"/>
@@ -242,7 +242,7 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(DO0Sync))]
     [XmlInclude(typeof(DO1Sync))]
     [XmlInclude(typeof(DI0Trigger))]
-    [XmlInclude(typeof(Microstepping))]
+    [XmlInclude(typeof(StepMode))]
     [XmlInclude(typeof(ProtocolStepCount))]
     [XmlInclude(typeof(ProtocolPeriod))]
     [XmlInclude(typeof(EnableEvents))]
@@ -1427,73 +1427,73 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// Represents a register that sets the motor microstepping resolution.
+    /// Represents a register that sets the motor step mode from a list of available types.
     /// </summary>
-    [Description("Sets the motor microstepping resolution.")]
-    public partial class Microstepping
+    [Description("Sets the motor step mode from a list of available types.")]
+    public partial class StepMode
     {
         /// <summary>
-        /// Represents the address of the <see cref="Microstepping"/> register. This field is constant.
+        /// Represents the address of the <see cref="StepMode"/> register. This field is constant.
         /// </summary>
         public const int Address = 44;
 
         /// <summary>
-        /// Represents the payload type of the <see cref="Microstepping"/> register. This field is constant.
+        /// Represents the payload type of the <see cref="StepMode"/> register. This field is constant.
         /// </summary>
         public const PayloadType RegisterType = PayloadType.U8;
 
         /// <summary>
-        /// Represents the length of the <see cref="Microstepping"/> register. This field is constant.
+        /// Represents the length of the <see cref="StepMode"/> register. This field is constant.
         /// </summary>
         public const int RegisterLength = 1;
 
         /// <summary>
-        /// Returns the payload data for <see cref="Microstepping"/> register messages.
+        /// Returns the payload data for <see cref="StepMode"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the message payload.</returns>
-        public static MicrosteppingMode GetPayload(HarpMessage message)
+        public static StepModeType GetPayload(HarpMessage message)
         {
-            return (MicrosteppingMode)message.GetPayloadByte();
+            return (StepModeType)message.GetPayloadByte();
         }
 
         /// <summary>
-        /// Returns the timestamped payload data for <see cref="Microstepping"/> register messages.
+        /// Returns the timestamped payload data for <see cref="StepMode"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<MicrosteppingMode> GetTimestampedPayload(HarpMessage message)
+        public static Timestamped<StepModeType> GetTimestampedPayload(HarpMessage message)
         {
             var payload = message.GetTimestampedPayloadByte();
-            return Timestamped.Create((MicrosteppingMode)payload.Value, payload.Seconds);
+            return Timestamped.Create((StepModeType)payload.Value, payload.Seconds);
         }
 
         /// <summary>
-        /// Returns a Harp message for the <see cref="Microstepping"/> register.
+        /// Returns a Harp message for the <see cref="StepMode"/> register.
         /// </summary>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="Microstepping"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="StepMode"/> register
         /// with the specified message type and payload.
         /// </returns>
-        public static HarpMessage FromPayload(MessageType messageType, MicrosteppingMode value)
+        public static HarpMessage FromPayload(MessageType messageType, StepModeType value)
         {
             return HarpMessage.FromByte(Address, messageType, (byte)value);
         }
 
         /// <summary>
-        /// Returns a timestamped Harp message for the <see cref="Microstepping"/>
+        /// Returns a timestamped Harp message for the <see cref="StepMode"/>
         /// register.
         /// </summary>
         /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="Microstepping"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="StepMode"/> register
         /// with the specified message type, timestamp, and payload.
         /// </returns>
-        public static HarpMessage FromPayload(double timestamp, MessageType messageType, MicrosteppingMode value)
+        public static HarpMessage FromPayload(double timestamp, MessageType messageType, StepModeType value)
         {
             return HarpMessage.FromByte(Address, timestamp, messageType, (byte)value);
         }
@@ -1501,25 +1501,25 @@ namespace Harp.SyringePump
 
     /// <summary>
     /// Provides methods for manipulating timestamped messages from the
-    /// Microstepping register.
+    /// StepMode register.
     /// </summary>
-    /// <seealso cref="Microstepping"/>
-    [Description("Filters and selects timestamped messages from the Microstepping register.")]
-    public partial class TimestampedMicrostepping
+    /// <seealso cref="StepMode"/>
+    [Description("Filters and selects timestamped messages from the StepMode register.")]
+    public partial class TimestampedStepMode
     {
         /// <summary>
-        /// Represents the address of the <see cref="Microstepping"/> register. This field is constant.
+        /// Represents the address of the <see cref="StepMode"/> register. This field is constant.
         /// </summary>
-        public const int Address = Microstepping.Address;
+        public const int Address = StepMode.Address;
 
         /// <summary>
-        /// Returns timestamped payload data for <see cref="Microstepping"/> register messages.
+        /// Returns timestamped payload data for <see cref="StepMode"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<MicrosteppingMode> GetPayload(HarpMessage message)
+        public static Timestamped<StepModeType> GetPayload(HarpMessage message)
         {
-            return Microstepping.GetTimestampedPayload(message);
+            return StepMode.GetTimestampedPayload(message);
         }
     }
 
@@ -2022,7 +2022,7 @@ namespace Harp.SyringePump
     /// <seealso cref="CreateDO0SyncPayload"/>
     /// <seealso cref="CreateDO1SyncPayload"/>
     /// <seealso cref="CreateDI0TriggerPayload"/>
-    /// <seealso cref="CreateMicrosteppingPayload"/>
+    /// <seealso cref="CreateStepModePayload"/>
     /// <seealso cref="CreateProtocolStepCountPayload"/>
     /// <seealso cref="CreateProtocolPeriodPayload"/>
     /// <seealso cref="CreateEnableEventsPayload"/>
@@ -2040,7 +2040,7 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(CreateDO0SyncPayload))]
     [XmlInclude(typeof(CreateDO1SyncPayload))]
     [XmlInclude(typeof(CreateDI0TriggerPayload))]
-    [XmlInclude(typeof(CreateMicrosteppingPayload))]
+    [XmlInclude(typeof(CreateStepModePayload))]
     [XmlInclude(typeof(CreateProtocolStepCountPayload))]
     [XmlInclude(typeof(CreateProtocolPeriodPayload))]
     [XmlInclude(typeof(CreateEnableEventsPayload))]
@@ -2638,22 +2638,22 @@ namespace Harp.SyringePump
 
     /// <summary>
     /// Represents an operator that creates a sequence of message payloads
-    /// that sets the motor microstepping resolution.
+    /// that sets the motor step mode from a list of available types.
     /// </summary>
-    [DisplayName("MicrosteppingPayload")]
+    [DisplayName("StepModePayload")]
     [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that sets the motor microstepping resolution.")]
-    public partial class CreateMicrosteppingPayload : HarpCombinator
+    [Description("Creates a sequence of message payloads that sets the motor step mode from a list of available types.")]
+    public partial class CreateStepModePayload : HarpCombinator
     {
         /// <summary>
-        /// Gets or sets the value that sets the motor microstepping resolution.
+        /// Gets or sets the value that sets the motor step mode from a list of available types.
         /// </summary>
-        [Description("The value that sets the motor microstepping resolution.")]
-        public MicrosteppingMode Value { get; set; }
+        [Description("The value that sets the motor step mode from a list of available types.")]
+        public StepModeType Value { get; set; }
 
         /// <summary>
         /// Creates an observable sequence that contains a single message
-        /// that sets the motor microstepping resolution.
+        /// that sets the motor step mode from a list of available types.
         /// </summary>
         /// <returns>
         /// A sequence containing a single <see cref="HarpMessage"/> object
@@ -2666,7 +2666,7 @@ namespace Harp.SyringePump
 
         /// <summary>
         /// Creates an observable sequence of message payloads
-        /// that sets the motor microstepping resolution.
+        /// that sets the motor step mode from a list of available types.
         /// </summary>
         /// <typeparam name="TSource">
         /// The type of the elements in the <paramref name="source"/> sequence.
@@ -2680,7 +2680,7 @@ namespace Harp.SyringePump
         /// </returns>
         public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
         {
-            return source.Select(_ => Microstepping.FromPayload(MessageType, Value));
+            return source.Select(_ => StepMode.FromPayload(MessageType, Value));
         }
     }
 
@@ -3029,9 +3029,9 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// Available microstepping resolutions.
+    /// Available step modes.
     /// </summary>
-    public enum MicrosteppingMode : byte
+    public enum StepModeType : byte
     {
         Full = 0,
         Half = 1,
