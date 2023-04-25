@@ -70,12 +70,12 @@ registers:
     address: 43
     maskType: DI0TriggerConfig
     description: Configures the callback function triggered when digital input is triggered.
-  StepResolution:
+  StepMode:
     address: 44
     type: U8
     access: Write
-    maskType: StepResolutionConfig
-    description: Sets the motor stepping resolution.
+    maskType: StepModeType
+    description: Sets the motor step mode from a list of available types.
   ProtocolStepCount: &protocol
     address: 45
     type: U16
@@ -203,8 +203,8 @@ groupMasks:
       None: 0
       Step: 1
       StartProtocol: 2
-  StepResolutionConfig:
-    description: Available stepping resolutions.
+  StepModeType:
+    description: Available step modes.
     values:
       Full: 0
       Half: 1
