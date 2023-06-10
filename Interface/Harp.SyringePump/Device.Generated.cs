@@ -43,7 +43,7 @@ namespace Harp.SyringePump
             { 35, typeof(Direction) },
             { 36, typeof(ForwardSwitch) },
             { 37, typeof(ReverseSwitch) },
-            { 38, typeof(DigitalInput) },
+            { 38, typeof(DigitalInputState) },
             { 39, typeof(DigitalOutputSet) },
             { 40, typeof(DigitalOutputClear) },
             { 41, typeof(DO0Sync) },
@@ -89,7 +89,7 @@ namespace Harp.SyringePump
     /// <seealso cref="Direction"/>
     /// <seealso cref="ForwardSwitch"/>
     /// <seealso cref="ReverseSwitch"/>
-    /// <seealso cref="DigitalInput"/>
+    /// <seealso cref="DigitalInputState"/>
     /// <seealso cref="DigitalOutputSet"/>
     /// <seealso cref="DigitalOutputClear"/>
     /// <seealso cref="DO0Sync"/>
@@ -107,7 +107,7 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(Direction))]
     [XmlInclude(typeof(ForwardSwitch))]
     [XmlInclude(typeof(ReverseSwitch))]
-    [XmlInclude(typeof(DigitalInput))]
+    [XmlInclude(typeof(DigitalInputState))]
     [XmlInclude(typeof(DigitalOutputSet))]
     [XmlInclude(typeof(DigitalOutputClear))]
     [XmlInclude(typeof(DO0Sync))]
@@ -146,7 +146,7 @@ namespace Harp.SyringePump
     /// <seealso cref="Direction"/>
     /// <seealso cref="ForwardSwitch"/>
     /// <seealso cref="ReverseSwitch"/>
-    /// <seealso cref="DigitalInput"/>
+    /// <seealso cref="DigitalInputState"/>
     /// <seealso cref="DigitalOutputSet"/>
     /// <seealso cref="DigitalOutputClear"/>
     /// <seealso cref="DO0Sync"/>
@@ -164,7 +164,7 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(Direction))]
     [XmlInclude(typeof(ForwardSwitch))]
     [XmlInclude(typeof(ReverseSwitch))]
-    [XmlInclude(typeof(DigitalInput))]
+    [XmlInclude(typeof(DigitalInputState))]
     [XmlInclude(typeof(DigitalOutputSet))]
     [XmlInclude(typeof(DigitalOutputClear))]
     [XmlInclude(typeof(DO0Sync))]
@@ -182,7 +182,7 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(TimestampedDirection))]
     [XmlInclude(typeof(TimestampedForwardSwitch))]
     [XmlInclude(typeof(TimestampedReverseSwitch))]
-    [XmlInclude(typeof(TimestampedDigitalInput))]
+    [XmlInclude(typeof(TimestampedDigitalInputState))]
     [XmlInclude(typeof(TimestampedDigitalOutputSet))]
     [XmlInclude(typeof(TimestampedDigitalOutputClear))]
     [XmlInclude(typeof(TimestampedDO0Sync))]
@@ -218,7 +218,7 @@ namespace Harp.SyringePump
     /// <seealso cref="Direction"/>
     /// <seealso cref="ForwardSwitch"/>
     /// <seealso cref="ReverseSwitch"/>
-    /// <seealso cref="DigitalInput"/>
+    /// <seealso cref="DigitalInputState"/>
     /// <seealso cref="DigitalOutputSet"/>
     /// <seealso cref="DigitalOutputClear"/>
     /// <seealso cref="DO0Sync"/>
@@ -236,7 +236,7 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(Direction))]
     [XmlInclude(typeof(ForwardSwitch))]
     [XmlInclude(typeof(ReverseSwitch))]
-    [XmlInclude(typeof(DigitalInput))]
+    [XmlInclude(typeof(DigitalInputState))]
     [XmlInclude(typeof(DigitalOutputSet))]
     [XmlInclude(typeof(DigitalOutputClear))]
     [XmlInclude(typeof(DO0Sync))]
@@ -848,70 +848,70 @@ namespace Harp.SyringePump
     /// Represents a register that status of the digital input pin.
     /// </summary>
     [Description("Status of the digital input pin.")]
-    public partial class DigitalInput
+    public partial class DigitalInputState
     {
         /// <summary>
-        /// Represents the address of the <see cref="DigitalInput"/> register. This field is constant.
+        /// Represents the address of the <see cref="DigitalInputState"/> register. This field is constant.
         /// </summary>
         public const int Address = 38;
 
         /// <summary>
-        /// Represents the payload type of the <see cref="DigitalInput"/> register. This field is constant.
+        /// Represents the payload type of the <see cref="DigitalInputState"/> register. This field is constant.
         /// </summary>
         public const PayloadType RegisterType = PayloadType.U8;
 
         /// <summary>
-        /// Represents the length of the <see cref="DigitalInput"/> register. This field is constant.
+        /// Represents the length of the <see cref="DigitalInputState"/> register. This field is constant.
         /// </summary>
         public const int RegisterLength = 1;
 
         /// <summary>
-        /// Returns the payload data for <see cref="DigitalInput"/> register messages.
+        /// Returns the payload data for <see cref="DigitalInputState"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the message payload.</returns>
-        public static DigitalInputState GetPayload(HarpMessage message)
+        public static DigitalInputs GetPayload(HarpMessage message)
         {
-            return (DigitalInputState)message.GetPayloadByte();
+            return (DigitalInputs)message.GetPayloadByte();
         }
 
         /// <summary>
-        /// Returns the timestamped payload data for <see cref="DigitalInput"/> register messages.
+        /// Returns the timestamped payload data for <see cref="DigitalInputState"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DigitalInputState> GetTimestampedPayload(HarpMessage message)
+        public static Timestamped<DigitalInputs> GetTimestampedPayload(HarpMessage message)
         {
             var payload = message.GetTimestampedPayloadByte();
-            return Timestamped.Create((DigitalInputState)payload.Value, payload.Seconds);
+            return Timestamped.Create((DigitalInputs)payload.Value, payload.Seconds);
         }
 
         /// <summary>
-        /// Returns a Harp message for the <see cref="DigitalInput"/> register.
+        /// Returns a Harp message for the <see cref="DigitalInputState"/> register.
         /// </summary>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="DigitalInput"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="DigitalInputState"/> register
         /// with the specified message type and payload.
         /// </returns>
-        public static HarpMessage FromPayload(MessageType messageType, DigitalInputState value)
+        public static HarpMessage FromPayload(MessageType messageType, DigitalInputs value)
         {
             return HarpMessage.FromByte(Address, messageType, (byte)value);
         }
 
         /// <summary>
-        /// Returns a timestamped Harp message for the <see cref="DigitalInput"/>
+        /// Returns a timestamped Harp message for the <see cref="DigitalInputState"/>
         /// register.
         /// </summary>
         /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
         /// <param name="messageType">The type of the Harp message.</param>
         /// <param name="value">The value to be stored in the message payload.</param>
         /// <returns>
-        /// A <see cref="HarpMessage"/> object for the <see cref="DigitalInput"/> register
+        /// A <see cref="HarpMessage"/> object for the <see cref="DigitalInputState"/> register
         /// with the specified message type, timestamp, and payload.
         /// </returns>
-        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DigitalInputState value)
+        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DigitalInputs value)
         {
             return HarpMessage.FromByte(Address, timestamp, messageType, (byte)value);
         }
@@ -919,25 +919,25 @@ namespace Harp.SyringePump
 
     /// <summary>
     /// Provides methods for manipulating timestamped messages from the
-    /// DigitalInput register.
+    /// DigitalInputState register.
     /// </summary>
-    /// <seealso cref="DigitalInput"/>
-    [Description("Filters and selects timestamped messages from the DigitalInput register.")]
-    public partial class TimestampedDigitalInput
+    /// <seealso cref="DigitalInputState"/>
+    [Description("Filters and selects timestamped messages from the DigitalInputState register.")]
+    public partial class TimestampedDigitalInputState
     {
         /// <summary>
-        /// Represents the address of the <see cref="DigitalInput"/> register. This field is constant.
+        /// Represents the address of the <see cref="DigitalInputState"/> register. This field is constant.
         /// </summary>
-        public const int Address = DigitalInput.Address;
+        public const int Address = DigitalInputState.Address;
 
         /// <summary>
-        /// Returns timestamped payload data for <see cref="DigitalInput"/> register messages.
+        /// Returns timestamped payload data for <see cref="DigitalInputState"/> register messages.
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DigitalInputState> GetPayload(HarpMessage message)
+        public static Timestamped<DigitalInputs> GetPayload(HarpMessage message)
         {
-            return DigitalInput.GetTimestampedPayload(message);
+            return DigitalInputState.GetTimestampedPayload(message);
         }
     }
 
@@ -967,9 +967,9 @@ namespace Harp.SyringePump
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the message payload.</returns>
-        public static DigitalOutputState GetPayload(HarpMessage message)
+        public static DigitalOutputs GetPayload(HarpMessage message)
         {
-            return (DigitalOutputState)message.GetPayloadByte();
+            return (DigitalOutputs)message.GetPayloadByte();
         }
 
         /// <summary>
@@ -977,10 +977,10 @@ namespace Harp.SyringePump
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DigitalOutputState> GetTimestampedPayload(HarpMessage message)
+        public static Timestamped<DigitalOutputs> GetTimestampedPayload(HarpMessage message)
         {
             var payload = message.GetTimestampedPayloadByte();
-            return Timestamped.Create((DigitalOutputState)payload.Value, payload.Seconds);
+            return Timestamped.Create((DigitalOutputs)payload.Value, payload.Seconds);
         }
 
         /// <summary>
@@ -992,7 +992,7 @@ namespace Harp.SyringePump
         /// A <see cref="HarpMessage"/> object for the <see cref="DigitalOutputSet"/> register
         /// with the specified message type and payload.
         /// </returns>
-        public static HarpMessage FromPayload(MessageType messageType, DigitalOutputState value)
+        public static HarpMessage FromPayload(MessageType messageType, DigitalOutputs value)
         {
             return HarpMessage.FromByte(Address, messageType, (byte)value);
         }
@@ -1008,7 +1008,7 @@ namespace Harp.SyringePump
         /// A <see cref="HarpMessage"/> object for the <see cref="DigitalOutputSet"/> register
         /// with the specified message type, timestamp, and payload.
         /// </returns>
-        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DigitalOutputState value)
+        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DigitalOutputs value)
         {
             return HarpMessage.FromByte(Address, timestamp, messageType, (byte)value);
         }
@@ -1032,7 +1032,7 @@ namespace Harp.SyringePump
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DigitalOutputState> GetPayload(HarpMessage message)
+        public static Timestamped<DigitalOutputs> GetPayload(HarpMessage message)
         {
             return DigitalOutputSet.GetTimestampedPayload(message);
         }
@@ -1064,9 +1064,9 @@ namespace Harp.SyringePump
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the message payload.</returns>
-        public static DigitalOutputState GetPayload(HarpMessage message)
+        public static DigitalOutputs GetPayload(HarpMessage message)
         {
-            return (DigitalOutputState)message.GetPayloadByte();
+            return (DigitalOutputs)message.GetPayloadByte();
         }
 
         /// <summary>
@@ -1074,10 +1074,10 @@ namespace Harp.SyringePump
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DigitalOutputState> GetTimestampedPayload(HarpMessage message)
+        public static Timestamped<DigitalOutputs> GetTimestampedPayload(HarpMessage message)
         {
             var payload = message.GetTimestampedPayloadByte();
-            return Timestamped.Create((DigitalOutputState)payload.Value, payload.Seconds);
+            return Timestamped.Create((DigitalOutputs)payload.Value, payload.Seconds);
         }
 
         /// <summary>
@@ -1089,7 +1089,7 @@ namespace Harp.SyringePump
         /// A <see cref="HarpMessage"/> object for the <see cref="DigitalOutputClear"/> register
         /// with the specified message type and payload.
         /// </returns>
-        public static HarpMessage FromPayload(MessageType messageType, DigitalOutputState value)
+        public static HarpMessage FromPayload(MessageType messageType, DigitalOutputs value)
         {
             return HarpMessage.FromByte(Address, messageType, (byte)value);
         }
@@ -1105,7 +1105,7 @@ namespace Harp.SyringePump
         /// A <see cref="HarpMessage"/> object for the <see cref="DigitalOutputClear"/> register
         /// with the specified message type, timestamp, and payload.
         /// </returns>
-        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DigitalOutputState value)
+        public static HarpMessage FromPayload(double timestamp, MessageType messageType, DigitalOutputs value)
         {
             return HarpMessage.FromByte(Address, timestamp, messageType, (byte)value);
         }
@@ -1129,7 +1129,7 @@ namespace Harp.SyringePump
         /// </summary>
         /// <param name="message">A <see cref="HarpMessage"/> object representing the register message.</param>
         /// <returns>A value representing the timestamped message payload.</returns>
-        public static Timestamped<DigitalOutputState> GetPayload(HarpMessage message)
+        public static Timestamped<DigitalOutputs> GetPayload(HarpMessage message)
         {
             return DigitalOutputClear.GetTimestampedPayload(message);
         }
@@ -2016,7 +2016,7 @@ namespace Harp.SyringePump
     /// <seealso cref="CreateDirectionPayload"/>
     /// <seealso cref="CreateForwardSwitchPayload"/>
     /// <seealso cref="CreateReverseSwitchPayload"/>
-    /// <seealso cref="CreateDigitalInputPayload"/>
+    /// <seealso cref="CreateDigitalInputStatePayload"/>
     /// <seealso cref="CreateDigitalOutputSetPayload"/>
     /// <seealso cref="CreateDigitalOutputClearPayload"/>
     /// <seealso cref="CreateDO0SyncPayload"/>
@@ -2034,7 +2034,7 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(CreateDirectionPayload))]
     [XmlInclude(typeof(CreateForwardSwitchPayload))]
     [XmlInclude(typeof(CreateReverseSwitchPayload))]
-    [XmlInclude(typeof(CreateDigitalInputPayload))]
+    [XmlInclude(typeof(CreateDigitalInputStatePayload))]
     [XmlInclude(typeof(CreateDigitalOutputSetPayload))]
     [XmlInclude(typeof(CreateDigitalOutputClearPayload))]
     [XmlInclude(typeof(CreateDO0SyncPayload))]
@@ -2352,16 +2352,16 @@ namespace Harp.SyringePump
     /// Represents an operator that creates a sequence of message payloads
     /// that status of the digital input pin.
     /// </summary>
-    [DisplayName("DigitalInputPayload")]
+    [DisplayName("DigitalInputStatePayload")]
     [WorkflowElementCategory(ElementCategory.Transform)]
     [Description("Creates a sequence of message payloads that status of the digital input pin.")]
-    public partial class CreateDigitalInputPayload : HarpCombinator
+    public partial class CreateDigitalInputStatePayload : HarpCombinator
     {
         /// <summary>
         /// Gets or sets the value that status of the digital input pin.
         /// </summary>
         [Description("The value that status of the digital input pin.")]
-        public DigitalInputState Value { get; set; }
+        public DigitalInputs Value { get; set; }
 
         /// <summary>
         /// Creates an observable sequence that contains a single message
@@ -2392,7 +2392,7 @@ namespace Harp.SyringePump
         /// </returns>
         public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
         {
-            return source.Select(_ => DigitalInput.FromPayload(MessageType, Value));
+            return source.Select(_ => DigitalInputState.FromPayload(MessageType, Value));
         }
     }
 
@@ -2409,7 +2409,7 @@ namespace Harp.SyringePump
         /// Gets or sets the value that set the specified digital output lines.
         /// </summary>
         [Description("The value that set the specified digital output lines.")]
-        public DigitalOutputState Value { get; set; }
+        public DigitalOutputs Value { get; set; }
 
         /// <summary>
         /// Creates an observable sequence that contains a single message
@@ -2457,7 +2457,7 @@ namespace Harp.SyringePump
         /// Gets or sets the value that clear the specified digital output lines.
         /// </summary>
         [Description("The value that clear the specified digital output lines.")]
-        public DigitalOutputState Value { get; set; }
+        public DigitalOutputs Value { get; set; }
 
         /// <summary>
         /// Creates an observable sequence that contains a single message
@@ -2932,9 +2932,8 @@ namespace Harp.SyringePump
     /// The digital output lines.
     /// </summary>
     [Flags]
-    public enum DigitalOutputState : byte
+    public enum DigitalOutputs : byte
     {
-        None = 0x0,
         DO0 = 0x1,
         DO1 = 0x2
     }
@@ -2943,9 +2942,8 @@ namespace Harp.SyringePump
     /// The state of the digital input pin.
     /// </summary>
     [Flags]
-    public enum DigitalInputState : byte
+    public enum DigitalInputs : byte
     {
-        None = 0x0,
         DI0 = 0x1
     }
 
