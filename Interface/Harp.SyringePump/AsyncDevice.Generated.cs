@@ -245,29 +245,29 @@ namespace Harp.SyringePump
         }
 
         /// <summary>
-        /// Asynchronously reads the contents of the DigitalInput register.
+        /// Asynchronously reads the contents of the DigitalInputState register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the register payload.
         /// </returns>
-        public async Task<DigitalInputState> ReadDigitalInputAsync()
+        public async Task<DigitalInputs> ReadDigitalInputStateAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(DigitalInput.Address));
-            return DigitalInput.GetPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(DigitalInputState.Address));
+            return DigitalInputState.GetPayload(reply);
         }
 
         /// <summary>
-        /// Asynchronously reads the timestamped contents of the DigitalInput register.
+        /// Asynchronously reads the timestamped contents of the DigitalInputState register.
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the timestamped register payload.
         /// </returns>
-        public async Task<Timestamped<DigitalInputState>> ReadTimestampedDigitalInputAsync()
+        public async Task<Timestamped<DigitalInputs>> ReadTimestampedDigitalInputStateAsync()
         {
-            var reply = await CommandAsync(HarpCommand.ReadByte(DigitalInput.Address));
-            return DigitalInput.GetTimestampedPayload(reply);
+            var reply = await CommandAsync(HarpCommand.ReadByte(DigitalInputState.Address));
+            return DigitalInputState.GetTimestampedPayload(reply);
         }
 
         /// <summary>
@@ -277,7 +277,7 @@ namespace Harp.SyringePump
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the register payload.
         /// </returns>
-        public async Task<DigitalOutputState> ReadDigitalOutputSetAsync()
+        public async Task<DigitalOutputs> ReadDigitalOutputSetAsync()
         {
             var reply = await CommandAsync(HarpCommand.ReadByte(DigitalOutputSet.Address));
             return DigitalOutputSet.GetPayload(reply);
@@ -290,7 +290,7 @@ namespace Harp.SyringePump
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the timestamped register payload.
         /// </returns>
-        public async Task<Timestamped<DigitalOutputState>> ReadTimestampedDigitalOutputSetAsync()
+        public async Task<Timestamped<DigitalOutputs>> ReadTimestampedDigitalOutputSetAsync()
         {
             var reply = await CommandAsync(HarpCommand.ReadByte(DigitalOutputSet.Address));
             return DigitalOutputSet.GetTimestampedPayload(reply);
@@ -301,7 +301,7 @@ namespace Harp.SyringePump
         /// </summary>
         /// <param name="value">The value to be stored in the register.</param>
         /// <returns>The task object representing the asynchronous write operation.</returns>
-        public async Task WriteDigitalOutputSetAsync(DigitalOutputState value)
+        public async Task WriteDigitalOutputSetAsync(DigitalOutputs value)
         {
             var request = DigitalOutputSet.FromPayload(MessageType.Write, value);
             await CommandAsync(request);
@@ -314,7 +314,7 @@ namespace Harp.SyringePump
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the register payload.
         /// </returns>
-        public async Task<DigitalOutputState> ReadDigitalOutputClearAsync()
+        public async Task<DigitalOutputs> ReadDigitalOutputClearAsync()
         {
             var reply = await CommandAsync(HarpCommand.ReadByte(DigitalOutputClear.Address));
             return DigitalOutputClear.GetPayload(reply);
@@ -327,7 +327,7 @@ namespace Harp.SyringePump
         /// A task that represents the asynchronous read operation. The <see cref="Task{TResult}.Result"/>
         /// property contains the timestamped register payload.
         /// </returns>
-        public async Task<Timestamped<DigitalOutputState>> ReadTimestampedDigitalOutputClearAsync()
+        public async Task<Timestamped<DigitalOutputs>> ReadTimestampedDigitalOutputClearAsync()
         {
             var reply = await CommandAsync(HarpCommand.ReadByte(DigitalOutputClear.Address));
             return DigitalOutputClear.GetTimestampedPayload(reply);
@@ -338,7 +338,7 @@ namespace Harp.SyringePump
         /// </summary>
         /// <param name="value">The value to be stored in the register.</param>
         /// <returns>The task object representing the asynchronous write operation.</returns>
-        public async Task WriteDigitalOutputClearAsync(DigitalOutputState value)
+        public async Task WriteDigitalOutputClearAsync(DigitalOutputs value)
         {
             var request = DigitalOutputClear.FromPayload(MessageType.Write, value);
             await CommandAsync(request);

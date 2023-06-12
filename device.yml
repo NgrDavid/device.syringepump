@@ -2,7 +2,7 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/harp-tech/reflex-generator/main/schema/device.json
 device: SyringePump
-whoAmI: 1280
+whoAmI: 1296
 firmwareVersion: "1.0"
 hardwareTargets: "1.0"
 registers:
@@ -39,16 +39,16 @@ registers:
     address: 37
     maskType: ReverseSwitchState
     description: Status of the reverse limit switch.
-  DigitalInput:
+  DigitalInputState:
     <<: *switchreg
     address: 38
-    maskType: DigitalInputState
+    maskType: DigitalInputs
     description: Status of the digital input pin.
   DigitalOutputSet: &output
     address: 39
     type: U8
     access: Write
-    maskType: DigitalOutputState
+    maskType: DigitalOutputs
     description: Set the specified digital output lines.
   DigitalOutputClear:
     <<: *output
@@ -145,16 +145,14 @@ registers:
     maskType: ProtocolDirectionState
     description: Sets the direction of the protocol execution.
 bitMasks:
-  DigitalOutputState:
+  DigitalOutputs:
     description: The digital output lines.
     bits:
-      None: 0x0
       DO0: 0x1
       DO1: 0x2
-  DigitalInputState:
+  DigitalInputs:
     description: The state of the digital input pin.
     bits:
-      None: 0x0
       DI0: 0x1
   PumpEvents:
     description: The events that can be enabled/disabled.
