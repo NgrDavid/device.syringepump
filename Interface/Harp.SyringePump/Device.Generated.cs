@@ -22,7 +22,7 @@ namespace Harp.SyringePump
         /// Represents the unique identity class of the <see cref="SyringePump"/> device.
         /// This field is constant.
         /// </summary>
-        public const int WhoAmI = 1280;
+        public const int WhoAmI = 1296;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Device"/> class.
