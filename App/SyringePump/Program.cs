@@ -1,8 +1,8 @@
-using Avalonia;
+﻿using Avalonia;
 using System;
-using Device.Pump.GUI;
+using SyringePump.Design;
 
-namespace Device.Pump
+namespace SyringePump
 {
     internal class Program
     {

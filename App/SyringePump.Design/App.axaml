@@ -1,16 +1,16 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="using:Device.Pump.GUI"
-             x:Class="Device.Pump.App"
-             Name="Syringe Pump">
+             xmlns:local="using:SyringePump.Design"
+             x:Class="SyringePump.App"
+             Name="SyringePump">
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
 
     <Application.Styles>
         <FluentTheme Mode="Light"/>
-        <StyleInclude Source="avares://Device.Pump.GUI/Views/Icons.axaml" />
-        <StyleInclude Source="avares://Device.Pump.GUI/Views/AccentColors.axaml" />
+        <StyleInclude Source="avares://SyringePump.Design/Views/Icons.axaml" />
+        <StyleInclude Source="avares://SyringePump.Design/Views/AccentColors.axaml" />
         <!-- <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/> -->
         <!-- <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/> -->
     </Application.Styles>

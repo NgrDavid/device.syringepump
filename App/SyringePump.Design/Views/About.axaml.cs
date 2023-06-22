@@ -1,12 +1,12 @@
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
-using Device.Pump.GUI.ViewModels;
+using SyringePump.Design.ViewModels;
 
-namespace Device.Pump.GUI.Views
+namespace SyringePump.Design.Views
 {
-    public class SyringePumpView : ReactiveUserControl<SyringePumpViewModel>
+    public partial class About : ReactiveWindow<AboutViewModel>
     {
-        public SyringePumpView()
+        public About()
         {
             InitializeComponent();
         }
@@ -17,3 +17,4 @@ namespace Device.Pump.GUI.Views
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace Device.Pump.GUI.Models
+﻿namespace SyringePump.Design.Models
 {
     public enum Direction
     {

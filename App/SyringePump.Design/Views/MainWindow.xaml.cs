@@ -3,9 +3,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
-using Device.Pump.GUI.ViewModels;
+using SyringePump.Design.ViewModels;
 
-namespace Device.Pump.GUI.Views
+namespace SyringePump.Design.Views
 {
     public class MainWindow : ReactiveWindow<MainWindowViewModel>
     {

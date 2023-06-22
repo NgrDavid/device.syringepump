@@ -6,7 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using ReactiveUI;
 
-namespace Device.Pump.GUI
+namespace SyringePump.Design
 {
     public class ViewLocator : IDataTemplate
     {

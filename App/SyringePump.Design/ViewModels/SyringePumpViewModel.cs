@@ -15,8 +15,8 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Themes.Fluent;
 using Bonsai.Harp;
-using Device.Pump.GUI.Models;
-using Device.Pump.GUI.Views;
+using SyringePump.Design.Models;
+using SyringePump.Design.Views;
 using MessageBox.Avalonia.Enums;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -27,7 +27,7 @@ using OperatingSystem = System.OperatingSystem;
 
 #endregion
 
-namespace Device.Pump.GUI.ViewModels
+namespace SyringePump.Design.ViewModels
 {
     public class SyringePumpViewModel : ReactiveValidationObject
     {

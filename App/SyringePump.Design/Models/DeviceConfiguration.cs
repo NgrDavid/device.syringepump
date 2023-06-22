@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using Bonsai.Harp;
 
-namespace Device.Pump.GUI.Models
+namespace SyringePump.Design.Models
 {
     public class DeviceConfiguration
     {
