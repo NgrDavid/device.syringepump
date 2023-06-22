@@ -30,12 +30,12 @@ void hwbp_app_initialize(void)
     uint8_t hwH = 1;
     uint8_t hwL = 1;
     uint8_t fwH = 0;
-    uint8_t fwL = 5;
+    uint8_t fwL = 6;
     uint8_t ass = 0;
     
    	/* Start core */
     core_func_start_core(
-        1280,
+        1296,
         hwH, hwL,
         fwH, fwL,
         ass,
