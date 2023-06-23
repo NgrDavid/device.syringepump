@@ -381,7 +381,8 @@ namespace SyringePump.Design.ViewModels
                 Log.Information("Connection established with the following return information: {Info}", configuration);
 
                 // present messagebox if we are not handling a Pump device
-                if (configuration.WhoAmI != 1280)
+                // NOTE: this is temporary and in the next version we will remove support for the older ID (1280)
+                if (configuration.WhoAmI != 1296 && configuration.WhoAmI != 1280)
                 {
                     // when the configuration.WhoAmI is zero, we are dealing with a non-HARP device, so change message accordingly
                     var message = $"Found a HARP device: {configuration.DeviceName} ({configuration.WhoAmI}).\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.";

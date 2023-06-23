@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
     <Nullable>enable</Nullable>
     <UseAppHost>true</UseAppHost>
       <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
@@ -9,7 +10,7 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AssemblyName>SyringePump</AssemblyName>
     <BaseOutputPath>..\bin</BaseOutputPath>
-    <Version>1.0</Version>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   <PropertyGroup>
     <CFBundleName>SyringePump</CFBundleName>
