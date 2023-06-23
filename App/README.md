@@ -4,13 +4,13 @@ This repository folder contains the Syringe Pump GUI (henceforth GUI) applicatio
 
 The Syringe Pump device is a Harp device and has all the inherent functionality of Harp devices.
 
-The GUI was developed using [.NET 5](https://dotnet.microsoft.com/), [Avalonia](https://avaloniaui.net/) with ReactiveUI and makes direct use of the [Bonsai.Harp](https://github.com/bonsai-rx/harp) library.
+The GUI was developed using [.NET 6](https://dotnet.microsoft.com/), [Avalonia](https://avaloniaui.net/) with ReactiveUI and makes direct use of the [Bonsai.Harp](https://github.com/bonsai-rx/harp) library.
 
 As with other Harp devices, the Syringe Pump can also be used in [Bonsai](bonsai-rx.org/) using the [Bonsai.Harp.CF](https://github.com/bonsai-rx/harp.cf) package. 
 
 ## Installation
 
-Go to the [Downloads](https://bitbucket.org/fchampalimaud/device.pump/downloads/) page to download the latest version for your Operating System.
+Go to the Releases page to download the latest version for your Operating System.
 
 Currently there are x64 builds for Windows and Linux. Mac builds will be available in the future.
 
@@ -25,10 +25,6 @@ There might be other alternatives to this, but at least on Ubuntu and Fedora que
 ```sh
 sudo usermod -a -G dialout <USERNAME>
 ```
-
-## Usage
-
-Usage information is available in the [Wiki](https://bitbucket.org/fchampalimaud/device.pump/wiki/Home).
 
 ## For developers
 
@@ -56,9 +52,28 @@ dotnet restore -r osx-x64 -p:TargetFramework=net6.0
 dotnet msbuild -t:BundleApp -p:RuntimeIdentifier=osx-x64 -property:Configuration=Release -p:UseAppHost=true -p:TargetFramework=net6.0
 ```
 
+### Build tar.gz package for Linux (either in Linux or WSL)
+
+To build the tar.gz package, run the following commands on the solution folder:
+
+First you need to make sure that the [`dotnet-packaging`](https://github.com/quamotion/dotnet-packaging) tool is installed
+
+Run the following commands to install the tool:
+
+```sh
+dotnet tool install --global dotnet-tarball
+```
+
+Then run the following commands to build the tar.gz package:
+
+```sh
+dotnet restore -r linux-x64 -p:TargetFramework=net6.0
+dotnet msbuild -p:RuntimeIdentifier=linux-x64 -property:Configuration=Release -p:UseAppHost=true -p:TargetFramework=net6.0 /t:CreateTarball
+```
+
 ## Roadmap
 
-See the [open issues](https://bitbucket.org/fchampalimaud/device.pump/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/harp-tech/device.syringepump/issues) for a list of proposed features (and known issues).
 
 ## Contributing
 
@@ -72,7 +87,7 @@ Contributions are what make the open source community such an amazing place to b
 
 ## Authors
 
-Scientific Hardware Platform and Scientific Software Platform of the Champalimaud Foundation.
+Hardware & Software Platform of the Champalimaud Foundation.
 
 ### Main contributors
 
