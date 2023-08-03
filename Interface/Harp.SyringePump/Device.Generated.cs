@@ -120,12 +120,12 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(Protocol))]
     [XmlInclude(typeof(ProtocolDirection))]
     [Description("Filters register-specific messages reported by the SyringePump device.")]
-    public class FilterMessage : FilterMessageBuilder, INamedElement
+    public class FilterRegister : FilterRegisterBuilder, INamedElement
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterMessage"/> class.
+        /// Initializes a new instance of the <see cref="FilterRegister"/> class.
         /// </summary>
-        public FilterMessage()
+        public FilterRegister()
         {
             Register = new EnableMotorDriver();
         }
@@ -2046,6 +2046,24 @@ namespace Harp.SyringePump
     [XmlInclude(typeof(CreateEnableEventsPayload))]
     [XmlInclude(typeof(CreateProtocolPayload))]
     [XmlInclude(typeof(CreateProtocolDirectionPayload))]
+    [XmlInclude(typeof(CreateTimestampedEnableMotorDriverPayload))]
+    [XmlInclude(typeof(CreateTimestampedEnableProtocolPayload))]
+    [XmlInclude(typeof(CreateTimestampedStepPayload))]
+    [XmlInclude(typeof(CreateTimestampedDirectionPayload))]
+    [XmlInclude(typeof(CreateTimestampedForwardSwitchPayload))]
+    [XmlInclude(typeof(CreateTimestampedReverseSwitchPayload))]
+    [XmlInclude(typeof(CreateTimestampedDigitalInputStatePayload))]
+    [XmlInclude(typeof(CreateTimestampedDigitalOutputSetPayload))]
+    [XmlInclude(typeof(CreateTimestampedDigitalOutputClearPayload))]
+    [XmlInclude(typeof(CreateTimestampedDO0SyncPayload))]
+    [XmlInclude(typeof(CreateTimestampedDO1SyncPayload))]
+    [XmlInclude(typeof(CreateTimestampedDI0TriggerPayload))]
+    [XmlInclude(typeof(CreateTimestampedStepModePayload))]
+    [XmlInclude(typeof(CreateTimestampedProtocolStepCountPayload))]
+    [XmlInclude(typeof(CreateTimestampedProtocolPeriodPayload))]
+    [XmlInclude(typeof(CreateTimestampedEnableEventsPayload))]
+    [XmlInclude(typeof(CreateTimestampedProtocolPayload))]
+    [XmlInclude(typeof(CreateTimestampedProtocolDirectionPayload))]
     [Description("Creates standard message payloads for the SyringePump device.")]
     public partial class CreateMessage : CreateMessageBuilder, INamedElement
     {
@@ -2061,637 +2079,714 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a message payload
     /// that enables the motor driver.
     /// </summary>
     [DisplayName("EnableMotorDriverPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that enables the motor driver.")]
-    public partial class CreateEnableMotorDriverPayload : HarpCombinator
+    [Description("Creates a message payload that enables the motor driver.")]
+    public partial class CreateEnableMotorDriverPayload
     {
         /// <summary>
         /// Gets or sets the value that enables the motor driver.
         /// </summary>
         [Description("The value that enables the motor driver.")]
-        public EnableFlag Value { get; set; }
+        public EnableFlag EnableMotorDriver { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that enables the motor driver.
+        /// Creates a message payload for the EnableMotorDriver register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public EnableFlag GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return EnableMotorDriver;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that enables the motor driver.
+        /// Creates a message that enables the motor driver.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the EnableMotorDriver register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => EnableMotorDriver.FromPayload(MessageType, Value));
+            return Harp.SyringePump.EnableMotorDriver.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that enables the motor driver.
+    /// </summary>
+    [DisplayName("TimestampedEnableMotorDriverPayload")]
+    [Description("Creates a timestamped message payload that enables the motor driver.")]
+    public partial class CreateTimestampedEnableMotorDriverPayload : CreateEnableMotorDriverPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that enables the motor driver.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the EnableMotorDriver register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.EnableMotorDriver.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that enables the currently defined protocol.
     /// </summary>
     [DisplayName("EnableProtocolPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that enables the currently defined protocol.")]
-    public partial class CreateEnableProtocolPayload : HarpCombinator
+    [Description("Creates a message payload that enables the currently defined protocol.")]
+    public partial class CreateEnableProtocolPayload
     {
         /// <summary>
         /// Gets or sets the value that enables the currently defined protocol.
         /// </summary>
         [Description("The value that enables the currently defined protocol.")]
-        public EnableFlag Value { get; set; }
+        public EnableFlag EnableProtocol { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that enables the currently defined protocol.
+        /// Creates a message payload for the EnableProtocol register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public EnableFlag GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return EnableProtocol;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that enables the currently defined protocol.
+        /// Creates a message that enables the currently defined protocol.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the EnableProtocol register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => EnableProtocol.FromPayload(MessageType, Value));
+            return Harp.SyringePump.EnableProtocol.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that enables the currently defined protocol.
+    /// </summary>
+    [DisplayName("TimestampedEnableProtocolPayload")]
+    [Description("Creates a timestamped message payload that enables the currently defined protocol.")]
+    public partial class CreateTimestampedEnableProtocolPayload : CreateEnableProtocolPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that enables the currently defined protocol.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the EnableProtocol register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.EnableProtocol.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that status of the STEP motor controller pin.
     /// </summary>
     [DisplayName("StepPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that status of the STEP motor controller pin.")]
-    public partial class CreateStepPayload : HarpCombinator
+    [Description("Creates a message payload that status of the STEP motor controller pin.")]
+    public partial class CreateStepPayload
     {
         /// <summary>
         /// Gets or sets the value that status of the STEP motor controller pin.
         /// </summary>
         [Description("The value that status of the STEP motor controller pin.")]
-        public StepState Value { get; set; }
+        public StepState Step { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that status of the STEP motor controller pin.
+        /// Creates a message payload for the Step register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public StepState GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return Step;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that status of the STEP motor controller pin.
+        /// Creates a message that status of the STEP motor controller pin.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the Step register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => Step.FromPayload(MessageType, Value));
+            return Harp.SyringePump.Step.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that status of the STEP motor controller pin.
+    /// </summary>
+    [DisplayName("TimestampedStepPayload")]
+    [Description("Creates a timestamped message payload that status of the STEP motor controller pin.")]
+    public partial class CreateTimestampedStepPayload : CreateStepPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that status of the STEP motor controller pin.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the Step register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.Step.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that status of the DIR motor controller pin.
     /// </summary>
     [DisplayName("DirectionPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that status of the DIR motor controller pin.")]
-    public partial class CreateDirectionPayload : HarpCombinator
+    [Description("Creates a message payload that status of the DIR motor controller pin.")]
+    public partial class CreateDirectionPayload
     {
         /// <summary>
         /// Gets or sets the value that status of the DIR motor controller pin.
         /// </summary>
         [Description("The value that status of the DIR motor controller pin.")]
-        public DirectionState Value { get; set; }
+        public DirectionState Direction { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that status of the DIR motor controller pin.
+        /// Creates a message payload for the Direction register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public DirectionState GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return Direction;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that status of the DIR motor controller pin.
+        /// Creates a message that status of the DIR motor controller pin.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the Direction register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => Direction.FromPayload(MessageType, Value));
+            return Harp.SyringePump.Direction.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that status of the DIR motor controller pin.
+    /// </summary>
+    [DisplayName("TimestampedDirectionPayload")]
+    [Description("Creates a timestamped message payload that status of the DIR motor controller pin.")]
+    public partial class CreateTimestampedDirectionPayload : CreateDirectionPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that status of the DIR motor controller pin.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the Direction register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.Direction.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that status of the forward limit switch.
     /// </summary>
     [DisplayName("ForwardSwitchPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that status of the forward limit switch.")]
-    public partial class CreateForwardSwitchPayload : HarpCombinator
+    [Description("Creates a message payload that status of the forward limit switch.")]
+    public partial class CreateForwardSwitchPayload
     {
         /// <summary>
         /// Gets or sets the value that status of the forward limit switch.
         /// </summary>
         [Description("The value that status of the forward limit switch.")]
-        public ForwardSwitchState Value { get; set; }
+        public ForwardSwitchState ForwardSwitch { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that status of the forward limit switch.
+        /// Creates a message payload for the ForwardSwitch register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public ForwardSwitchState GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return ForwardSwitch;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that status of the forward limit switch.
+        /// Creates a message that status of the forward limit switch.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the ForwardSwitch register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => ForwardSwitch.FromPayload(MessageType, Value));
+            return Harp.SyringePump.ForwardSwitch.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that status of the forward limit switch.
+    /// </summary>
+    [DisplayName("TimestampedForwardSwitchPayload")]
+    [Description("Creates a timestamped message payload that status of the forward limit switch.")]
+    public partial class CreateTimestampedForwardSwitchPayload : CreateForwardSwitchPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that status of the forward limit switch.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the ForwardSwitch register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.ForwardSwitch.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that status of the reverse limit switch.
     /// </summary>
     [DisplayName("ReverseSwitchPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that status of the reverse limit switch.")]
-    public partial class CreateReverseSwitchPayload : HarpCombinator
+    [Description("Creates a message payload that status of the reverse limit switch.")]
+    public partial class CreateReverseSwitchPayload
     {
         /// <summary>
         /// Gets or sets the value that status of the reverse limit switch.
         /// </summary>
         [Description("The value that status of the reverse limit switch.")]
-        public ReverseSwitchState Value { get; set; }
+        public ReverseSwitchState ReverseSwitch { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that status of the reverse limit switch.
+        /// Creates a message payload for the ReverseSwitch register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public ReverseSwitchState GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return ReverseSwitch;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that status of the reverse limit switch.
+        /// Creates a message that status of the reverse limit switch.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the ReverseSwitch register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => ReverseSwitch.FromPayload(MessageType, Value));
+            return Harp.SyringePump.ReverseSwitch.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that status of the reverse limit switch.
+    /// </summary>
+    [DisplayName("TimestampedReverseSwitchPayload")]
+    [Description("Creates a timestamped message payload that status of the reverse limit switch.")]
+    public partial class CreateTimestampedReverseSwitchPayload : CreateReverseSwitchPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that status of the reverse limit switch.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the ReverseSwitch register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.ReverseSwitch.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that status of the digital input pin.
     /// </summary>
     [DisplayName("DigitalInputStatePayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that status of the digital input pin.")]
-    public partial class CreateDigitalInputStatePayload : HarpCombinator
+    [Description("Creates a message payload that status of the digital input pin.")]
+    public partial class CreateDigitalInputStatePayload
     {
         /// <summary>
         /// Gets or sets the value that status of the digital input pin.
         /// </summary>
         [Description("The value that status of the digital input pin.")]
-        public DigitalInputs Value { get; set; }
+        public DigitalInputs DigitalInputState { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that status of the digital input pin.
+        /// Creates a message payload for the DigitalInputState register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public DigitalInputs GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return DigitalInputState;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that status of the digital input pin.
+        /// Creates a message that status of the digital input pin.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the DigitalInputState register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => DigitalInputState.FromPayload(MessageType, Value));
+            return Harp.SyringePump.DigitalInputState.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that status of the digital input pin.
+    /// </summary>
+    [DisplayName("TimestampedDigitalInputStatePayload")]
+    [Description("Creates a timestamped message payload that status of the digital input pin.")]
+    public partial class CreateTimestampedDigitalInputStatePayload : CreateDigitalInputStatePayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that status of the digital input pin.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the DigitalInputState register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.DigitalInputState.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that set the specified digital output lines.
     /// </summary>
     [DisplayName("DigitalOutputSetPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that set the specified digital output lines.")]
-    public partial class CreateDigitalOutputSetPayload : HarpCombinator
+    [Description("Creates a message payload that set the specified digital output lines.")]
+    public partial class CreateDigitalOutputSetPayload
     {
         /// <summary>
         /// Gets or sets the value that set the specified digital output lines.
         /// </summary>
         [Description("The value that set the specified digital output lines.")]
-        public DigitalOutputs Value { get; set; }
+        public DigitalOutputs DigitalOutputSet { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that set the specified digital output lines.
+        /// Creates a message payload for the DigitalOutputSet register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public DigitalOutputs GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return DigitalOutputSet;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that set the specified digital output lines.
+        /// Creates a message that set the specified digital output lines.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the DigitalOutputSet register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => DigitalOutputSet.FromPayload(MessageType, Value));
+            return Harp.SyringePump.DigitalOutputSet.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that set the specified digital output lines.
+    /// </summary>
+    [DisplayName("TimestampedDigitalOutputSetPayload")]
+    [Description("Creates a timestamped message payload that set the specified digital output lines.")]
+    public partial class CreateTimestampedDigitalOutputSetPayload : CreateDigitalOutputSetPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that set the specified digital output lines.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the DigitalOutputSet register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.DigitalOutputSet.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that clear the specified digital output lines.
     /// </summary>
     [DisplayName("DigitalOutputClearPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that clear the specified digital output lines.")]
-    public partial class CreateDigitalOutputClearPayload : HarpCombinator
+    [Description("Creates a message payload that clear the specified digital output lines.")]
+    public partial class CreateDigitalOutputClearPayload
     {
         /// <summary>
         /// Gets or sets the value that clear the specified digital output lines.
         /// </summary>
         [Description("The value that clear the specified digital output lines.")]
-        public DigitalOutputs Value { get; set; }
+        public DigitalOutputs DigitalOutputClear { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that clear the specified digital output lines.
+        /// Creates a message payload for the DigitalOutputClear register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public DigitalOutputs GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return DigitalOutputClear;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that clear the specified digital output lines.
+        /// Creates a message that clear the specified digital output lines.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the DigitalOutputClear register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => DigitalOutputClear.FromPayload(MessageType, Value));
+            return Harp.SyringePump.DigitalOutputClear.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that clear the specified digital output lines.
+    /// </summary>
+    [DisplayName("TimestampedDigitalOutputClearPayload")]
+    [Description("Creates a timestamped message payload that clear the specified digital output lines.")]
+    public partial class CreateTimestampedDigitalOutputClearPayload : CreateDigitalOutputClearPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that clear the specified digital output lines.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the DigitalOutputClear register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.DigitalOutputClear.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that configures which signal is mimicked in the digital output 0.
     /// </summary>
     [DisplayName("DO0SyncPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that configures which signal is mimicked in the digital output 0.")]
-    public partial class CreateDO0SyncPayload : HarpCombinator
+    [Description("Creates a message payload that configures which signal is mimicked in the digital output 0.")]
+    public partial class CreateDO0SyncPayload
     {
         /// <summary>
         /// Gets or sets the value that configures which signal is mimicked in the digital output 0.
         /// </summary>
         [Description("The value that configures which signal is mimicked in the digital output 0.")]
-        public DO0SyncConfig Value { get; set; }
+        public DO0SyncConfig DO0Sync { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that configures which signal is mimicked in the digital output 0.
+        /// Creates a message payload for the DO0Sync register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public DO0SyncConfig GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return DO0Sync;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that configures which signal is mimicked in the digital output 0.
+        /// Creates a message that configures which signal is mimicked in the digital output 0.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the DO0Sync register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => DO0Sync.FromPayload(MessageType, Value));
+            return Harp.SyringePump.DO0Sync.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that configures which signal is mimicked in the digital output 0.
+    /// </summary>
+    [DisplayName("TimestampedDO0SyncPayload")]
+    [Description("Creates a timestamped message payload that configures which signal is mimicked in the digital output 0.")]
+    public partial class CreateTimestampedDO0SyncPayload : CreateDO0SyncPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that configures which signal is mimicked in the digital output 0.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the DO0Sync register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.DO0Sync.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that configures which signal is mimicked in the digital output 1.
     /// </summary>
     [DisplayName("DO1SyncPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that configures which signal is mimicked in the digital output 1.")]
-    public partial class CreateDO1SyncPayload : HarpCombinator
+    [Description("Creates a message payload that configures which signal is mimicked in the digital output 1.")]
+    public partial class CreateDO1SyncPayload
     {
         /// <summary>
         /// Gets or sets the value that configures which signal is mimicked in the digital output 1.
         /// </summary>
         [Description("The value that configures which signal is mimicked in the digital output 1.")]
-        public DO1SyncConfig Value { get; set; }
+        public DO1SyncConfig DO1Sync { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that configures which signal is mimicked in the digital output 1.
+        /// Creates a message payload for the DO1Sync register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public DO1SyncConfig GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return DO1Sync;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that configures which signal is mimicked in the digital output 1.
+        /// Creates a message that configures which signal is mimicked in the digital output 1.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the DO1Sync register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => DO1Sync.FromPayload(MessageType, Value));
+            return Harp.SyringePump.DO1Sync.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that configures which signal is mimicked in the digital output 1.
+    /// </summary>
+    [DisplayName("TimestampedDO1SyncPayload")]
+    [Description("Creates a timestamped message payload that configures which signal is mimicked in the digital output 1.")]
+    public partial class CreateTimestampedDO1SyncPayload : CreateDO1SyncPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that configures which signal is mimicked in the digital output 1.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the DO1Sync register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.DO1Sync.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that configures the callback function triggered when digital input is triggered.
     /// </summary>
     [DisplayName("DI0TriggerPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that configures the callback function triggered when digital input is triggered.")]
-    public partial class CreateDI0TriggerPayload : HarpCombinator
+    [Description("Creates a message payload that configures the callback function triggered when digital input is triggered.")]
+    public partial class CreateDI0TriggerPayload
     {
         /// <summary>
         /// Gets or sets the value that configures the callback function triggered when digital input is triggered.
         /// </summary>
         [Description("The value that configures the callback function triggered when digital input is triggered.")]
-        public DI0TriggerConfig Value { get; set; }
+        public DI0TriggerConfig DI0Trigger { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that configures the callback function triggered when digital input is triggered.
+        /// Creates a message payload for the DI0Trigger register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public DI0TriggerConfig GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return DI0Trigger;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that configures the callback function triggered when digital input is triggered.
+        /// Creates a message that configures the callback function triggered when digital input is triggered.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the DI0Trigger register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => DI0Trigger.FromPayload(MessageType, Value));
+            return Harp.SyringePump.DI0Trigger.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that configures the callback function triggered when digital input is triggered.
+    /// </summary>
+    [DisplayName("TimestampedDI0TriggerPayload")]
+    [Description("Creates a timestamped message payload that configures the callback function triggered when digital input is triggered.")]
+    public partial class CreateTimestampedDI0TriggerPayload : CreateDI0TriggerPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that configures the callback function triggered when digital input is triggered.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the DI0Trigger register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.DI0Trigger.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that sets the motor step mode from a list of available types.
     /// </summary>
     [DisplayName("StepModePayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that sets the motor step mode from a list of available types.")]
-    public partial class CreateStepModePayload : HarpCombinator
+    [Description("Creates a message payload that sets the motor step mode from a list of available types.")]
+    public partial class CreateStepModePayload
     {
         /// <summary>
         /// Gets or sets the value that sets the motor step mode from a list of available types.
         /// </summary>
         [Description("The value that sets the motor step mode from a list of available types.")]
-        public StepModeType Value { get; set; }
+        public StepModeType StepMode { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that sets the motor step mode from a list of available types.
+        /// Creates a message payload for the StepMode register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public StepModeType GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return StepMode;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that sets the motor step mode from a list of available types.
+        /// Creates a message that sets the motor step mode from a list of available types.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the StepMode register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => StepMode.FromPayload(MessageType, Value));
+            return Harp.SyringePump.StepMode.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that sets the motor step mode from a list of available types.
+    /// </summary>
+    [DisplayName("TimestampedStepModePayload")]
+    [Description("Creates a timestamped message payload that sets the motor step mode from a list of available types.")]
+    public partial class CreateTimestampedStepModePayload : CreateStepModePayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that sets the motor step mode from a list of available types.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the StepMode register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.StepMode.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that sets the number of steps to be executed in the current protocol.
     /// </summary>
     [DisplayName("ProtocolStepCountPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that sets the number of steps to be executed in the current protocol.")]
-    public partial class CreateProtocolStepCountPayload : HarpCombinator
+    [Description("Creates a message payload that sets the number of steps to be executed in the current protocol.")]
+    public partial class CreateProtocolStepCountPayload
     {
         /// <summary>
         /// Gets or sets the value that sets the number of steps to be executed in the current protocol.
@@ -2699,49 +2794,55 @@ namespace Harp.SyringePump
         [Range(min: 1, max: long.MaxValue)]
         [Editor(DesignTypes.NumericUpDownEditor, DesignTypes.UITypeEditor)]
         [Description("The value that sets the number of steps to be executed in the current protocol.")]
-        public ushort Value { get; set; } = 1;
+        public ushort ProtocolStepCount { get; set; } = 1;
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that sets the number of steps to be executed in the current protocol.
+        /// Creates a message payload for the ProtocolStepCount register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public ushort GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return ProtocolStepCount;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that sets the number of steps to be executed in the current protocol.
+        /// Creates a message that sets the number of steps to be executed in the current protocol.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the ProtocolStepCount register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => ProtocolStepCount.FromPayload(MessageType, Value));
+            return Harp.SyringePump.ProtocolStepCount.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that sets the number of steps to be executed in the current protocol.
+    /// </summary>
+    [DisplayName("TimestampedProtocolStepCountPayload")]
+    [Description("Creates a timestamped message payload that sets the number of steps to be executed in the current protocol.")]
+    public partial class CreateTimestampedProtocolStepCountPayload : CreateProtocolStepCountPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that sets the number of steps to be executed in the current protocol.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the ProtocolStepCount register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.ProtocolStepCount.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that sets the period, in ms, of of each step in the protocol.
     /// </summary>
     [DisplayName("ProtocolPeriodPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that sets the period, in ms, of of each step in the protocol.")]
-    public partial class CreateProtocolPeriodPayload : HarpCombinator
+    [Description("Creates a message payload that sets the period, in ms, of of each step in the protocol.")]
+    public partial class CreateProtocolPeriodPayload
     {
         /// <summary>
         /// Gets or sets the value that sets the period, in ms, of of each step in the protocol.
@@ -2749,182 +2850,207 @@ namespace Harp.SyringePump
         [Range(min: 1, max: long.MaxValue)]
         [Editor(DesignTypes.NumericUpDownEditor, DesignTypes.UITypeEditor)]
         [Description("The value that sets the period, in ms, of of each step in the protocol.")]
-        public ushort Value { get; set; } = 1;
+        public ushort ProtocolPeriod { get; set; } = 1;
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that sets the period, in ms, of of each step in the protocol.
+        /// Creates a message payload for the ProtocolPeriod register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public ushort GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return ProtocolPeriod;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that sets the period, in ms, of of each step in the protocol.
+        /// Creates a message that sets the period, in ms, of of each step in the protocol.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the ProtocolPeriod register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => ProtocolPeriod.FromPayload(MessageType, Value));
+            return Harp.SyringePump.ProtocolPeriod.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that sets the period, in ms, of of each step in the protocol.
+    /// </summary>
+    [DisplayName("TimestampedProtocolPeriodPayload")]
+    [Description("Creates a timestamped message payload that sets the period, in ms, of of each step in the protocol.")]
+    public partial class CreateTimestampedProtocolPeriodPayload : CreateProtocolPeriodPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that sets the period, in ms, of of each step in the protocol.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the ProtocolPeriod register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.ProtocolPeriod.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that specifies all the active events in the device.
     /// </summary>
     [DisplayName("EnableEventsPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that specifies all the active events in the device.")]
-    public partial class CreateEnableEventsPayload : HarpCombinator
+    [Description("Creates a message payload that specifies all the active events in the device.")]
+    public partial class CreateEnableEventsPayload
     {
         /// <summary>
         /// Gets or sets the value that specifies all the active events in the device.
         /// </summary>
         [Description("The value that specifies all the active events in the device.")]
-        public PumpEvents Value { get; set; }
+        public PumpEvents EnableEvents { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that specifies all the active events in the device.
+        /// Creates a message payload for the EnableEvents register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public PumpEvents GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return EnableEvents;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that specifies all the active events in the device.
+        /// Creates a message that specifies all the active events in the device.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the EnableEvents register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => EnableEvents.FromPayload(MessageType, Value));
+            return Harp.SyringePump.EnableEvents.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that specifies all the active events in the device.
+    /// </summary>
+    [DisplayName("TimestampedEnableEventsPayload")]
+    [Description("Creates a timestamped message payload that specifies all the active events in the device.")]
+    public partial class CreateTimestampedEnableEventsPayload : CreateEnableEventsPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that specifies all the active events in the device.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the EnableEvents register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.EnableEvents.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that status of the protocol execution.
     /// </summary>
     [DisplayName("ProtocolPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that status of the protocol execution.")]
-    public partial class CreateProtocolPayload : HarpCombinator
+    [Description("Creates a message payload that status of the protocol execution.")]
+    public partial class CreateProtocolPayload
     {
         /// <summary>
         /// Gets or sets the value that status of the protocol execution.
         /// </summary>
         [Description("The value that status of the protocol execution.")]
-        public ProtocolState Value { get; set; }
+        public ProtocolState Protocol { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that status of the protocol execution.
+        /// Creates a message payload for the Protocol register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public ProtocolState GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return Protocol;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that status of the protocol execution.
+        /// Creates a message that status of the protocol execution.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the Protocol register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => Protocol.FromPayload(MessageType, Value));
+            return Harp.SyringePump.Protocol.FromPayload(messageType, GetPayload());
         }
     }
 
     /// <summary>
-    /// Represents an operator that creates a sequence of message payloads
+    /// Represents an operator that creates a timestamped message payload
+    /// that status of the protocol execution.
+    /// </summary>
+    [DisplayName("TimestampedProtocolPayload")]
+    [Description("Creates a timestamped message payload that status of the protocol execution.")]
+    public partial class CreateTimestampedProtocolPayload : CreateProtocolPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that status of the protocol execution.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the Protocol register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.Protocol.FromPayload(timestamp, messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a message payload
     /// that sets the direction of the protocol execution.
     /// </summary>
     [DisplayName("ProtocolDirectionPayload")]
-    [WorkflowElementCategory(ElementCategory.Transform)]
-    [Description("Creates a sequence of message payloads that sets the direction of the protocol execution.")]
-    public partial class CreateProtocolDirectionPayload : HarpCombinator
+    [Description("Creates a message payload that sets the direction of the protocol execution.")]
+    public partial class CreateProtocolDirectionPayload
     {
         /// <summary>
         /// Gets or sets the value that sets the direction of the protocol execution.
         /// </summary>
         [Description("The value that sets the direction of the protocol execution.")]
-        public ProtocolDirectionState Value { get; set; }
+        public ProtocolDirectionState ProtocolDirection { get; set; }
 
         /// <summary>
-        /// Creates an observable sequence that contains a single message
-        /// that sets the direction of the protocol execution.
+        /// Creates a message payload for the ProtocolDirection register.
         /// </summary>
-        /// <returns>
-        /// A sequence containing a single <see cref="HarpMessage"/> object
-        /// representing the created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process()
+        /// <returns>The created message payload value.</returns>
+        public ProtocolDirectionState GetPayload()
         {
-            return Process(Observable.Return(System.Reactive.Unit.Default));
+            return ProtocolDirection;
         }
 
         /// <summary>
-        /// Creates an observable sequence of message payloads
-        /// that sets the direction of the protocol execution.
+        /// Creates a message that sets the direction of the protocol execution.
         /// </summary>
-        /// <typeparam name="TSource">
-        /// The type of the elements in the <paramref name="source"/> sequence.
-        /// </typeparam>
-        /// <param name="source">
-        /// The sequence containing the notifications used for emitting message payloads.
-        /// </param>
-        /// <returns>
-        /// A sequence of <see cref="HarpMessage"/> objects representing each
-        /// created message payload.
-        /// </returns>
-        public IObservable<HarpMessage> Process<TSource>(IObservable<TSource> source)
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new message for the ProtocolDirection register.</returns>
+        public HarpMessage GetMessage(MessageType messageType)
         {
-            return source.Select(_ => ProtocolDirection.FromPayload(MessageType, Value));
+            return Harp.SyringePump.ProtocolDirection.FromPayload(messageType, GetPayload());
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that creates a timestamped message payload
+    /// that sets the direction of the protocol execution.
+    /// </summary>
+    [DisplayName("TimestampedProtocolDirectionPayload")]
+    [Description("Creates a timestamped message payload that sets the direction of the protocol execution.")]
+    public partial class CreateTimestampedProtocolDirectionPayload : CreateProtocolDirectionPayload
+    {
+        /// <summary>
+        /// Creates a timestamped message that sets the direction of the protocol execution.
+        /// </summary>
+        /// <param name="timestamp">The timestamp of the message payload, in seconds.</param>
+        /// <param name="messageType">Specifies the type of the created message.</param>
+        /// <returns>A new timestamped message for the ProtocolDirection register.</returns>
+        public HarpMessage GetMessage(double timestamp, MessageType messageType)
+        {
+            return Harp.SyringePump.ProtocolDirection.FromPayload(timestamp, messageType, GetPayload());
         }
     }
 
@@ -2934,6 +3060,7 @@ namespace Harp.SyringePump
     [Flags]
     public enum DigitalOutputs : byte
     {
+        None = 0x0,
         DO0 = 0x1,
         DO1 = 0x2
     }
@@ -2944,6 +3071,7 @@ namespace Harp.SyringePump
     [Flags]
     public enum DigitalInputs : byte
     {
+        None = 0x0,
         DI0 = 0x1
     }
 
@@ -2953,6 +3081,7 @@ namespace Harp.SyringePump
     [Flags]
     public enum PumpEvents : byte
     {
+        None = 0x0,
         Step = 0x1,
         Direction = 0x2,
         ForwardSwitch = 0x4,
