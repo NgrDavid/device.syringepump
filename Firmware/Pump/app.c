@@ -338,7 +338,7 @@ void core_callback_t_before_exec(void)
 		if(step_period_counter == STEP_UPTIME_HALF_MILLISECONDS)
 			clear_step();
 			
-		if(step_period_counter == prot_step_period)
+		if(step_period_counter >= prot_step_period)
 		{
 			step_period_counter = 0;
 			// make step if there are still steps remaining in the current running protocol
