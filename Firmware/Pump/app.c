@@ -29,8 +29,8 @@ void hwbp_app_initialize(void)
     /* Define versions */
     uint8_t hwH = 1;
     uint8_t hwL = 1;
-    uint8_t fwH = 0;
-    uint8_t fwL = 6;
+    uint8_t fwH = 1;
+    uint8_t fwL = 0;
     uint8_t ass = 0;
     
    	/* Start core */
@@ -42,7 +42,10 @@ void hwbp_app_initialize(void)
         (uint8_t*)(&app_regs),
         APP_NBYTES_OF_REG_BANK,
         APP_REGS_ADD_MAX - APP_REGS_ADD_MIN + 1,
-        default_device_name
+        default_device_name,
+		false,	// The device is _not_ able to repeat the harp timestamp clock
+		false,	// The device is _not_ able to generate the harp timestamp clock
+		0		// Default timestamp offset
     );
 }
 
@@ -193,7 +196,9 @@ extern void clear_sw_r()
 /************************************************************************/
 /* Initialization Callbacks                                             */
 /************************************************************************/
-void core_callback_1st_config_hw_after_boot(void)
+void core_callback_define_clock_default(void) {}
+	
+void core_callback_initialize_hardware(void)
 {
 	/* Initialize IOs */
 	/* Don't delete this function!!! */
@@ -333,7 +338,7 @@ void core_callback_t_before_exec(void)
 		if(step_period_counter == STEP_UPTIME_HALF_MILLISECONDS)
 			clear_step();
 			
-		if(step_period_counter == prot_step_period)
+		if(step_period_counter >= prot_step_period)
 		{
 			step_period_counter = 0;
 			// make step if there are still steps remaining in the current running protocol
@@ -584,6 +589,14 @@ void core_callback_t_1ms(void)
 	}
 }
 
+/************************************************************************/
+/* Callbacks: clock control                                              */
+/************************************************************************/
+void core_callback_clock_to_repeater(void) {}
+void core_callback_clock_to_generator(void) {}
+void core_callback_clock_to_unlock(void) {}
+void core_callback_clock_to_lock(void) {}
+	
 /************************************************************************/
 /* Callbacks: uart control                                              */
 /************************************************************************/
