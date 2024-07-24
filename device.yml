@@ -173,7 +173,7 @@ groupMasks:
     description: The state of the DIR motor controller pin.
     values:
       Reverse: 0
-      Forward: 2
+      Forward: 1
   ForwardSwitchState:
     description: The state of the forward limit switch.
     values:
@@ -183,7 +183,7 @@ groupMasks:
     description: The state of the reverse limit switch.
     values:
       Low: 0
-      High: 2
+      High: 1
   DO0SyncConfig:
     description: Configures which signal is mimicked in the digital output 0.
     values:
