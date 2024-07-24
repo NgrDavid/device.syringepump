@@ -3105,7 +3105,7 @@ namespace Harp.SyringePump
     public enum DirectionState : byte
     {
         Reverse = 0,
-        Forward = 2
+        Forward = 1
     }
 
     /// <summary>
@@ -3123,7 +3123,7 @@ namespace Harp.SyringePump
     public enum ReverseSwitchState : byte
     {
         Low = 0,
-        High = 2
+        High = 1
     }
 
     /// <summary>
