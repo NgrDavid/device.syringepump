@@ -51,11 +51,52 @@ namespace Harp.SyringePump
             { 43, typeof(DI0Trigger) },
             { 44, typeof(StepMode) },
             { 45, typeof(ProtocolStepCount) },
+            { 46, typeof(ProtocolFlowrate) },
             { 47, typeof(ProtocolPeriod) },
+            { 48, typeof(ProtocolVolume) },
+            { 49, typeof(ProtocolType) },
+            { 50, typeof(CalibrationOffset) },
+            { 51, typeof(CalibrationSlope) },
             { 52, typeof(EnableEvents) },
+            { 53, typeof(BoardType) },
             { 54, typeof(Protocol) },
             { 55, typeof(ProtocolDirection) }
         };
+
+        /// <summary>
+        /// Gets the contents of the metadata file describing the <see cref="SyringePump"/>
+        /// device registers.
+        /// </summary>
+        public static readonly string Metadata = GetDeviceMetadata();
+
+        static string GetDeviceMetadata()
+        {
+            var deviceType = typeof(Device);
+            using var metadataStream = deviceType.Assembly.GetManifestResourceStream($"{deviceType.Namespace}.device.yml");
+            using var streamReader = new System.IO.StreamReader(metadataStream);
+            return streamReader.ReadToEnd();
+        }
+    }
+
+    /// <summary>
+    /// Represents an operator that returns the contents of the metadata file
+    /// describing the <see cref="SyringePump"/> device registers.
+    /// </summary>
+    [Description("Returns the contents of the metadata file describing the SyringePump device registers.")]
+    public partial class GetMetadata : Source<string>
+    {
+        /// <summary>
+        /// Returns an observable sequence with the contents of the metadata file
+        /// describing the <see cref="SyringePump"/> device registers.
+        /// </summary>
+        /// <returns>
+        /// A sequence with a single <see cref="string"/> object representing the
+        /// contents of the metadata file.
+        /// </returns>
+        public override IObservable<string> Generate()
+        {
+            return Observable.Return(Device.Metadata);
+        }
     }
 
     /// <summary>
@@ -1620,6 +1661,28 @@ namespace Harp.SyringePump
     }
 
     /// <summary>
+    /// Represents a register that sets the flowrate of the protocol in ul/s.
+    /// </summary>
+    [Description("Sets the flowrate of the protocol in ul/s.")]
+    internal partial class ProtocolFlowrate
+    {
+        /// <summary>
+        /// Represents the address of the <see cref="ProtocolFlowrate"/> register. This field is constant.
+        /// </summary>
+        public const int Address = 46;
+
+        /// <summary>
+        /// Represents the payload type of the <see cref="ProtocolFlowrate"/> register. This field is constant.
+        /// </summary>
+        public const PayloadType RegisterType = PayloadType.Float;
+
+        /// <summary>
+        /// Represents the length of the <see cref="ProtocolFlowrate"/> register. This field is constant.
+        /// </summary>
+        public const int RegisterLength = 1;
+    }
+
+    /// <summary>
     /// Represents a register that sets the period, in ms, of of each step in the protocol.
     /// </summary>
     [Description("Sets the period, in ms, of of each step in the protocol.")]
@@ -1713,6 +1776,94 @@ namespace Harp.SyringePump
         {
             return ProtocolPeriod.GetTimestampedPayload(message);
         }
+    }
+
+    /// <summary>
+    /// Represents a register that sets the volume to be delivered, in ul.
+    /// </summary>
+    [Description("Sets the volume to be delivered, in ul.")]
+    internal partial class ProtocolVolume
+    {
+        /// <summary>
+        /// Represents the address of the <see cref="ProtocolVolume"/> register. This field is constant.
+        /// </summary>
+        public const int Address = 48;
+
+        /// <summary>
+        /// Represents the payload type of the <see cref="ProtocolVolume"/> register. This field is constant.
+        /// </summary>
+        public const PayloadType RegisterType = PayloadType.Float;
+
+        /// <summary>
+        /// Represents the length of the <see cref="ProtocolVolume"/> register. This field is constant.
+        /// </summary>
+        public const int RegisterLength = 1;
+    }
+
+    /// <summary>
+    /// Represents a register that sets the type of protocol to be executed.
+    /// </summary>
+    [Description("Sets the type of protocol to be executed.")]
+    internal partial class ProtocolType
+    {
+        /// <summary>
+        /// Represents the address of the <see cref="ProtocolType"/> register. This field is constant.
+        /// </summary>
+        public const int Address = 49;
+
+        /// <summary>
+        /// Represents the payload type of the <see cref="ProtocolType"/> register. This field is constant.
+        /// </summary>
+        public const PayloadType RegisterType = PayloadType.U8;
+
+        /// <summary>
+        /// Represents the length of the <see cref="ProtocolType"/> register. This field is constant.
+        /// </summary>
+        public const int RegisterLength = 1;
+    }
+
+    /// <summary>
+    /// Represents a register that sets the offset value of the calibration curve.
+    /// </summary>
+    [Description("Sets the offset value of the calibration curve.")]
+    internal partial class CalibrationOffset
+    {
+        /// <summary>
+        /// Represents the address of the <see cref="CalibrationOffset"/> register. This field is constant.
+        /// </summary>
+        public const int Address = 50;
+
+        /// <summary>
+        /// Represents the payload type of the <see cref="CalibrationOffset"/> register. This field is constant.
+        /// </summary>
+        public const PayloadType RegisterType = PayloadType.Float;
+
+        /// <summary>
+        /// Represents the length of the <see cref="CalibrationOffset"/> register. This field is constant.
+        /// </summary>
+        public const int RegisterLength = 1;
+    }
+
+    /// <summary>
+    /// Represents a register that sets the slope value of the calibration curve.
+    /// </summary>
+    [Description("Sets the slope value of the calibration curve.")]
+    internal partial class CalibrationSlope
+    {
+        /// <summary>
+        /// Represents the address of the <see cref="CalibrationSlope"/> register. This field is constant.
+        /// </summary>
+        public const int Address = 51;
+
+        /// <summary>
+        /// Represents the payload type of the <see cref="CalibrationSlope"/> register. This field is constant.
+        /// </summary>
+        public const PayloadType RegisterType = PayloadType.Float;
+
+        /// <summary>
+        /// Represents the length of the <see cref="CalibrationSlope"/> register. This field is constant.
+        /// </summary>
+        public const int RegisterLength = 1;
     }
 
     /// <summary>
@@ -1810,6 +1961,28 @@ namespace Harp.SyringePump
         {
             return EnableEvents.GetTimestampedPayload(message);
         }
+    }
+
+    /// <summary>
+    /// Represents a register that sets the board type.
+    /// </summary>
+    [Description("Sets the board type.")]
+    internal partial class BoardType
+    {
+        /// <summary>
+        /// Represents the address of the <see cref="BoardType"/> register. This field is constant.
+        /// </summary>
+        public const int Address = 53;
+
+        /// <summary>
+        /// Represents the payload type of the <see cref="BoardType"/> register. This field is constant.
+        /// </summary>
+        public const PayloadType RegisterType = PayloadType.U8;
+
+        /// <summary>
+        /// Represents the length of the <see cref="BoardType"/> register. This field is constant.
+        /// </summary>
+        public const int RegisterLength = 1;
     }
 
     /// <summary>
