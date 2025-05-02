@@ -202,7 +202,7 @@ namespace SyringePump.Design.ViewModels
                 Log.Information("Loaded USB information");
             });
         }
-
+    
         private IObservable<Unit> StartProtocol()
         {
             return Observable.StartAsync(async () =>
