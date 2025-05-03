@@ -1,554 +1,830 @@
-﻿#region Usings
-
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Themes.Fluent;
 using Bonsai.Harp;
-using SyringePump.Design.Models;
-using SyringePump.Design.Views;
-using MessageBox.Avalonia.Enums;
+using Harp.SyringePump.Design.Views;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using ReactiveUI.Validation.Extensions;
-using ReactiveUI.Validation.Helpers;
-using Serilog;
-using OperatingSystem = System.OperatingSystem;
 
-#endregion
+namespace Harp.SyringePump.Design.ViewModels;
 
-namespace SyringePump.Design.ViewModels
+
+public class SyringePumpViewModel : ViewModelBase
 {
-    public class SyringePumpViewModel : ReactiveValidationObject
+    public string AppVersion { get; set; }
+    public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
+
+    public ReactiveCommand<Unit, Unit> StartProtocolCommand { get; }
+
+    #region Connection Information
+
+    [Reactive] public ObservableCollection<string> Ports { get; set; }
+    [Reactive] public string SelectedPort { get; set; }
+    [Reactive] public bool Connected { get; set; }
+    [Reactive] public string ConnectButtonText { get; set; } = "Connect";
+    public ReactiveCommand<Unit, Unit> ConnectAndGetBaseInfoCommand { get; }
+
+    #endregion
+
+    #region Operations
+
+    public ReactiveCommand<bool, Unit> SaveConfigurationCommand { get; }
+    public ReactiveCommand<Unit, Unit> ResetConfigurationCommand { get; }
+
+    #endregion
+
+    #region Device basic information
+
+    [Reactive] public int DeviceID { get; set; }
+    [Reactive] public string DeviceName { get; set; }
+    [Reactive] public HarpVersion HardwareVersion { get; set; }
+    [Reactive] public HarpVersion FirmwareVersion { get; set; }
+    [Reactive] public int SerialNumber { get; set; }
+
+    #endregion
+
+    #region Registers
+
+    [Reactive] public EnableFlag EnableMotorDriver { get; set; }
+    [Reactive] public EnableFlag EnableProtocol { get; set; }
+    [Reactive] public StepState Step { get; set; }
+    [Reactive] public DirectionState Direction { get; set; }
+    [Reactive] public ForwardSwitchState ForwardSwitch { get; set; }
+    [Reactive] public ReverseSwitchState ReverseSwitch { get; set; }
+    [Reactive] public DigitalInputs DigitalInputState { get; set; }
+    [Reactive] public DigitalOutputs DigitalOutputSet { get; set; }
+    [Reactive] public DigitalOutputs DigitalOutputClear { get; set; }
+    [Reactive] public DO0SyncConfig DO0Sync { get; set; }
+    [Reactive] public DO1SyncConfig DO1Sync { get; set; }
+    [Reactive] public DI0TriggerConfig DI0Trigger { get; set; }
+    [Reactive] public StepModeType StepMode { get; set; }
+    [Reactive] public ushort ProtocolStepCount { get; set; }
+    [Reactive] public ushort ProtocolPeriod { get; set; }
+    [Reactive] public PumpEvents EnableEvents { get; set; }
+    [Reactive] public ProtocolState Protocol { get; set; }
+    [Reactive] public ProtocolDirectionState ProtocolDirection { get; set; }
+
+    #endregion
+
+    #region Array Collections
+
+
+    #endregion
+
+    #region Events Flags
+
+    public bool IsStepEnabled
     {
-        public string AppVersion { get; set; }
-
-        [Reactive] public List<string> Ports { get; set; }
-
-        [Reactive] public string SelectedPort { get; set; }
-        [Reactive] public bool Connected { get; set; }
-
-        [Reactive] public ObservableCollection<string> HarpMessages { get; set; }
-
-        [Reactive] public bool StepStateEvent { get; set; } = true;
-        [Reactive] public bool DirectionStateEvent { get; set; } = true;
-        [Reactive] public bool SwitchForwardStateEvent { get; set; } = true;
-        [Reactive] public bool SwitchReverseStateEvent { get; set; } = true;
-        [Reactive] public bool InputStateEvent { get; set; } = true;
-        [Reactive] public bool ProtocolStateEvent { get; set; } = true;
-
-        [Reactive] public int ProtocolType { get; set; }
-
-        [Reactive] public string DeviceName { get; set; }
-        [Reactive] public int DeviceID { get; set; }
-        [Reactive] public HarpVersion HardwareVersion { get; set; }
-        [Reactive] public HarpVersion FirmwareVersion { get; set; }
-
-        [Reactive] public int NumberOfSteps { get; set; } = 15;
-        [Reactive] public int StepPeriod { get; set; } = 10;
-        [Reactive] public float Flowrate { get; set; } = 0.5f;
-        [Reactive] public float Volume { get; set; } = 0.5f;
-        [Reactive] public int MotorMicrostep { get; set; }
-        [Reactive] public int DigitalInput0Config { get; set; }
-        [Reactive] public int DigitalOutput0Config { get; set; }
-        [Reactive] public int DigitalOutput1Config { get; set; }
-        [Reactive] public int CalibrationValue1 { get; set; }
-        [Reactive] public int CalibrationValue2 { get; set; }
-        [Reactive] public Direction ProtocolDirection { get; set; }
-
-        [Reactive] public List<Direction> Directions { get; set; }
-
-        [Reactive] public bool ShowLogs { get; set; } = false;
-
-        [ObservableAsProperty] public bool IsLoadingPorts { get; }
-
-        [ObservableAsProperty] public bool IsConnecting { get; }
-
-        [ObservableAsProperty] public bool IsResetting { get; }
-
-        [ObservableAsProperty] public bool IsSaving { get; }
-
-        [ObservableAsProperty] public bool IsRunningProtocol { get; }
-
-        [Reactive] public bool ShowDarkTheme { get; set; }
-
-        public ReactiveCommand<Unit, Unit> LoadDeviceInformation { get; }
-        public ReactiveCommand<Unit, Unit> ConnectAndGetBaseInfoCommand { get; }
-        public ReactiveCommand<Unit, Unit> StartProtocolCommand { get; }
-        public ReactiveCommand<Unit, Unit> ShowLogsCommand { get; }
-        public ReactiveCommand<bool, Unit> SaveConfigurationCommand { get; }
-        public ReactiveCommand<Unit, Unit> ResetConfigurationCommand { get; }
-
-        public ReactiveCommand<Unit, Unit> ChangeThemeCommand { get; }
-        public ReactiveCommand<Unit, Unit> ShowAboutCommand { get; }
-        public ReactiveCommand<Unit,Unit> ClearHarpMessagesCommand { get; set; }
-        
-        private Bonsai.Harp.Device _dev;
-        private readonly IObserver<HarpMessage> _observer;
-        private IDisposable _observable;
-        private readonly Subject<HarpMessage> _msgsSubject;
-        private DeviceConfiguration configuration;
-
-        public SyringePumpViewModel()
+        get
         {
-            var assembly = typeof(SyringePumpViewModel).Assembly;
-            var informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-            AppVersion = $"v{informationVersion}";
+            return EnableEvents.HasFlag(PumpEvents.Step);
+        }
+        set
+        {
+            if (value)
+            {
+                EnableEvents |= PumpEvents.Step;
+            }
+            else
+            {
+                EnableEvents &= ~PumpEvents.Step;
+            }
 
-            Console.WriteLine(
-                $"Dotnet version: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsStepEnabled));
+            this.RaisePropertyChanged(nameof(EnableEvents));
+        }
+    }
 
-            HarpMessages = new ObservableCollection<string>();
-            Directions = Enum.GetValues<Direction>().ToList();
+    public bool IsDirectionEnabled
+    {
+        get
+        {
+            return EnableEvents.HasFlag(PumpEvents.Direction);
+        }
+        set
+        {
+            if (value)
+            {
+                EnableEvents |= PumpEvents.Direction;
+            }
+            else
+            {
+                EnableEvents &= ~PumpEvents.Direction;
+            }
 
-            LoadDeviceInformation = ReactiveCommand.CreateFromObservable(LoadUsbInformation);
-            LoadDeviceInformation.IsExecuting.ToPropertyEx(this, x => x.IsLoadingPorts);
-            LoadDeviceInformation.ThrownExceptions.Subscribe(ex =>
-                Log.Error(ex, "Error loading device information with exception: {Exception}", ex));
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsDirectionEnabled));
+            this.RaisePropertyChanged(nameof(EnableEvents));
+        }
+    }
 
-            // can connect if there is a selection and also if the new selection is different than the old one
-            var canConnect = this.WhenAnyValue(x => x.SelectedPort)
-                .Select(selectedPort => !string.IsNullOrEmpty(selectedPort));
+    public bool IsForwardSwitchEnabled
+    {
+        get
+        {
+            return EnableEvents.HasFlag(PumpEvents.ForwardSwitch);
+        }
+        set
+        {
+            if (value)
+            {
+                EnableEvents |= PumpEvents.ForwardSwitch;
+            }
+            else
+            {
+                EnableEvents &= ~PumpEvents.ForwardSwitch;
+            }
 
-            ConnectAndGetBaseInfoCommand = ReactiveCommand.CreateFromObservable(ConnectAndGetBaseInfo, canConnect);
-            ConnectAndGetBaseInfoCommand.IsExecuting.ToPropertyEx(this, x => x.IsConnecting);
-            ConnectAndGetBaseInfoCommand.ThrownExceptions.Subscribe(ex =>
-                Log.Error(ex, "Error connecting to device with error: {Exception}", ex));
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsForwardSwitchEnabled));
+            this.RaisePropertyChanged(nameof(EnableEvents));
+        }
+    }
 
-            var canChangeConfig = this.WhenAnyValue(x => x.Connected).Select(connected => connected);
-            StartProtocolCommand = ReactiveCommand.CreateFromObservable(StartProtocol, canChangeConfig);
-            StartProtocolCommand.IsExecuting.ToPropertyEx(this, x => x.IsRunningProtocol);
-            StartProtocolCommand.ThrownExceptions.Subscribe(ex =>
-                Log.Error(ex, "Error starting protocol with error: {Exception}", ex));
+    public bool IsReverseSwitchEnabled
+    {
+        get
+        {
+            return EnableEvents.HasFlag(PumpEvents.ReverseSwitch);
+        }
+        set
+        {
+            if (value)
+            {
+                EnableEvents |= PumpEvents.ReverseSwitch;
+            }
+            else
+            {
+                EnableEvents &= ~PumpEvents.ReverseSwitch;
+            }
 
-            ShowLogsCommand = ReactiveCommand.Create(() => { ShowLogs = !ShowLogs; });
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsReverseSwitchEnabled));
+            this.RaisePropertyChanged(nameof(EnableEvents));
+        }
+    }
 
-            SaveConfigurationCommand =
-                ReactiveCommand.CreateFromObservable<bool, Unit>(SaveConfiguration, canChangeConfig);
-            SaveConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsSaving);
-            SaveConfigurationCommand.ThrownExceptions.Subscribe(ex =>
-                Log.Error(ex, "Error saving configuration with error: {Exception}", ex));
+    public bool IsDigitalInputEnabled
+    {
+        get
+        {
+            return EnableEvents.HasFlag(PumpEvents.DigitalInput);
+        }
+        set
+        {
+            if (value)
+            {
+                EnableEvents |= PumpEvents.DigitalInput;
+            }
+            else
+            {
+                EnableEvents &= ~PumpEvents.DigitalInput;
+            }
 
-            ResetConfigurationCommand = ReactiveCommand.CreateFromObservable(ResetConfiguration, canChangeConfig);
-            ResetConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsResetting);
-            ResetConfigurationCommand.ThrownExceptions.Subscribe(ex =>
-                Log.Error(ex, "Error resetting device configuration with error: {Exception}", ex));
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsDigitalInputEnabled));
+            this.RaisePropertyChanged(nameof(EnableEvents));
+        }
+    }
 
-            ChangeThemeCommand = ReactiveCommand.Create(ChangeTheme);
+    public bool IsProtocolEnabled
+    {
+        get
+        {
+            return EnableEvents.HasFlag(PumpEvents.Protocol);
+        }
+        set
+        {
+            if (value)
+            {
+                EnableEvents |= PumpEvents.Protocol;
+            }
+            else
+            {
+                EnableEvents &= ~PumpEvents.Protocol;
+            }
 
-            ShowAboutCommand = ReactiveCommand.CreateFromTask(async () =>
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsProtocolEnabled));
+            this.RaisePropertyChanged(nameof(EnableEvents));
+        }
+    }
+
+    #endregion
+
+    #region DigitalInputs_DigitalInputState Flags
+
+    public bool IsDI0Enabled_DigitalInputState
+    {
+        get
+        {
+            return DigitalInputState.HasFlag(DigitalInputs.DI0);
+        }
+        set
+        {
+            if (value)
+            {
+                DigitalInputState |= DigitalInputs.DI0;
+            }
+            else
+            {
+                DigitalInputState &= ~DigitalInputs.DI0;
+            }
+
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsDI0Enabled_DigitalInputState));
+            this.RaisePropertyChanged(nameof(DigitalInputState));
+        }
+    }
+
+    #endregion
+
+    #region DigitalOutputs_DigitalOutputSet Flags
+
+    public bool IsDO0Enabled_DigitalOutputSet
+    {
+        get
+        {
+            return DigitalOutputSet.HasFlag(DigitalOutputs.DO0);
+        }
+        set
+        {
+            if (value)
+            {
+                DigitalOutputSet |= DigitalOutputs.DO0;
+            }
+            else
+            {
+                DigitalOutputSet &= ~DigitalOutputs.DO0;
+            }
+
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsDO0Enabled_DigitalOutputSet));
+            this.RaisePropertyChanged(nameof(DigitalOutputSet));
+        }
+    }
+
+    public bool IsDO1Enabled_DigitalOutputSet
+    {
+        get
+        {
+            return DigitalOutputSet.HasFlag(DigitalOutputs.DO1);
+        }
+        set
+        {
+            if (value)
+            {
+                DigitalOutputSet |= DigitalOutputs.DO1;
+            }
+            else
+            {
+                DigitalOutputSet &= ~DigitalOutputs.DO1;
+            }
+
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsDO1Enabled_DigitalOutputSet));
+            this.RaisePropertyChanged(nameof(DigitalOutputSet));
+        }
+    }
+
+    #endregion
+
+    #region DigitalOutputs_DigitalOutputClear Flags
+
+    public bool IsDO0Enabled_DigitalOutputClear
+    {
+        get
+        {
+            return DigitalOutputClear.HasFlag(DigitalOutputs.DO0);
+        }
+        set
+        {
+            if (value)
+            {
+                DigitalOutputClear |= DigitalOutputs.DO0;
+            }
+            else
+            {
+                DigitalOutputClear &= ~DigitalOutputs.DO0;
+            }
+
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsDO0Enabled_DigitalOutputClear));
+            this.RaisePropertyChanged(nameof(DigitalOutputClear));
+        }
+    }
+
+    public bool IsDO1Enabled_DigitalOutputClear
+    {
+        get
+        {
+            return DigitalOutputClear.HasFlag(DigitalOutputs.DO1);
+        }
+        set
+        {
+            if (value)
+            {
+                DigitalOutputClear |= DigitalOutputs.DO1;
+            }
+            else
+            {
+                DigitalOutputClear &= ~DigitalOutputs.DO1;
+            }
+
+            // Notify the UI about the change
+            this.RaisePropertyChanged(nameof(IsDO1Enabled_DigitalOutputClear));
+            this.RaisePropertyChanged(nameof(DigitalOutputClear));
+        }
+    }
+
+    #endregion
+
+    #region Application State
+
+    [ObservableAsProperty] public bool IsLoadingPorts { get; }
+    [ObservableAsProperty] public bool IsConnecting { get; }
+    [ObservableAsProperty] public bool IsResetting { get; }
+    [ObservableAsProperty] public bool IsSaving { get; }
+    [ObservableAsProperty] public bool IsRunningProtocol { get; }
+
+    [Reactive] public bool ShowWriteMessages { get; set; }
+    [Reactive] public ObservableCollection<string> HarpEvents { get; set; } = new ObservableCollection<string>();
+    [Reactive] public ObservableCollection<string> SentMessages { get; set; } = new ObservableCollection<string>();
+
+    public ReactiveCommand<Unit, Unit> ShowAboutCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ClearMessagesCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ShowMessagesCommand { get; private set; }
+
+    #endregion
+
+    private Harp.SyringePump.AsyncDevice? _device;
+    private IObservable<string> _deviceEventsObservable;
+    private IDisposable? _deviceEventsSubscription;
+
+    public SyringePumpViewModel()
+    {
+        var assembly = typeof(SyringePumpViewModel).Assembly;
+        var informationVersion = assembly.GetName().Version;
+        if (informationVersion != null)
+            AppVersion = $"v{informationVersion.Major}.{informationVersion.Minor}.{informationVersion.Build}";
+
+        Ports = new ObservableCollection<string>();
+
+        ClearMessagesCommand = ReactiveCommand.Create(() => { SentMessages.Clear(); });
+        ShowMessagesCommand = ReactiveCommand.Create(() => { ShowWriteMessages = !ShowWriteMessages; });
+
+        LoadDeviceInformation = ReactiveCommand.CreateFromObservable(LoadUsbInformation);
+        LoadDeviceInformation.IsExecuting.ToPropertyEx(this, x => x.IsLoadingPorts);
+        LoadDeviceInformation.ThrownExceptions.Subscribe(ex =>
+            Console.WriteLine($"Error loading device information with exception: {ex.Message}"));
+        //Log.Error(ex, "Error loading device information with exception: {Exception}", ex));
+
+        // can connect if there is a selection and also if the new selection is different than the old one
+        var canConnect = this.WhenAnyValue(x => x.SelectedPort)
+            .Select(selectedPort => !string.IsNullOrEmpty(selectedPort));
+
+        ShowAboutCommand = ReactiveCommand.CreateFromTask(async () =>
                 await new About() { DataContext = new AboutViewModel() }.ShowDialog(
-                    (Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).MainWindow));
+                    (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow));
 
-            ClearHarpMessagesCommand = ReactiveCommand.Create(() => HarpMessages.Clear(), canChangeConfig);
+        ConnectAndGetBaseInfoCommand = ReactiveCommand.CreateFromTask(ConnectAndGetBaseInfo, canConnect);
+        ConnectAndGetBaseInfoCommand.IsExecuting.ToPropertyEx(this, x => x.IsConnecting);
+        ConnectAndGetBaseInfoCommand.ThrownExceptions.Subscribe(ex =>
+            //Log.Error(ex, "Error connecting to device with error: {Exception}", ex));
+            Console.WriteLine($"Error connecting to device with error: {ex}"));
 
-            // TODO: missing properly dispose of this
-            _msgsSubject = new Subject<HarpMessage>();
+        var canChangeConfig = this.WhenAnyValue(x => x.Connected).Select(connected => connected);
+        // Handle Save and Reset
+        SaveConfigurationCommand =
+            ReactiveCommand.CreateFromObservable<bool, Unit>(SaveConfiguration, canChangeConfig);
+        SaveConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsSaving);
+        SaveConfigurationCommand.ThrownExceptions.Subscribe(ex =>
+            //Log.Error(ex, "Error saving configuration with error: {Exception}", ex));
+            Console.WriteLine($"Error saving configuration with error: {ex}"));
 
-            _observer = Observer.Create<HarpMessage>(item => HarpMessages.Add(item.ToString()),
-                (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); },
-                () => HarpMessages.Add("Completed sending commands to device"));
+        ResetConfigurationCommand = ReactiveCommand.CreateFromObservable(ResetConfiguration, canChangeConfig);
+        ResetConfigurationCommand.IsExecuting.ToPropertyEx(this, x => x.IsResetting);
+        ResetConfigurationCommand.ThrownExceptions.Subscribe(ex =>
+            //Log.Error(ex, "Error resetting device configuration with error: {Exception}", ex));
+            Console.WriteLine($"Error resetting device configuration with error: {ex}"));
 
-            // Validation rules
-            this.ValidationRule(viewModel => viewModel.NumberOfSteps,
-                steps => steps > 0,
-                "Number of steps only accepts integer values greater than 0");
-            this.ValidationRule(viewModel => viewModel.StepPeriod,
-                period => period > 0,
-                "Step Period only accepts integer values greater than 0");
-            this.ValidationRule(viewModel => viewModel.Flowrate,
-                flowRate => flowRate > 0,
-                "Flowrate only accepts float values greater than 0");
-            this.ValidationRule(viewModel => viewModel.Volume,
-                volume => volume > 0,
-                "Volume only accepts float values greater than 0");
+        var canStartProtocol = this.WhenAnyValue(
+            x => x.Connected,
+            x => x.Protocol,
+            (connected, protocol) => connected && protocol != ProtocolState.Running
+        );
+        
+        StartProtocolCommand = ReactiveCommand.CreateFromObservable(StartProtocol, canStartProtocol);
+        StartProtocolCommand.IsExecuting.ToPropertyEx(this, x => x.IsRunningProtocol);
+        StartProtocolCommand.ThrownExceptions.Subscribe(ex =>
+            //Log.Error(ex, "Error starting protocol with error: {Exception}", ex));
+            Console.WriteLine($"Error starting protocol with error: {ex}"));
 
-            // force initial population of currently connected ports
-            LoadUsbInformation();
-        }
+        this.WhenAnyValue(x => x.Connected)
+            .Subscribe(x => { ConnectButtonText = x ? "Disconnect" : "Connect"; });
 
-        private void ChangeTheme()
-        {
-            Application.Current.Styles[0] = new FluentTheme(new Uri("avares://ControlCatalog/Styles"))
+        this.WhenAnyValue(x => x.EnableEvents)
+            .Subscribe(x =>
             {
-                Mode = ShowDarkTheme ? FluentThemeMode.Dark : FluentThemeMode.Light
-            };
-        }
-
-        private IObservable<Unit> LoadUsbInformation()
-        {
-            return Observable.Start(() =>
-            {
-                var devices = SerialPort.GetPortNames();
-
-                if (OperatingSystem.IsMacOS())
-                    // except with Bluetooth in the name
-                    Ports = devices.Where(d => d.Contains("cu.")).Except(devices.Where(d => d.Contains("Bluetooth")))
-                        .ToList();
-                else
-                    Ports = devices.ToList();
-
-                Log.Information("Loaded USB information");
+                IsStepEnabled = x.HasFlag(PumpEvents.Step);
+                IsDirectionEnabled = x.HasFlag(PumpEvents.Direction);
+                IsForwardSwitchEnabled = x.HasFlag(PumpEvents.ForwardSwitch);
+                IsReverseSwitchEnabled = x.HasFlag(PumpEvents.ReverseSwitch);
+                IsDigitalInputEnabled = x.HasFlag(PumpEvents.DigitalInput);
+                IsProtocolEnabled = x.HasFlag(PumpEvents.Protocol);
             });
-        }
-    
-        private IObservable<Unit> StartProtocol()
-        {
-            return Observable.StartAsync(async () =>
+
+
+        // handle the events from the device0
+        // When Connected changes subscribe/unsubscribe the device events.
+        this.WhenAnyValue(x => x.Connected)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(isConnected =>
             {
-                var startProtocolMessage = HarpCommand.WriteByte((int)PumpRegisters.StartProtocol, 1);
-
-                _msgsSubject.OnNext(startProtocolMessage);
-
-                await Task.Delay(200);
-
-                Log.Information("Started protocol");
-            });
-        }
-
-        private IObservable<Unit> SaveConfiguration(bool savePermanently)
-        {
-            return Observable.StartAsync(async () =>
-            {
-                if (_dev == null)
-                    throw new Exception("You need to connect to the device first");
-
-                var msgs = new List<HarpMessage>();
-
-                // send commands to save every config (verify each step for board's reply)
-
-                // events
-                byte events = (byte)((Convert.ToByte(StepStateEvent) << 0) |
-                                     (Convert.ToByte(DirectionStateEvent) << 1) |
-                                     (Convert.ToByte(SwitchForwardStateEvent) << 2) |
-                                     (Convert.ToByte(SwitchReverseStateEvent) << 3) |
-                                     (Convert.ToByte(InputStateEvent) << 4) |
-                                     (Convert.ToByte(ProtocolStateEvent) << 5));
-                var eventsMessage = HarpCommand.WriteByte((int)PumpRegisters.EventsEnable, events);
-                msgs.Add(eventsMessage);
-
-                // motor microstep
-                byte motor = Convert.ToByte(MotorMicrostep);
-                var motorMessage = HarpCommand.WriteByte((int)PumpRegisters.MotorMicrostep, motor);
-                msgs.Add(motorMessage);
-
-                // di0, do0 and do1
-                byte di0 = Convert.ToByte(DigitalInput0Config);
-                var di0Message = HarpCommand.WriteByte((int)PumpRegisters.DigitalInput0Config, di0);
-                msgs.Add(di0Message);
-
-                byte do0 = Convert.ToByte(DigitalOutput0Config);
-                var do0Message = HarpCommand.WriteByte((int)PumpRegisters.DigitalOutput0Config, do0);
-                msgs.Add(do0Message);
-
-                byte do1 = Convert.ToByte(DigitalOutput1Config);
-                var do1Message = HarpCommand.WriteByte((int)PumpRegisters.DigitalOutput1Config, do1);
-                msgs.Add(do1Message);
-
-                // protocol
-                // protocol type
-                byte protocolType = Convert.ToByte(ProtocolType);
-                var protocolTypeMessage = HarpCommand.WriteByte((int)PumpRegisters.ProtocolType, protocolType);
-                msgs.Add(protocolTypeMessage);
-
-                // protocol direction
-                byte protocolDirection = Convert.ToByte(ProtocolDirection);
-                var protocolDirectionMessage =
-                    HarpCommand.WriteByte((int)PumpRegisters.ProtocolDirection, protocolDirection);
-                msgs.Add(protocolDirectionMessage);
-
-                // if step:
-                if (protocolType == 0)
+                if (isConnected && _deviceEventsObservable != null)
                 {
-                    // number of steps
-                    ushort numberOfSteps = Convert.ToUInt16(NumberOfSteps);
-                    var numberOfStepsMessage =
-                        HarpCommand.WriteUInt16((int)PumpRegisters.ProtocolNumberOfSteps, numberOfSteps);
-                    msgs.Add(numberOfStepsMessage);
-
-                    // step period
-                    ushort stepPeriod = Convert.ToUInt16(StepPeriod);
-                    var stepPeriodMessage = HarpCommand.WriteUInt16((int)PumpRegisters.ProtocolStepPeriod, stepPeriod);
-                    msgs.Add(stepPeriodMessage);
+                    // Subscribe on the UI thread so that the HarpEvents collection can be updated safely.
+                    _deviceEventsSubscription = _deviceEventsObservable
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(
+                            msg => HarpEvents.Add(msg.ToString()),
+                            ex => Debug.WriteLine($"Error in device events: {ex}")
+                        );
                 }
                 else
                 {
-                    // flowrate
-                    float flowrate = Convert.ToSingle(Flowrate);
-                    var flowrateMessage = HarpCommand.WriteSingle((int)PumpRegisters.ProtocolFlowrate, flowrate);
-                    msgs.Add(flowrateMessage);
-                    // volume
-                    float volume = Convert.ToSingle(Volume);
-                    var volumeMessage = HarpCommand.WriteSingle((int)PumpRegisters.ProtocolVolume, volume);
-                    msgs.Add(volumeMessage);
-
-                    // calibration val 1
-                    byte calValue1 = Convert.ToByte(CalibrationValue1);
-                    var calValue1Message = HarpCommand.WriteByte((int)PumpRegisters.CalibrationValue1, calValue1);
-                    msgs.Add(calValue1Message);
-
-                    // calibration val 2
-                    byte calValue2 = Convert.ToByte(CalibrationValue2);
-                    var calValue2Message = HarpCommand.WriteByte((int)PumpRegisters.CalibrationValue2, calValue2);
-                    msgs.Add(calValue2Message);
+                    // Dispose subscription and clear messages.
+                    _deviceEventsSubscription?.Dispose();
+                    _deviceEventsSubscription = null;
                 }
-
-                if (savePermanently)
-                {
-                    var resetMessage = HarpCommand.ResetDevice(ResetMode.Save);
-                    msgs.Add(resetMessage);
-                }
-
-                // send all messages independently of the save type
-                HarpMessages.Clear();
-
-                foreach (var harpMessage in msgs)
-                {
-                    _msgsSubject.OnNext(harpMessage);
-                }
-
-                await Task.Delay(500);
             });
+
+        this.WhenAnyValue(x => x.DigitalInputState)
+            .Subscribe(x =>
+            {
+                IsDI0Enabled_DigitalInputState = x.HasFlag(DigitalInputs.DI0);
+            });
+
+        this.WhenAnyValue(x => x.DigitalOutputSet)
+            .Subscribe(x =>
+            {
+                IsDO0Enabled_DigitalOutputSet = x.HasFlag(DigitalOutputs.DO0);
+                IsDO1Enabled_DigitalOutputSet = x.HasFlag(DigitalOutputs.DO1);
+            });
+
+        this.WhenAnyValue(x => x.DigitalOutputClear)
+            .Subscribe(x =>
+            {
+                IsDO0Enabled_DigitalOutputClear = x.HasFlag(DigitalOutputs.DO0);
+                IsDO1Enabled_DigitalOutputClear = x.HasFlag(DigitalOutputs.DO1);
+            });
+        
+        // force initial population of currently connected ports
+        LoadUsbInformation();
+    }
+
+    private IObservable<Unit> LoadUsbInformation()
+    {
+        return Observable.Start(() =>
+        {
+            var devices = SerialPort.GetPortNames();
+
+            if (OperatingSystem.IsMacOS())
+                // except with Bluetooth in the name
+                Ports = new ObservableCollection<string>(devices.Where(d => d.Contains("cu.")).Except(devices.Where(d => d.Contains("Bluetooth"))));
+            else
+                Ports = new ObservableCollection<string>(devices);
+
+            Console.WriteLine("Loaded USB information");
+            //Log.Information("Loaded USB information");
+        });
+    }
+
+    private async Task ConnectAndGetBaseInfo()
+    {
+        if (string.IsNullOrEmpty(SelectedPort))
+            throw new Exception("invalid parameter");
+
+        if (Connected)
+        {
+            _device?.Dispose();
+            _device = null;
+            Connected = false;
+            SentMessages.Clear();
+            return;
         }
 
-        private IObservable<Unit> ResetConfiguration()
+        try
         {
-            return Observable.StartAsync(async () =>
-            {
-                var resetMessage = HarpCommand.ResetDevice(ResetMode.RestoreDefault);
+            _device = await Harp.SyringePump.Device.CreateAsync(SelectedPort);
+        }
+        catch (OperationCanceledException ex)
+        {
+            Console.WriteLine($"Error connecting to device with error: {ex}");
+            //Log.Error(ex, "Error connecting to device with error: {Exception}", ex);
+            var messageBoxStandardWindow = MessageBoxManager
+                .GetMessageBoxStandard("Unexpected device found",
+                    "Timeout when trying to connect to a device. Most likely not an Harp device.",
+                    icon: Icon.Error);
+            await messageBoxStandardWindow.ShowAsync();
+            _device?.Dispose();
+            _device = null;
+            return;
 
-                _msgsSubject.OnNext(resetMessage);
+        }
+        catch (HarpException ex)
+        {
+            Console.WriteLine($"Error connecting to device with error: {ex}");
+            //Log.Error(ex, "Error connecting to device with error: {Exception}", ex);
 
-                await Task.Delay(2000);
+            var messageBoxStandardWindow = MessageBoxManager
+                .GetMessageBoxStandard("Unexpected device found",
+                    ex.Message,
+                    icon: Icon.Error);
+            await messageBoxStandardWindow.ShowAsync();
 
-                await ConnectAndGetBaseInfo();
+            _device?.Dispose();
+            _device = null;
+            return;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            Console.WriteLine($"COM port still in use and most likely not the expected Harp device");
+            var messageBoxStandardWindow = MessageBoxManager
+                .GetMessageBoxStandard("Unexpected device found",
+                    $"COM port still in use and most likely not the expected Harp device.{Environment.NewLine}Specific error: {ex.Message}",
+                    icon: Icon.Error);
+            await messageBoxStandardWindow.ShowAsync();
 
-                // send message to opened device
-                // //TODO: when we have the observable from the receiving data, we should present a message stating if the operation completed successfully
-            });
+            _device?.Dispose();
+            _device = null;
+            return;
         }
 
-        private IObservable<Unit> ConnectAndGetBaseInfo()
-        {
-            return Observable.StartAsync(async () =>
-            {
-                if (string.IsNullOrEmpty(SelectedPort))
-                    throw new Exception("invalid parameter");
+        // Clear the sent messages list
+        SentMessages.Clear();
 
-                configuration = new DeviceConfiguration();
-                if (_dev != null)
+        //Log.Information("Attempting connection to port \'{SelectedPort}\'", SelectedPort);
+        Console.WriteLine($"Attempting connection to port \'{SelectedPort}\'");
+
+        DeviceID = await _device.ReadWhoAmIAsync();
+        DeviceName = await _device.ReadDeviceNameAsync();
+        HardwareVersion = await _device.ReadHardwareVersionAsync();
+        FirmwareVersion = await _device.ReadFirmwareVersionAsync();
+        try
+        {
+            // some devices may not have a serial number
+            SerialNumber = await _device.ReadSerialNumberAsync();
+        }
+        catch (HarpException)
+        {
+            // Device does not have a serial number, simply continue by ignoring the exception
+        }
+
+        /*****************************************************************
+        * TODO: Please REVIEW all these registers and update the values
+        * ****************************************************************/
+        EnableMotorDriver = await _device.ReadEnableMotorDriverAsync();
+        EnableProtocol = await _device.ReadEnableProtocolAsync();
+        Step = await _device.ReadStepAsync();
+        Direction = await _device.ReadDirectionAsync();
+        ForwardSwitch = await _device.ReadForwardSwitchAsync();
+        ReverseSwitch = await _device.ReadReverseSwitchAsync();
+        DigitalInputState = await _device.ReadDigitalInputStateAsync();
+        DigitalOutputSet = await _device.ReadDigitalOutputSetAsync();
+        DigitalOutputClear = await _device.ReadDigitalOutputClearAsync();
+        DO0Sync = await _device.ReadDO0SyncAsync();
+        DO1Sync = await _device.ReadDO1SyncAsync();
+        DI0Trigger = await _device.ReadDI0TriggerAsync();
+        StepMode = await _device.ReadStepModeAsync();
+        ProtocolStepCount = await _device.ReadProtocolStepCountAsync();
+        ProtocolPeriod = await _device.ReadProtocolPeriodAsync();
+        EnableEvents = await _device.ReadEnableEventsAsync();
+        Protocol = await _device.ReadProtocolAsync();
+        ProtocolDirection = await _device.ReadProtocolDirectionAsync();
+
+
+        // generate observable for the _deviceSync
+        _deviceEventsObservable = GenerateEventMessages();
+
+        Connected = true;
+
+        //Log.Information("Connected to device");
+        Console.WriteLine("Connected to device");
+    }
+
+    private IObservable<string> GenerateEventMessages()
+    {
+        return Observable.Create<string>(async (observer, cancellationToken) =>
+        {
+            // Loop until cancellation is requested or the device is no longer available.
+            while (!cancellationToken.IsCancellationRequested && _device != null)
+            {
+                // Capture local reference and check for null.
+                var device = _device;
+                if (device == null)
                 {
-                    // cleanup variables
-                    _observable?.Dispose();
-                    _observable = null;
+                    observer.OnCompleted();
+                    break;
                 }
 
-                _dev = new Bonsai.Harp.Device
+                try
                 {
-                    PortName = SelectedPort,
-                    Heartbeat = EnableType.Disable,
-                    IgnoreErrors = false
-                };
-
-                Log.Information("Attempting connection to port \'{SelectedPort}\'", SelectedPort);
-
-                HarpMessages.Clear();
-
-                await Task.Delay(300);
-
-                var observable = _dev.Generate()
-                    .Where(MessageType.Read)
-                    .Do(ReadRegister)
-                    .Throttle(TimeSpan.FromSeconds(0.2))
-                    .Timeout(TimeSpan.FromSeconds(5))
-                    .Subscribe(_ => { },
-                                // FIXME: ignore here the connection and perhaps simply return?
-                                (ex) => { HarpMessages.Add($"Error while sending commands to device:{ex.Message}"); });
-
-                await Task.Delay(300);
-
-                Log.Information("Connection established with the following return information: {Info}", configuration);
-
-                // present messagebox if we are not handling a Pump device
-                // NOTE: this is temporary and in the next version we will remove support for the older ID (1280)
-                if (configuration.WhoAmI != 1296 && configuration.WhoAmI != 1280)
-                {
-                    // when the configuration.WhoAmI is zero, we are dealing with a non-HARP device, so change message accordingly
-                    var message = $"Found a HARP device: {configuration.DeviceName} ({configuration.WhoAmI}).\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.";
-                    var icon = Icon.Info;
-                    if (configuration.WhoAmI == 0)
+                    // Check if Step event is enabled
+                    if (IsStepEnabled)
                     {
-                        message =
-                            $"Found a non-HARP device.\n\nThis GUI is only for the SyringePump HARP device.\n\nPlease select another serial port.";
-                        icon = Icon.Error;
+                        var result = await device.ReadStepAsync(cancellationToken);
+                        Step = result;
+                        observer.OnNext($"Step: {result}");
                     }
 
-                    var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager
-                        .GetMessageBoxStandardWindow("Unexpected device found",
-                            message,
-                            icon: icon);
-                    await messageBoxStandardWindow.Show();
-                    observable.Dispose();
-                    return;
-                }
-
-                DeviceName = configuration.DeviceName;
-                DeviceID = configuration.WhoAmI;
-
-                // convert Hw and Fw version
-                HardwareVersion = configuration.HardwareVersion;
-                FirmwareVersion = configuration.FirmwareVersion;
-
-                Connected = true;
-
-                observable.Dispose();
-
-                // generate observable for remaining operations
-                _observable = _dev.Generate(_msgsSubject)
-                    .Subscribe(_observer);
-            });
-        }
-
-        private void ReadRegister(HarpMessage message)
-        {
-            switch (message.Address)
-            {
-                case DeviceRegisters.WhoAmI:
-                    configuration.WhoAmI = message.GetPayloadUInt16();
-                    break;
-                case DeviceRegisters.HardwareVersionHigh:
-                    configuration.HardwareVersionHigh = message.GetPayloadByte();
-                    break;
-                case DeviceRegisters.HardwareVersionLow:
-                    configuration.HardwareVersionLow = message.GetPayloadByte();
-                    break;
-                case DeviceRegisters.FirmwareVersionHigh:
-                    configuration.FirmwareVersionHigh = message.GetPayloadByte();
-                    break;
-                case DeviceRegisters.FirmwareVersionLow:
-                    configuration.FirmwareVersionLow = message.GetPayloadByte();
-                    break;
-                case DeviceRegisters.CoreVersionHigh:
-                    configuration.CoreVersionHigh = message.GetPayloadByte();
-                    break;
-                case DeviceRegisters.CoreVersionLow:
-                    configuration.CoreVersionLow = message.GetPayloadByte();
-                    break;
-                case DeviceRegisters.AssemblyVersion:
-                    configuration.AssemblyVersion = message.GetPayloadByte();
-                    break;
-                case DeviceRegisters.TimestampSecond:
-                    configuration.Timestamp = message.GetPayloadUInt32();
-                    break;
-                case DeviceRegisters.DeviceName:
-                    var deviceName = nameof(Device);
-                    if (!message.Error)
+                    // Check if Direction event is enabled
+                    if (IsDirectionEnabled)
                     {
-                        var namePayload = message.GetPayload();
-                        deviceName = Encoding.ASCII.GetString(namePayload.Array, namePayload.Offset, namePayload.Count)
-                            .Trim('\0');
+                        var result = await device.ReadDirectionAsync(cancellationToken);
+                        Direction = result;
+                        observer.OnNext($"Direction: {result}");
                     }
 
-                    configuration.DeviceName = deviceName;
+                    // Check if ForwardSwitch event is enabled
+                    if (IsForwardSwitchEnabled)
+                    {
+                        var result = await device.ReadForwardSwitchAsync(cancellationToken);
+                        ForwardSwitch = result;
+                        observer.OnNext($"ForwardSwitch: {result}");
+                    }
+
+                    // Check if ReverseSwitch event is enabled
+                    if (IsReverseSwitchEnabled)
+                    {
+                        var result = await device.ReadReverseSwitchAsync(cancellationToken);
+                        ReverseSwitch = result;
+                        observer.OnNext($"ReverseSwitch: {result}");
+                    }
+
+                    // Check if DigitalInput event is enabled
+                    if (IsDigitalInputEnabled)
+                    {
+                        var result = await device.ReadDigitalInputStateAsync(cancellationToken);
+                        DigitalInputState = result;
+                        observer.OnNext($"DigitalInput: {result}");
+                    }
+
+                    // Check if Protocol event is enabled
+                    if (IsProtocolEnabled)
+                    {
+                        var result = await device.ReadProtocolAsync(cancellationToken);
+                        Protocol = result;
+                        observer.OnNext($"Protocol: {result}");
+                    }
+
+
+                    // NOTE: Move the below entries to the correct event validation.
+                    // The following registers have Event access but don't have a direct mapping to event flags
+                    // These should be moved to appropriate event validation sections once their triggering events are identified
+                    var ProtocolResult = await device.ReadProtocolAsync(cancellationToken);
+                    observer.OnNext($"Protocol: {ProtocolResult}");
+
+                    // Wait a short while before polling again. Adjust delay as necessary.
+                    await Task.Delay(TimeSpan.FromMilliseconds(10), cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
                     break;
-                case DeviceRegisters.SerialNumber:
-                    configuration.SerialNumber = message.GetPayloadUInt16();
+                }
+                catch (Exception ex)
+                {
+                    observer.OnError(ex);
                     break;
+                }
             }
+            observer.OnCompleted();
+            return Disposable.Empty;
+        });
+    }
 
-            // Update UI with the remaining registers
-            if (message.Address >= (int)(PumpRegisters.EnableMotorDriver))
-                UpdateUI(message);
-        }
-
-        private void UpdateUI(HarpMessage item)
+    private IObservable<Unit> StartProtocol()
+    {
+        return Observable.StartAsync(async () =>
         {
-            switch ((PumpRegisters)item.Address)
+            if (_device == null)
+                return;
+
+            // Write EnableProtocol message to device without changing it's value
+            await WriteAndLogAsync(
+                    value => _device.WriteEnableProtocolAsync(value),
+                    EnableFlag.Enable,
+                    "EnableProtocol");
+        });
+    }
+
+    private IObservable<Unit> SaveConfiguration(bool savePermanently)
+    {
+        return Observable.StartAsync(async () =>
+        {
+            if (_device == null)
+                throw new Exception("You need to connect to the device first");
+
+            /*****************************************************************
+            * TODO: Please REVIEW all these registers and update the values
+            * ****************************************************************/
+            await WriteAndLogAsync(
+                value => _device.WriteEnableMotorDriverAsync(value),
+                EnableMotorDriver,
+                "EnableMotorDriver");
+            await WriteAndLogAsync(
+                value => _device.WriteEnableProtocolAsync(value),
+                EnableProtocol,
+                "EnableProtocol");
+            await WriteAndLogAsync(
+                value => _device.WriteDigitalOutputSetAsync(value),
+                DigitalOutputSet,
+                "DigitalOutputSet");
+            await WriteAndLogAsync(
+                value => _device.WriteDigitalOutputClearAsync(value),
+                DigitalOutputClear,
+                "DigitalOutputClear");
+            await WriteAndLogAsync(
+                value => _device.WriteDO0SyncAsync(value),
+                DO0Sync,
+                "DO0Sync");
+            await WriteAndLogAsync(
+                value => _device.WriteDO1SyncAsync(value),
+                DO1Sync,
+                "DO1Sync");
+            await WriteAndLogAsync(
+                value => _device.WriteDI0TriggerAsync(value),
+                DI0Trigger,
+                "DI0Trigger");
+            await WriteAndLogAsync(
+                value => _device.WriteStepModeAsync(value),
+                StepMode,
+                "StepMode");
+            await WriteAndLogAsync(
+                value => _device.WriteProtocolStepCountAsync(value),
+                ProtocolStepCount,
+                "ProtocolStepCount");
+            await WriteAndLogAsync(
+                value => _device.WriteProtocolPeriodAsync(value),
+                ProtocolPeriod,
+                "ProtocolPeriod");
+            await WriteAndLogAsync(
+                value => _device.WriteEnableEventsAsync(value),
+                EnableEvents,
+                "EnableEvents");
+            await WriteAndLogAsync(
+                value => _device.WriteProtocolDirectionAsync(value),
+                ProtocolDirection,
+                "ProtocolDirection");
+
+            // Save the configuration to the device permanently
+            if (savePermanently)
             {
-                case PumpRegisters.EnableMotorDriver:
-                case PumpRegisters.StartProtocol:
-                case PumpRegisters.StepState:
-                case PumpRegisters.DirState:
-                case PumpRegisters.SwitchForwardState:
-                case PumpRegisters.SwitchReverseState:
-                case PumpRegisters.InputState:
-                    break;
-                case PumpRegisters.SetDigitalOutputs:
-                    //TODO: add this element to the UI
-                    break;
-                case PumpRegisters.ClearDigitalOutputs:
-                    //TODO: add this element to the UI
-                    break;
-                case PumpRegisters.DigitalOutput0Config:
-                    DigitalOutput0Config = item.GetPayloadByte();
-                    break;
-                case PumpRegisters.DigitalOutput1Config:
-                    DigitalOutput1Config = item.GetPayloadByte();
-                    break;
-                case PumpRegisters.DigitalInput0Config:
-                    DigitalInput0Config = item.GetPayloadByte();
-                    break;
-                case PumpRegisters.MotorMicrostep:
-                    MotorMicrostep = item.GetPayloadByte();
-                    break;
-                case PumpRegisters.ProtocolNumberOfSteps:
-                    NumberOfSteps = item.GetPayloadUInt16();
-                    break;
-                case PumpRegisters.ProtocolFlowrate:
-                    Flowrate = item.GetPayloadSingle();
-                    break;
-                case PumpRegisters.ProtocolStepPeriod:
-                    StepPeriod = item.GetPayloadUInt16();
-                    break;
-                case PumpRegisters.ProtocolVolume:
-                    Volume = item.GetPayloadSingle();
-                    break;
-                case PumpRegisters.ProtocolType:
-                    ProtocolType = item.GetPayloadByte();
-                    break;
-                case PumpRegisters.CalibrationValue1:
-                    CalibrationValue1 = item.GetPayloadByte();
-                    break;
-                case PumpRegisters.CalibrationValue2:
-                    CalibrationValue2 = item.GetPayloadByte();
-                    break;
-                case PumpRegisters.ProtocolDirection:
-                    ProtocolDirection = (Direction)item.GetPayloadByte();
-                    break;
-                case PumpRegisters.EventsEnable:
-                    byte all = item.GetPayloadByte();
-
-                    StepStateEvent = GetBit(all, 0);
-                    DirectionStateEvent = GetBit(all, 1);
-                    SwitchForwardStateEvent = GetBit(all, 2);
-                    SwitchReverseStateEvent = GetBit(all, 3);
-                    InputStateEvent = GetBit(all, 4);
-                    ProtocolStateEvent = GetBit(all, 5);
-
-                    break;
-                case PumpRegisters.SetBoardType:
-                    break;
-                case PumpRegisters.ProtocolState:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                await WriteAndLogAsync(
+                    value => _device.WriteResetDeviceAsync(value),
+                    ResetFlags.Save,
+                    "SavePermanently");
             }
-        }
+        });
+    }
 
-        private bool GetBit(byte b, int pos)
+    private IObservable<Unit> ResetConfiguration()
+    {
+        return Observable.StartAsync(async () =>
         {
-            return Convert.ToBoolean((b >> pos) & 1);
-        }
+            if (_device != null)
+            {
+                await WriteAndLogAsync(
+                    value => _device.WriteResetDeviceAsync(value),
+                    ResetFlags.RestoreDefault,
+                    "ResetDevice");
+            }
+        });
+    }
+
+    private async Task WriteAndLogAsync<T>(Func<T, Task> writeFunc, T value, string registerName)
+    {
+        if (_device == null)
+            throw new Exception("Device is not connected");
+
+        await writeFunc(value);
+
+        // Log the message to the SentMessages collection on the UI thread
+        RxApp.MainThreadScheduler.Schedule(() =>
+        {
+            SentMessages.Add($"{DateTime.Now:HH:mm:ss.fff} - Write {registerName}: {value}");
+        });
     }
 }

@@ -1,19 +1,11 @@
-﻿using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
-using SyringePump.Design.ViewModels;
+﻿using Avalonia.Controls;
 
-namespace SyringePump.Design.Views
+namespace Harp.SyringePump.Design.Views;
+
+public partial class SyringePumpView : UserControl
 {
-    public class SyringePumpView : ReactiveUserControl<SyringePumpViewModel>
+    public SyringePumpView()
     {
-        public SyringePumpView()
-        {
-            InitializeComponent();
-        }
-
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
+        InitializeComponent();
     }
 }
