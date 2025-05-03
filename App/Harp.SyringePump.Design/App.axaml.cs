@@ -2,37 +2,44 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using SyringePump.Design.ViewModels;
-using SyringePump.Design.Views;
 
-namespace SyringePump
+using Harp.SyringePump.Design.ViewModels;
+using Harp.SyringePump.Design.Views;
+
+namespace Harp.SyringePump.Design;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    public override void Initialize()
     {
-        public override void Initialize()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
+        AvaloniaXamlLoader.Load(this);
+    }
 
-        public override void OnFrameworkInitializationCompleted()
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            desktop.MainWindow = new MainWindow
             {
-                desktop.MainWindow = new MainWindow
-                {
-                    DataContext = new MainWindowViewModel(),
-                };
-            }
-
-            base.OnFrameworkInitializationCompleted();
+                DataContext = new SyringePumpViewModel()
+            };
+        }
+        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+        {
+            singleViewPlatform.MainView = new SyringePumpView
+            {
+                DataContext = new SyringePumpViewModel()
+            };
         }
 
-        private void NativeMenuItem_OnClick(object sender, EventArgs e)
-        { 
-            // FIXME: This should be using a Command
-            var about = new About() { DataContext = new AboutViewModel() };
-            about.ShowDialog((Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)
-                .MainWindow);
-        }
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    private void NativeMenuItem_OnClick(object sender, EventArgs e)
+    { 
+        // FIXME: This should be using a Command
+        var about = new About() { DataContext = new AboutViewModel() };
+        about.ShowDialog((Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)
+            .MainWindow);
     }
 }

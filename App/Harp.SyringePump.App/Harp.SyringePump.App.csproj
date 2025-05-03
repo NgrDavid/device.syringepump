@@ -1,62 +1,51 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
+    <!--If you are willing to use Windows/MacOS native APIs you will need to create 3 projects.
+    One for Windows with net8.0-windows TFM, one for MacOS with net8.0-macos and one with net8.0 TFM for Linux.-->
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <UseAppHost>true</UseAppHost>
-      <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
-    <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <AssemblyName>SyringePump</AssemblyName>
-    <BaseOutputPath>..\bin</BaseOutputPath>
-    <Version>1.0.1</Version>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+    <Version>$(AppVersion)</Version>
+    <ApplicationIcon>..\Harp.SyringePump.Design\Assets\cf-logo.ico</ApplicationIcon>
+    <Name>Harp.SyringePump.App</Name>
   </PropertyGroup>
+
   <PropertyGroup>
-    <CFBundleName>SyringePump</CFBundleName>
-    <CFBundleDisplayName>Syringe Pump</CFBundleDisplayName>
+    <CFBundleName>Harp.SyringePump.App</CFBundleName>
+    <CFBundleDisplayName>Harp.SyringePump.App</CFBundleDisplayName>
     <CFBundleIdentifier>org.fchampalimaud</CFBundleIdentifier>
     <CFBundleVersion>$(Version)</CFBundleVersion>
     <CFBundleShortVersionString>$(Version)</CFBundleShortVersionString>
     <CFBundlePackageType>AAPL</CFBundlePackageType>
     <CFBundleSignature>.</CFBundleSignature>
-    <CFBundleExecutable>SyringePump</CFBundleExecutable>
+    <CFBundleExecutable>Harp.SyringePump.App</CFBundleExecutable>
     <CFBundleIconFile>cf-logo.icns</CFBundleIconFile>
     <NSPrincipalClass>NSApplication</NSPrincipalClass>
     <NSHighResolutionCapable>true</NSHighResolutionCapable>
     <Copyright>Champalimaud Foundation</Copyright>
-    <ApplicationIcon>..\Assets\cf-logo.ico</ApplicationIcon>
+    <ApplicationIcon>..\Harp.SyringePump.Design\Assets\cf-logo.ico</ApplicationIcon>
     <PackageReadmeFile>..\README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
-    <BaseOutputPath>..\bin</BaseOutputPath>
+    <BaseOutputPath>..\bin\$(Configuration)</BaseOutputPath>
   </PropertyGroup>
-  <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
-    <Copy SourceFiles="..\Assets\cf-logo.icns" DestinationFolder="$(OutDir)" />
+
+  <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="$([MSBuild]::IsOsPlatform('OSX')) or $([MSBuild]::IsOsPlatform('Linux'))">
+    <Copy SourceFiles="..\Harp.SyringePump.Design\Assets\cf-logo.icns" DestinationFolder="$(OutDir)" />
   </Target>
+
   <Target Name="CopyCustomContent2" AfterTargets="Publish">
-    <Copy SourceFiles="..\Assets\cf-logo.ico" DestinationFolder="$(OutDir)\publish" />
+    <Copy SourceFiles="..\Harp.SyringePump.Design\Assets\cf-logo.ico" DestinationFolder="$(OutDir)\publish" />
   </Target>
+
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
-    <None Remove=".gitignore" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Dotnet.Bundle" Version="*" />
   </ItemGroup>
+
   <ItemGroup>
-    <!--This helps with theme dll-s trimming.
-	If you will publish your application in self-contained mode with p:PublishTrimmed=true and it will use Fluent theme Default theme will be trimmed from the output and vice versa.
-	https://github.com/AvaloniaUI/Avalonia/issues/5593 -->
-    <TrimmableAssembly Include="Avalonia.Themes.Fluent" />
-    <TrimmableAssembly Include="Avalonia.Themes.Default" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.18" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
-    <PackageReference Include="XamlNameReferenceGenerator" Version="1.3.4" />
-    <PackageReference Include="Dotnet.Bundle" Version="0.9.13" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SyringePump.Design\SyringePump.Design.csproj" />
+    <ProjectReference Include="..\Harp.SyringePump.Design\Harp.SyringePump.Design.csproj" />
   </ItemGroup>
 </Project>

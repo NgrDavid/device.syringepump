@@ -1,25 +1,24 @@
-﻿using Avalonia;
-using System;
-using SyringePump.Design;
+﻿using System;
 
-namespace SyringePump
+using Avalonia;
+using Avalonia.ReactiveUI;
+
+namespace Harp.SyringePump.App;
+
+class Program
 {
-    internal class Program
-    {
-        // Initialization code. Don't use any Avalonia, third-party APIs or any
-        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-        // yet and stuff might break.
-        [STAThread]
-        public static void Main(string[] args)
-        {
-            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+    // Initialization code. Don't use any Avalonia, third-party APIs or any
+    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+    // yet and stuff might break.
+    [STAThread]
+    public static void Main(string[] args) => BuildAvaloniaApp()
+        .StartWithClassicDesktopLifetime(args);
 
-            StartApp.CloseLog();
-        }
-        
-        public static AppBuilder BuildAvaloniaApp()
-        {
-            return StartApp.BuildAvaloniaApp();
-        }
-    }
+    // Avalonia configuration, don't remove; also used by visual designer.
+    public static AppBuilder BuildAvaloniaApp()
+        => AppBuilder.Configure<Design.App>()
+            .UsePlatformDetect()
+            .WithInterFont()
+            .LogToTrace()
+            .UseReactiveUI();
 }
