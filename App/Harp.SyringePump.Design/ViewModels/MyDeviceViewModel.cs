@@ -690,13 +690,6 @@ public class SyringePumpViewModel : ViewModelBase
                         observer.OnNext($"Protocol: {result}");
                     }
 
-
-                    // NOTE: Move the below entries to the correct event validation.
-                    // The following registers have Event access but don't have a direct mapping to event flags
-                    // These should be moved to appropriate event validation sections once their triggering events are identified
-                    var ProtocolResult = await device.ReadProtocolAsync(cancellationToken);
-                    observer.OnNext($"Protocol: {ProtocolResult}");
-
                     // Wait a short while before polling again. Adjust delay as necessary.
                     await Task.Delay(TimeSpan.FromMilliseconds(10), cancellationToken);
                 }
